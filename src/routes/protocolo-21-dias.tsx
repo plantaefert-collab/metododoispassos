@@ -240,7 +240,7 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
         <figure className="relative mt-5 overflow-hidden rounded-[22px]" style={{ backgroundColor: "#EEE8F2" }}>
           <img
             src={welcomeOrchid}
-            alt="Orquídea Phalaenopsis saudável em vaso, com folhas verdes e flores em tons de rosa e branco"
+            alt="Orquídea Phalaenopsis saudável em vaso, com folhas verdes e raízes aéreas visíveis em ambiente doméstico claro."
             width={1024}
             height={1024}
             className="h-[220px] w-full object-cover sm:h-[240px]"
@@ -314,7 +314,7 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
             <Stethoscope size={13} style={{ color: "#173D32" }} />
             <CalendarCheck size={13} style={{ color: "#173D32" }} />
             <Camera size={13} style={{ color: "#173D32" }} />
-            <span className="ml-1 text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: "#173D32" }}>
+            <span className="ml-1 text-[12px] font-semibold uppercase tracking-[0.09em]" style={{ color: "#173D32" }}>
               Diagnóstico · Tarefas · Fotos
             </span>
           </div>
