@@ -261,8 +261,9 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
           <span className="block text-[22px] font-normal" style={{ color: "#58705D" }}>
             Guia Prático
           </span>
-          <span className="mt-1 block text-[40px] font-normal sm:text-[44px]">
-            Orquídeas <em className="not-italic" style={{ color: "#B72D72" }}>Floridas</em>
+          <span className="mt-1 block text-[36px] leading-[1.05] font-normal min-[390px]:text-[40px] sm:text-[44px] [word-spacing:0.02em]">
+            <span className="whitespace-nowrap">Orquídeas</span>{" "}
+            <em className="not-italic whitespace-nowrap" style={{ color: "#B72D72" }}>Floridas</em>
           </span>
         </h1>
 
@@ -306,15 +307,20 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
 
         {/* Benefit */}
         <div
-          className="mt-5 rounded-2xl px-4 py-3 text-[13px] leading-snug"
+          className="mt-5 rounded-2xl px-4 py-3"
           style={{ backgroundColor: "rgba(255,255,255,0.6)", color: "#26352E", border: "1px solid rgba(23,61,50,0.08)" }}
         >
-          <div className="flex items-center gap-3">
-            <BenefitIcon icon={<Stethoscope size={14} />} />
-            <BenefitIcon icon={<CalendarCheck size={14} />} />
-            <BenefitIcon icon={<Camera size={14} />} />
-            <span className="ml-1">Diagnóstico, tarefas, fotografias e acompanhamento em um só lugar.</span>
+          <div className="flex items-center gap-2">
+            <Stethoscope size={13} style={{ color: "#173D32" }} />
+            <CalendarCheck size={13} style={{ color: "#173D32" }} />
+            <Camera size={13} style={{ color: "#173D32" }} />
+            <span className="ml-1 text-[11px] font-semibold uppercase tracking-[0.14em]" style={{ color: "#173D32" }}>
+              Diagnóstico · Tarefas · Fotos
+            </span>
           </div>
+          <p className="mt-1.5 text-[14px] leading-relaxed" style={{ color: "#66736C" }}>
+            Acompanhe tudo em um só lugar.
+          </p>
         </div>
 
         {/* CTAs */}
@@ -376,26 +382,15 @@ function StepCard({
               {label}
             </h3>
           </div>
-          <p className="mt-1 text-[12px] font-semibold uppercase tracking-[0.1em]" style={{ color: ink, opacity: 0.7 }}>
+          <p className="mt-1 text-[12.5px] font-semibold uppercase tracking-[0.1em]" style={{ color: ink, opacity: 0.7 }}>
             {support}
           </p>
-          <p className="mt-1.5 text-[13.5px] leading-relaxed" style={{ color: "#26352E", opacity: 0.85 }}>
+          <p className="mt-1.5 text-[14.5px] leading-[1.55]" style={{ color: "#26352E", opacity: 0.85 }}>
             {text}
           </p>
         </div>
       </div>
     </div>
-  );
-}
-
-function BenefitIcon({ icon }: { icon: ReactNode }) {
-  return (
-    <span
-      className="grid h-7 w-7 place-items-center rounded-full"
-      style={{ backgroundColor: "#DCEBDD", color: "#173D32" }}
-    >
-      {icon}
-    </span>
   );
 }
 
