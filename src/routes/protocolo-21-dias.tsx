@@ -25,11 +25,19 @@ import {
   Flower2,
   Sparkles,
 } from "lucide-react";
+import { useProtocolStore } from "@/lib/protocol-store";
 import {
-  useProtocolStore,
-  fileToDataUrl,
-  type Diagnosis,
-} from "@/lib/protocol-store";
+  compressImage,
+  PHOTO_ERROR_MESSAGE,
+} from "@/lib/image-compress";
+import {
+  CATEGORY_LABEL,
+  DIAGNOSIS_OPTIONS,
+  GUIDANCE_BY_CATEGORY,
+  totalObservations,
+  type DiagnosisCategory,
+  type DiagnosisGuidance,
+} from "@/lib/diagnosis-matrix";
 import welcomeOrchid from "@/assets/welcome-orchid.jpg";
 
 export const Route = createFileRoute("/protocolo-21-dias")({
