@@ -750,14 +750,18 @@ function DiagnosisResultScreen({
   );
 }
 
-function ResultBlocks({ result }: { result: ReturnType<typeof buildResultView> extends never ? never : any }) {
-  const { priorities, adjustments, favorable, insufficientInformation, trackingPoints } = result as {
+function ResultBlocks({
+  result,
+}: {
+  result: {
     priorities: DiagnosisGuidance[];
     adjustments: DiagnosisGuidance[];
     favorable: DiagnosisGuidance[];
     insufficientInformation: DiagnosisGuidance[];
     trackingPoints: string[];
   };
+}) {
+  const { priorities, adjustments, favorable, insufficientInformation, trackingPoints } = result;
   const hasAny =
     priorities.length + adjustments.length + favorable.length + insufficientInformation.length > 0;
   return (
@@ -812,10 +816,6 @@ function ResultBlocks({ result }: { result: ReturnType<typeof buildResultView> e
       </InfoCard>
     </div>
   );
-}
-
-function buildResultView() {
-  return null;
 }
 
 function ResultSection({
