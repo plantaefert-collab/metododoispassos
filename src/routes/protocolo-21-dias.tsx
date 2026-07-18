@@ -382,10 +382,10 @@ function StepCard({
               {label}
             </h3>
           </div>
-          <p className="mt-1 text-[12px] font-semibold uppercase tracking-[0.1em]" style={{ color: ink, opacity: 0.7 }}>
+          <p className="mt-1 text-[12.5px] font-semibold uppercase tracking-[0.1em]" style={{ color: ink, opacity: 0.7 }}>
             {support}
           </p>
-          <p className="mt-1.5 text-[13.5px] leading-relaxed" style={{ color: "#26352E", opacity: 0.85 }}>
+          <p className="mt-1.5 text-[14.5px] leading-[1.55]" style={{ color: "#26352E", opacity: 0.85 }}>
             {text}
           </p>
         </div>
