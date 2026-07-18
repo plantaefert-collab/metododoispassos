@@ -433,8 +433,12 @@ function SignupScreen({ onNext }: { onNext: () => void }) {
   const handlePhoto = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const dataUrl = await fileToDataUrl(file);
-    updatePlant({ photo: dataUrl });
+    try {
+      const dataUrl = await compressImage(file);
+      updatePlant({ photo: dataUrl });
+    } catch {
+      alert(PHOTO_ERROR_MESSAGE);
+    }
   };
 
   const canSave = plant.name.trim().length > 0;
@@ -1219,12 +1223,11 @@ function ProductPlaceholder({ title }: { title: string }) {
 
 function DiagnosticoTab({ onRedo }: { onRedo: () => void }) {
   const { state } = useProtocolStore();
-  const items: Array<{ label: string; values: string[] }> = [
-    { label: "Raízes", values: state.diagnosis.roots },
-    { label: "Folhas", values: state.diagnosis.leaves },
-    { label: "Ambiente", values: state.diagnosis.environment },
-    { label: "Rotina", values: state.diagnosis.routine },
-  ];
+  const items: Array<{ key: DiagnosisCategory; label: string; values: string[] }> = (
+    Object.keys(CATEGORY_LABEL) as DiagnosisCategory[]
+  ).map((k) => ({ key: k, label: CATEGORY_LABEL[k], values: state.diagnosis[k] }));
+  const result = state.diagnosisResult;
+  const isOutdated = state.diagnosisStatus === "outdated";
 
   return (
     <div className="space-y-4">
@@ -1234,8 +1237,14 @@ function DiagnosticoTab({ onRedo }: { onRedo: () => void }) {
         <p className="mt-1 text-sm text-muted-foreground">Este resumo orienta sua observação. Um sinal isolado não fecha um diagnóstico.</p>
       </div>
 
+      {isOutdated && (
+        <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
+          Você editou respostas depois de gerar o resultado. Refaça o diagnóstico para atualizar as orientações.
+        </InfoCard>
+      )}
+
       {items.map((it) => (
-        <div key={it.label} className="rounded-2xl border border-border bg-card p-4">
+        <div key={it.key} className="rounded-2xl border border-border bg-card p-4">
           <div className="text-sm font-bold text-primary">{it.label}</div>
           {it.values.length === 0 ? (
             <p className="mt-1 text-sm text-muted-foreground">Nada marcado.</p>
@@ -1250,6 +1259,8 @@ function DiagnosticoTab({ onRedo }: { onRedo: () => void }) {
           )}
         </div>
       ))}
+
+      {result && !isOutdated && <ResultBlocks result={result} />}
 
       <button onClick={onRedo} className="w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground">
         Refazer diagnóstico
@@ -1266,8 +1277,12 @@ function DiarioTab() {
   const handlePhoto = async (day: number, e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const dataUrl = await fileToDataUrl(file);
-    updateDay(day, { photo: dataUrl });
+    try {
+      const dataUrl = await compressImage(file);
+      updateDay(day, { photo: dataUrl });
+    } catch {
+      alert(PHOTO_ERROR_MESSAGE);
+    }
   };
 
   return (
