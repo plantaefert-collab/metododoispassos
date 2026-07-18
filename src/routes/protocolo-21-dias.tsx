@@ -25,11 +25,19 @@ import {
   Flower2,
   Sparkles,
 } from "lucide-react";
+import { useProtocolStore } from "@/lib/protocol-store";
 import {
-  useProtocolStore,
-  fileToDataUrl,
-  type Diagnosis,
-} from "@/lib/protocol-store";
+  compressImage,
+  PHOTO_ERROR_MESSAGE,
+} from "@/lib/image-compress";
+import {
+  CATEGORY_LABEL,
+  DIAGNOSIS_OPTIONS,
+  GUIDANCE_BY_CATEGORY,
+  totalObservations,
+  type DiagnosisCategory,
+  type DiagnosisGuidance,
+} from "@/lib/diagnosis-matrix";
 import welcomeOrchid from "@/assets/welcome-orchid.jpg";
 
 export const Route = createFileRoute("/protocolo-21-dias")({
@@ -67,13 +75,14 @@ function ProtocoloPage() {
   const store = useProtocolStore();
   const [tab, setTab] = useState<Tab>("inicio");
   const [screen, setScreen] = useState<
-    "welcome" | "signup" | "diagnosis" | "app" | null
+    "welcome" | "signup" | "diagnosis" | "result" | "app" | null
   >(null);
   const [showReset, setShowReset] = useState(false);
 
   // Resolve which screen we're on:
   // If not onboarded, show welcome -> signup -> diagnosis flow gated by explicit screen state.
-  const activeScreen = screen ?? (store.state.onboarded ? "app" : "welcome");
+  const activeScreen =
+    screen ?? (store.state.onboarded || store.state.guestMode ? "app" : "welcome");
 
   if (!store.hydrated) {
     return (
@@ -84,7 +93,16 @@ function ProtocoloPage() {
   }
 
   if (activeScreen === "welcome") {
-    return <WelcomeScreen onStart={() => setScreen("signup")} onExplore={() => { store.setOnboarded(true); setScreen("app"); setTab("aprender"); }} />;
+    return (
+      <WelcomeScreen
+        onStart={() => setScreen("signup")}
+        onExplore={() => {
+          store.setGuestMode(true);
+          setScreen("app");
+          setTab("aprender");
+        }}
+      />
+    );
   }
   if (activeScreen === "signup") {
     return <SignupScreen onNext={() => setScreen("diagnosis")} />;
@@ -92,6 +110,18 @@ function ProtocoloPage() {
   if (activeScreen === "diagnosis") {
     return (
       <DiagnosisScreen
+        onBack={() => setScreen("signup")}
+        onFinish={() => {
+          store.saveDiagnosisResult();
+          setScreen("result");
+        }}
+      />
+    );
+  }
+  if (activeScreen === "result") {
+    return (
+      <DiagnosisResultScreen
+        onBack={() => setScreen("diagnosis")}
         onFinish={() => {
           store.setOnboarded(true);
           setScreen("app");
@@ -403,8 +433,12 @@ function SignupScreen({ onNext }: { onNext: () => void }) {
   const handlePhoto = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const dataUrl = await fileToDataUrl(file);
-    updatePlant({ photo: dataUrl });
+    try {
+      const dataUrl = await compressImage(file);
+      updatePlant({ photo: dataUrl });
+    } catch {
+      alert(PHOTO_ERROR_MESSAGE);
+    }
   };
 
   const canSave = plant.name.trim().length > 0;
@@ -561,77 +595,22 @@ function StepHeader({ step, total, title, subtitle }: { step: number; total: num
 
 /* ---------------- Diagnosis ---------------- */
 
-const DIAG_STEPS: Array<{ key: keyof Diagnosis; label: string; icon: ReactNode; options: string[] }> = [
-  {
-    key: "roots",
-    label: "Raízes",
-    icon: <Sprout size={18} />,
-    options: ["Firmes", "Pontas novas", "Secas ou ocas", "Escuras ou moles", "Mau cheiro", "Poucas raízes"],
-  },
-  {
-    key: "leaves",
-    label: "Folhas",
-    icon: <Leaf size={18} />,
-    options: ["Firmes", "Enrugadas", "Amareladas", "Manchas", "Folha nova", "Brotação"],
-  },
-  {
-    key: "environment",
-    label: "Ambiente",
-    icon: <Sun size={18} />,
-    options: [
-      "Boa claridade",
-      "Sol forte direto",
-      "Local abafado",
-      "Boa ventilação",
-      "Água acumulada no vaso",
-      "Substrato compactado",
-    ],
-  },
-  {
-    key: "routine",
-    label: "Rotina",
-    icon: <Droplets size={18} />,
-    options: [
-      "Verifico umidade antes de regar",
-      "Rego por calendário",
-      "Uso vários produtos",
-      "Mudei a planta recentemente",
-    ],
-  },
+const DIAG_CATEGORIES: Array<{ key: DiagnosisCategory; icon: ReactNode }> = [
+  { key: "roots", icon: <Sprout size={18} /> },
+  { key: "leaves", icon: <Leaf size={18} /> },
+  { key: "environment", icon: <Sun size={18} /> },
+  { key: "potAndSubstrate", icon: <FlowerIcon size={18} /> },
+  { key: "wateringAndRoutine", icon: <Droplets size={18} /> },
 ];
 
-const WARNING_SIGNS = ["Escuras ou moles", "Mau cheiro", "Manchas", "Água acumulada no vaso"];
-
-function DiagnosisScreen({ onFinish }: { onFinish: () => void }) {
+function DiagnosisScreen({ onFinish, onBack }: { onFinish: () => void; onBack: () => void }) {
   const { state, toggleDiagnosis } = useProtocolStore();
   const [stepIdx, setStepIdx] = useState(0);
-  const isLast = stepIdx === DIAG_STEPS.length - 1;
-  const isSummary = stepIdx === DIAG_STEPS.length;
-
-  const educationalPoints = useMemo(() => {
-    const pts: string[] = [];
-    if (state.diagnosis.roots.some((r) => ["Secas ou ocas", "Escuras ou moles", "Poucas raízes"].includes(r))) {
-      pts.push("Raízes fragilizadas: revise rega, drenagem e substrato antes de tudo.");
-    }
-    if (state.diagnosis.leaves.some((l) => ["Enrugadas", "Amareladas", "Manchas"].includes(l))) {
-      pts.push("Folhas com sinais de estresse: observe luz, ventilação e histórico de rega.");
-    }
-    if (state.diagnosis.environment.some((e) => ["Sol forte direto", "Local abafado", "Água acumulada no vaso"].includes(e))) {
-      pts.push("Ambiente com pontos de atenção: ajuste luz indireta e ventilação suave.");
-    }
-    if (state.diagnosis.routine.includes("Rego por calendário")) {
-      pts.push("Rega por calendário pode encharcar: prefira verificar o substrato antes.");
-    }
-    return pts.slice(0, 3);
-  }, [state.diagnosis]);
-
-  const showWarning = useMemo(
-    () =>
-      [...state.diagnosis.roots, ...state.diagnosis.leaves, ...state.diagnosis.environment].some((v) =>
-        WARNING_SIGNS.includes(v),
-      ),
-    [state.diagnosis],
-  );
+  const total = DIAG_CATEGORIES.length;
+  const current = DIAG_CATEGORIES[stepIdx];
+  const options = DIAGNOSIS_OPTIONS[current.key];
+  const selected = state.diagnosis[current.key];
+  const isLast = stepIdx === total - 1;
 
   return (
     <div className="min-h-screen bg-background">
@@ -640,101 +619,259 @@ function DiagnosisScreen({ onFinish }: { onFinish: () => void }) {
           step={2}
           total={3}
           title="Diagnóstico guiado"
-          subtitle={isSummary ? "Resumo do que observamos." : "Marque tudo que se aplica à sua planta."}
+          subtitle="Marque tudo que você observa na sua orquídea."
         />
 
-        <ProgressBar value={(Math.min(stepIdx, DIAG_STEPS.length) / DIAG_STEPS.length) * 100} className="mt-4" />
-        <div className="mt-2 flex flex-wrap gap-1.5">
-          {DIAG_STEPS.map((s, i) => (
+        <ProgressBar value={((stepIdx + 1) / total) * 100} className="mt-4" />
+        <div className="mt-2 flex flex-wrap gap-1.5" aria-label="Etapas do diagnóstico">
+          {DIAG_CATEGORIES.map((c, i) => (
             <span
-              key={s.key}
+              key={c.key}
               className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                i < stepIdx ? "bg-primary/10 text-primary" : i === stepIdx ? "bg-accent/15 text-accent" : "bg-muted text-muted-foreground"
+                i < stepIdx
+                  ? "bg-primary/10 text-primary"
+                  : i === stepIdx
+                    ? "bg-accent/15 text-accent"
+                    : "bg-muted text-muted-foreground"
               }`}
             >
-              {s.label}
+              {CATEGORY_LABEL[c.key]}
             </span>
           ))}
         </div>
 
-        {!isSummary && (
-          <div className="mt-6">
-            <div className="flex items-center gap-2 text-primary">
-              <span className="grid h-8 w-8 place-items-center rounded-full bg-secondary">{DIAG_STEPS[stepIdx].icon}</span>
-              <h2 className="text-xl font-bold">{DIAG_STEPS[stepIdx].label}</h2>
-            </div>
-            <div className="mt-4 grid gap-2">
-              {DIAG_STEPS[stepIdx].options.map((opt) => {
-                const active = state.diagnosis[DIAG_STEPS[stepIdx].key].includes(opt);
-                return (
-                  <button
-                    key={opt}
-                    onClick={() => toggleDiagnosis(DIAG_STEPS[stepIdx].key, opt)}
-                    className={`flex items-center justify-between rounded-2xl border px-4 py-3.5 text-left text-[15px] transition-colors ${
-                      active
-                        ? "border-primary bg-primary/5 text-primary"
-                        : "border-border bg-card text-foreground hover:border-primary/40"
-                    }`}
-                  >
-                    <span className="pr-3">{opt}</span>
-                    {active ? <CheckCircle2 size={20} /> : <Circle size={20} className="text-muted-foreground" />}
-                  </button>
-                );
-              })}
-            </div>
+        <div className="mt-6">
+          <div className="flex items-center gap-2 text-primary">
+            <span className="grid h-8 w-8 place-items-center rounded-full bg-secondary">{current.icon}</span>
+            <h2 className="text-xl font-bold">{CATEGORY_LABEL[current.key]}</h2>
           </div>
-        )}
-
-        {isSummary && (
-          <div className="mt-6 space-y-4">
-            <div className="rounded-2xl border border-border bg-secondary/50 p-4">
-              <div className="text-sm font-bold text-primary">Pontos para revisar primeiro</div>
-              {educationalPoints.length === 0 ? (
-                <p className="mt-2 text-sm text-secondary-foreground/80">
-                  Poucos sinais marcados. Siga o plano de 21 dias observando raízes, folhas e ambiente.
-                </p>
-              ) : (
-                <ul className="mt-2 space-y-2">
-                  {educationalPoints.map((p) => (
-                    <li key={p} className="flex gap-2 text-sm text-secondary-foreground/90">
-                      <ChevronRight size={16} className="mt-0.5 shrink-0 text-primary" /> {p}
-                    </li>
-                  ))}
-                </ul>
-              )}
-            </div>
-
-            <InfoCard tone="lilac" icon={<Info size={16} />}>
-              Um sinal isolado não fecha um diagnóstico. Use este resumo apenas para orientar sua observação nos próximos dias.
-            </InfoCard>
-
-            {showWarning && (
-              <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
-                Alguns sinais indicam atenção: se houver deterioração rápida, mau cheiro, raízes muito moles, manchas em expansão ou pragas intensas, procure orientação especializada.
-              </InfoCard>
-            )}
+          <p className="mt-1 text-xs text-muted-foreground">
+            Selecione todas as alternativas que descrevem sua observação atual.
+          </p>
+          <div className="mt-4 grid gap-2" role="group" aria-label={`Alternativas de ${CATEGORY_LABEL[current.key]}`}>
+            {options.map((opt) => {
+              const active = selected.includes(opt);
+              return (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => toggleDiagnosis(current.key, opt)}
+                  aria-pressed={active}
+                  className={`flex items-center justify-between rounded-2xl border px-4 py-3.5 text-left text-[15px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                    active
+                      ? "border-primary bg-primary/5 text-primary"
+                      : "border-border bg-card text-foreground hover:border-primary/40"
+                  }`}
+                >
+                  <span className="pr-3">{opt}</span>
+                  {active ? (
+                    <CheckCircle2 size={20} />
+                  ) : (
+                    <Circle size={20} className="text-muted-foreground" />
+                  )}
+                </button>
+              );
+            })}
           </div>
-        )}
+        </div>
 
-        <div className="mt-8 flex gap-2">
-          {stepIdx > 0 && (
-            <button
-              onClick={() => setStepIdx((i) => i - 1)}
-              className="flex items-center gap-1 rounded-full border border-border px-4 py-3 text-sm font-medium text-foreground hover:bg-muted"
-            >
-              <ChevronLeft size={16} /> Voltar
-            </button>
-          )}
+        <InfoCard tone="lilac" icon={<Info size={16} />}>
+          Um sinal isolado não fecha um diagnóstico. Estas escolhas orientam a observação nos próximos dias.
+        </InfoCard>
+
+        <div className="mt-6 flex gap-2">
           <button
-            onClick={() => (isSummary ? onFinish() : setStepIdx((i) => i + 1))}
-            className="ml-auto flex items-center gap-1 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground active:scale-[0.98]"
+            onClick={() => (stepIdx === 0 ? onBack() : setStepIdx((i) => i - 1))}
+            className="flex items-center gap-1 rounded-full border border-border px-4 py-3 text-sm font-medium text-foreground hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            {isSummary ? "Concluir e ver meu plano" : isLast ? "Ver resumo" : "Próximo"}
+            <ChevronLeft size={16} /> Voltar
+          </button>
+          <button
+            onClick={() => (isLast ? onFinish() : setStepIdx((i) => i + 1))}
+            className="ml-auto flex items-center gap-1 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            {isLast ? "Ver resultado" : "Próxima etapa"}
             <ChevronRight size={16} />
           </button>
         </div>
       </div>
     </div>
+  );
+}
+
+/* ---------------- Diagnosis Result Screen ---------------- */
+
+function DiagnosisResultScreen({
+  onBack,
+  onFinish,
+}: {
+  onBack: () => void;
+  onFinish: () => void;
+}) {
+  const { state } = useProtocolStore();
+  const result = state.diagnosisResult;
+  const observations = totalObservations(state.diagnosis);
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="mx-auto min-h-screen max-w-[440px] px-5 py-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-3xl sm:border sm:border-border sm:bg-card sm:shadow-[0_10px_60px_-30px_rgba(0,80,40,0.35)]">
+        <StepHeader
+          step={3}
+          total={3}
+          title="Seu resultado personalizado"
+          subtitle={
+            state.plant.name
+              ? `Baseado nas suas observações sobre “${state.plant.name}”.`
+              : "Baseado nas suas observações de hoje."
+          }
+        />
+        <div className="mt-3 text-xs text-muted-foreground">
+          {observations} {observations === 1 ? "sinal observado" : "sinais observados"}. Este resultado orienta o acompanhamento — não é um diagnóstico definitivo.
+        </div>
+
+        {result && <ResultBlocks result={result} />}
+
+        <div className="mt-6 flex gap-2">
+          <button
+            onClick={onBack}
+            className="flex items-center gap-1 rounded-full border border-border px-4 py-3 text-sm font-medium text-foreground hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <ChevronLeft size={16} /> Revisar respostas
+          </button>
+          <button
+            onClick={onFinish}
+            className="ml-auto flex items-center gap-1 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            Ir para meu plano <ChevronRight size={16} />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ResultBlocks({
+  result,
+}: {
+  result: {
+    priorities: DiagnosisGuidance[];
+    adjustments: DiagnosisGuidance[];
+    favorable: DiagnosisGuidance[];
+    insufficientInformation: DiagnosisGuidance[];
+    trackingPoints: string[];
+  };
+}) {
+  const { priorities, adjustments, favorable, insufficientInformation, trackingPoints } = result;
+  const hasAny =
+    priorities.length + adjustments.length + favorable.length + insufficientInformation.length > 0;
+  return (
+    <div className="mt-5 space-y-3">
+      {!hasAny && (
+        <InfoCard tone="lilac" icon={<Info size={16} />}>
+          Nenhuma alternativa foi marcada. Volte e selecione o que você observa para receber orientações personalizadas.
+        </InfoCard>
+      )}
+      {priorities.length > 0 && (
+        <ResultSection
+          title="Pontos que merecem atenção próxima"
+          tone="warn"
+          items={priorities}
+        />
+      )}
+      {adjustments.length > 0 && (
+        <ResultSection
+          title="Ajustes recomendados"
+          tone="accent"
+          items={adjustments}
+        />
+      )}
+      {favorable.length > 0 && (
+        <ResultSection
+          title="Sinais favoráveis"
+          tone="green"
+          items={favorable}
+        />
+      )}
+      {insufficientInformation.length > 0 && (
+        <ResultSection
+          title="Ainda não observado"
+          tone="muted"
+          items={insufficientInformation}
+        />
+      )}
+      {trackingPoints.length > 0 && (
+        <div className="rounded-2xl border border-border bg-secondary/50 p-4">
+          <div className="text-sm font-bold text-primary">Pontos para acompanhar</div>
+          <ul className="mt-2 space-y-1.5">
+            {trackingPoints.map((p) => (
+              <li key={p} className="flex gap-2 text-sm text-secondary-foreground/90">
+                <ChevronRight size={16} className="mt-0.5 shrink-0 text-primary" /> {p}
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+      <InfoCard tone="lilac" icon={<Info size={16} />}>
+        Um sinal isolado não fecha um diagnóstico. Utilize estas orientações como apoio à observação.
+      </InfoCard>
+    </div>
+  );
+}
+
+function ResultSection({
+  title,
+  tone,
+  items,
+}: {
+  title: string;
+  tone: "warn" | "accent" | "green" | "muted";
+  items: DiagnosisGuidance[];
+}) {
+  const toneCls =
+    tone === "warn"
+      ? "border-accent/40 bg-accent/5"
+      : tone === "accent"
+        ? "border-primary/20 bg-lilac/40"
+        : tone === "green"
+          ? "border-primary/20 bg-secondary/40"
+          : "border-border bg-card";
+  return (
+    <section className={`rounded-2xl border p-4 ${toneCls}`}>
+      <h3 className="text-sm font-bold text-primary">{title}</h3>
+      <ul className="mt-3 space-y-3">
+        {items.map((g) => (
+          <li key={g.id} className="rounded-xl bg-card/70 p-3 border border-border/60">
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              {CATEGORY_LABEL[g.category]} · {g.answer}
+            </div>
+            <div className="mt-1 text-sm font-bold text-primary">{g.title}</div>
+            <p className="mt-1 text-sm text-foreground/85">{g.explanation}</p>
+            <p className="mt-2 text-sm">
+              <span className="font-semibold text-primary">O que fazer: </span>
+              <span className="text-foreground/90">{g.action}</span>
+            </p>
+            {g.avoid && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                <span className="font-semibold">Evite: </span>
+                {g.avoid}
+              </p>
+            )}
+            {g.tracking.length > 0 && (
+              <p className="mt-1 text-xs text-muted-foreground">
+                <span className="font-semibold">Acompanhe: </span>
+                {g.tracking.join(" · ")}
+              </p>
+            )}
+            {g.warning && (
+              <div className="mt-2 flex gap-1.5 rounded-lg bg-accent/10 p-2 text-xs text-accent">
+                <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+                <span>{g.warning}</span>
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+    </section>
   );
 }
 
@@ -768,6 +905,8 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
   const day = state.currentDay;
   const phase = phaseOf(day);
   const isApplicationDay = APPLICATION_DAYS.includes(day);
+  const trackingPoints = state.diagnosisResult?.trackingPoints ?? [];
+  const diagnosisFresh = state.diagnosisStatus === "fresh";
 
   return (
     <div className="space-y-4">
@@ -859,6 +998,28 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
         Aplique no horário fresco, evite sol forte e não atinja diretamente as flores.
       </InfoCard>
 
+      {diagnosisFresh && trackingPoints.length > 0 && (
+        <div className="rounded-3xl border border-primary/20 bg-secondary/40 p-5">
+          <div className="flex items-center gap-2 text-primary">
+            <Info size={16} />
+            <div className="text-sm font-bold">Pontos do seu diagnóstico para acompanhar</div>
+          </div>
+          <ul className="mt-3 space-y-1.5">
+            {trackingPoints.map((p) => (
+              <li key={p} className="flex gap-2 text-sm text-foreground/85">
+                <ChevronRight size={16} className="mt-0.5 shrink-0 text-primary" /> {p}
+              </li>
+            ))}
+          </ul>
+          <button
+            onClick={() => setTab("diagnostico")}
+            className="mt-3 text-xs font-semibold text-accent hover:underline"
+          >
+            Ver diagnóstico completo
+          </button>
+        </div>
+      )}
+
       <div className="rounded-3xl border border-border bg-card p-5">
         <div className="text-sm font-bold text-primary">Simular outro dia</div>
         <p className="mt-1 text-xs text-muted-foreground">Esta versão é uma demonstração local. Escolha um dia para explorar.</p>
@@ -928,7 +1089,7 @@ const DAY_META: Record<number, { title: string; goal: string; hint: string; chec
 };
 
 function PlanoTab() {
-  const { state, setCurrentDay, updateDay, toggleChecklist } = useProtocolStore();
+  const { state, setCurrentDay, updateDay, toggleChecklist, toggleDayCompleted } = useProtocolStore();
   const [showMethod, setShowMethod] = useState(false);
   const day = state.currentDay;
   const meta = DAY_META[day] ?? DAY_META[1];
@@ -1005,12 +1166,13 @@ function PlanoTab() {
         )}
 
         <button
-          onClick={() => updateDay(day, { completed: true })}
-          className={`mt-2 w-full rounded-full px-4 py-3 text-sm font-semibold active:scale-[0.98] ${
+          onClick={() => toggleDayCompleted(day)}
+          aria-pressed={entry.completed}
+          className={`mt-2 w-full rounded-full px-4 py-3 text-sm font-semibold active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
             entry.completed ? "bg-secondary text-secondary-foreground" : "bg-primary text-primary-foreground"
           }`}
         >
-          {entry.completed ? "Tarefa concluída ✓" : "Concluir tarefa"}
+          {entry.completed ? "Tarefa concluída ✓ · Desfazer" : "Concluir tarefa"}
         </button>
       </div>
 
@@ -1022,8 +1184,8 @@ function PlanoTab() {
 }
 
 function MethodDrawer({ day, onClose }: { day: number; onClose: () => void }) {
-  const { updateDay, state } = useProtocolStore();
-  const entry = state.days[day];
+  const { registerApplication, state } = useProtocolStore();
+  const applicationsForDay = state.applications.filter((a) => a.day === day);
   return (
     <Drawer onClose={onClose} title="Método de 2 Passos">
       <p className="text-sm text-muted-foreground">
@@ -1058,14 +1220,24 @@ function MethodDrawer({ day, onClose }: { day: number; onClose: () => void }) {
         Sem indicação de quantidade nesta versão. Siga sempre o rótulo do produto e evite aplicação direta nas flores.
       </InfoCard>
 
+      {applicationsForDay.length > 0 && (
+        <div className="mt-4 rounded-xl border border-border bg-secondary/40 p-3 text-xs text-secondary-foreground">
+          <div className="font-semibold text-primary">Histórico de aplicações no Dia {day}</div>
+          <ul className="mt-1 space-y-0.5">
+            {applicationsForDay.map((a) => (
+              <li key={a.id}>{new Date(a.timestamp).toLocaleString("pt-BR")}</li>
+            ))}
+          </ul>
+        </div>
+      )}
       <button
         onClick={() => {
-          updateDay(day, { applicationDone: true });
+          registerApplication(day);
           onClose();
         }}
-        className="mt-4 w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground active:scale-[0.98]"
+        className="mt-4 w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
-        {entry?.applicationDone ? "Registrar novamente" : "Registrar aplicação concluída"}
+        {applicationsForDay.length > 0 ? "Registrar nova aplicação" : "Registrar aplicação concluída"}
       </button>
     </Drawer>
   );
@@ -1086,12 +1258,11 @@ function ProductPlaceholder({ title }: { title: string }) {
 
 function DiagnosticoTab({ onRedo }: { onRedo: () => void }) {
   const { state } = useProtocolStore();
-  const items: Array<{ label: string; values: string[] }> = [
-    { label: "Raízes", values: state.diagnosis.roots },
-    { label: "Folhas", values: state.diagnosis.leaves },
-    { label: "Ambiente", values: state.diagnosis.environment },
-    { label: "Rotina", values: state.diagnosis.routine },
-  ];
+  const items: Array<{ key: DiagnosisCategory; label: string; values: string[] }> = (
+    Object.keys(CATEGORY_LABEL) as DiagnosisCategory[]
+  ).map((k) => ({ key: k, label: CATEGORY_LABEL[k], values: state.diagnosis[k] }));
+  const result = state.diagnosisResult;
+  const isOutdated = state.diagnosisStatus === "outdated";
 
   return (
     <div className="space-y-4">
@@ -1101,8 +1272,14 @@ function DiagnosticoTab({ onRedo }: { onRedo: () => void }) {
         <p className="mt-1 text-sm text-muted-foreground">Este resumo orienta sua observação. Um sinal isolado não fecha um diagnóstico.</p>
       </div>
 
+      {isOutdated && (
+        <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
+          Você editou respostas depois de gerar o resultado. Refaça o diagnóstico para atualizar as orientações.
+        </InfoCard>
+      )}
+
       {items.map((it) => (
-        <div key={it.label} className="rounded-2xl border border-border bg-card p-4">
+        <div key={it.key} className="rounded-2xl border border-border bg-card p-4">
           <div className="text-sm font-bold text-primary">{it.label}</div>
           {it.values.length === 0 ? (
             <p className="mt-1 text-sm text-muted-foreground">Nada marcado.</p>
@@ -1117,6 +1294,8 @@ function DiagnosticoTab({ onRedo }: { onRedo: () => void }) {
           )}
         </div>
       ))}
+
+      {result && !isOutdated && <ResultBlocks result={result} />}
 
       <button onClick={onRedo} className="w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground">
         Refazer diagnóstico
@@ -1133,8 +1312,12 @@ function DiarioTab() {
   const handlePhoto = async (day: number, e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const dataUrl = await fileToDataUrl(file);
-    updateDay(day, { photo: dataUrl });
+    try {
+      const dataUrl = await compressImage(file);
+      updateDay(day, { photo: dataUrl });
+    } catch {
+      alert(PHOTO_ERROR_MESSAGE);
+    }
   };
 
   return (
