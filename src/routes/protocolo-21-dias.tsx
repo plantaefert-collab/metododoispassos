@@ -30,6 +30,7 @@ import {
   fileToDataUrl,
   type Diagnosis,
 } from "@/lib/protocol-store";
+import welcomeOrchid from "@/assets/welcome-orchid.jpg";
 
 export const Route = createFileRoute("/protocolo-21-dias")({
   head: () => ({
@@ -209,60 +210,192 @@ function TabBtn({ active, onClick, icon, label }: { active: boolean; onClick: ()
 
 function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore: () => void }) {
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto flex min-h-screen max-w-[440px] flex-col px-6 py-10 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-3xl sm:border sm:border-border sm:bg-card sm:shadow-[0_10px_60px_-30px_rgba(0,80,40,0.35)]">
-        <div className="flex items-center gap-2 text-primary">
-          <div className="grid h-10 w-10 place-items-center rounded-full bg-primary text-primary-foreground">
-            <Leaf size={20} strokeWidth={2.2} />
+    <div
+      className="min-h-screen font-sans"
+      style={{ backgroundColor: "#F8F5EE", color: "#26352E" }}
+    >
+      <div
+        className="mx-auto flex min-h-screen w-full max-w-[440px] flex-col px-5 pb-8 pt-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-[28px] sm:px-6 sm:shadow-[0_20px_70px_-40px_rgba(23,61,50,0.35)]"
+        style={{ backgroundColor: "#F8F5EE" }}
+      >
+        {/* Header */}
+        <header className="flex items-center gap-2.5">
+          <div
+            className="grid h-9 w-9 place-items-center rounded-full"
+            style={{ backgroundColor: "#173D32", color: "#F8F5EE" }}
+          >
+            <Leaf size={18} strokeWidth={2} />
           </div>
-          <div className="text-sm font-bold tracking-tight">PlantaeFert</div>
-        </div>
+          <div className="leading-tight">
+            <div className="text-[13px] font-semibold tracking-tight" style={{ color: "#173D32" }}>
+              PlantaeFert
+            </div>
+            <div className="text-[10px] uppercase tracking-[0.14em]" style={{ color: "#66736C" }}>
+              Nutrição Vegetal
+            </div>
+          </div>
+        </header>
 
-        <div className="mt-10 flex items-center gap-2 self-start rounded-full bg-accent/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-accent">
-          <Sparkles size={12} /> Método de 2 passos
-        </div>
+        {/* Photo */}
+        <figure className="relative mt-5 overflow-hidden rounded-[22px]" style={{ backgroundColor: "#EEE8F2" }}>
+          <img
+            src={welcomeOrchid}
+            alt="Orquídea Phalaenopsis saudável em vaso, com folhas verdes e flores em tons de rosa e branco"
+            width={1024}
+            height={1024}
+            className="h-[220px] w-full object-cover sm:h-[240px]"
+          />
+          <span
+            className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em]"
+            style={{ backgroundColor: "#F3DCE7", color: "#B72D72" }}
+          >
+            <Sparkles size={11} /> Método de 2 passos
+          </span>
+        </figure>
 
-        <h1 className="mt-4 text-3xl font-black leading-tight tracking-tight text-primary">
-          Guia Prático<br />Orquídeas Floridas
+        {/* Title */}
+        <h1
+          className="mt-6 font-display leading-[1.02] tracking-tight"
+          style={{ color: "#173D32" }}
+        >
+          <span className="block text-[22px] font-normal" style={{ color: "#58705D" }}>
+            Guia Prático
+          </span>
+          <span className="mt-1 block text-[40px] font-normal sm:text-[44px]">
+            Orquídeas <em className="not-italic" style={{ color: "#B72D72" }}>Floridas</em>
+          </span>
         </h1>
-        <p className="mt-3 text-lg font-semibold text-accent">Seu plano guiado de 21 dias</p>
-        <p className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
-          Uma rotina simples para observar sua orquídea, fortalecer as raízes, melhorar o vigor e criar condições favoráveis para novos ciclos de floração.
+
+        {/* Promise */}
+        <p className="mt-4 text-[15px] font-semibold" style={{ color: "#173D32" }}>
+          Seu plano guiado de 21 dias
+        </p>
+        <p className="mt-1.5 text-[14px] leading-relaxed" style={{ color: "#66736C" }}>
+          Observe sua orquídea, fortaleça a base e acompanhe os sinais da planta com uma rotina simples.
         </p>
 
-        <div className="mt-6 grid gap-3">
-          <div className="rounded-2xl border border-border bg-secondary/60 p-4">
-            <div className="flex items-center gap-2 text-primary">
-              <span className="grid h-7 w-7 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">1</span>
-              <span className="text-base font-bold">Enraizar</span>
-            </div>
-            <p className="mt-1.5 text-sm text-secondary-foreground/80">Fortalecer raízes e criar base para o vigor.</p>
+        {/* Two-step method */}
+        <div className="mt-6 flex flex-col gap-2">
+          <StepCard
+            number="1"
+            label="Enraizar"
+            support="Fortalecer a base"
+            text="Cuidar das raízes e preparar a planta para aproveitar melhor a rotina."
+            bg="#DCEBDD"
+            ink="#173D32"
+            badge="#173D32"
+            badgeInk="#F8F5EE"
+            icon={<Sprout size={18} strokeWidth={2} />}
+          />
+          <div className="flex items-center gap-2 pl-6 text-[10px] uppercase tracking-[0.2em]" style={{ color: "#66736C" }}>
+            <span className="h-px w-6" style={{ backgroundColor: "#66736C" }} />
+            depois
           </div>
-          <div className="rounded-2xl border border-border bg-lilac/60 p-4">
-            <div className="flex items-center gap-2 text-lilac-foreground">
-              <span className="grid h-7 w-7 place-items-center rounded-full bg-accent text-xs font-bold text-accent-foreground">2</span>
-              <span className="text-base font-bold">Nutrir</span>
-            </div>
-            <p className="mt-1.5 text-sm text-lilac-foreground/80">Alimentar a planta para novos ciclos de floração.</p>
+          <StepCard
+            number="2"
+            label="Nutrir"
+            support="Apoiar o desenvolvimento"
+            text="Oferecer suporte nutricional para o vigor e os próximos ciclos da planta."
+            bg="#EEE8F2"
+            ink="#173D32"
+            badge="#B72D72"
+            badgeInk="#F8F5EE"
+            icon={<Leaf size={18} strokeWidth={2} />}
+          />
+        </div>
+
+        {/* Benefit */}
+        <div
+          className="mt-5 rounded-2xl px-4 py-3 text-[13px] leading-snug"
+          style={{ backgroundColor: "rgba(255,255,255,0.6)", color: "#26352E", border: "1px solid rgba(23,61,50,0.08)" }}
+        >
+          <div className="flex items-center gap-3">
+            <BenefitIcon icon={<Stethoscope size={14} />} />
+            <BenefitIcon icon={<CalendarCheck size={14} />} />
+            <BenefitIcon icon={<Camera size={14} />} />
+            <span className="ml-1">Diagnóstico, tarefas, fotografias e acompanhamento em um só lugar.</span>
           </div>
         </div>
 
-        <div className="mt-auto grid gap-2 pt-8">
+        {/* CTAs */}
+        <div className="mt-6 flex flex-col gap-2">
           <button
             onClick={onStart}
-            className="rounded-full bg-primary px-6 py-3.5 text-base font-semibold text-primary-foreground shadow-sm transition-transform active:scale-[0.98]"
+            className="rounded-full px-6 py-4 text-[15px] font-semibold uppercase tracking-[0.06em] transition-transform active:scale-[0.98]"
+            style={{ backgroundColor: "#173D32", color: "#F8F5EE" }}
           >
             Começar meu plano
           </button>
           <button
             onClick={onExplore}
-            className="rounded-full px-6 py-3 text-sm font-medium text-primary hover:bg-secondary"
+            className="rounded-full px-6 py-2.5 text-[13px] font-medium underline-offset-4 hover:underline"
+            style={{ color: "#58705D" }}
           >
             Explorar o conteúdo
           </button>
         </div>
       </div>
     </div>
+  );
+}
+
+function StepCard({
+  number,
+  label,
+  support,
+  text,
+  bg,
+  ink,
+  badge,
+  badgeInk,
+  icon,
+}: {
+  number: string;
+  label: string;
+  support: string;
+  text: string;
+  bg: string;
+  ink: string;
+  badge: string;
+  badgeInk: string;
+  icon: ReactNode;
+}) {
+  return (
+    <div className="rounded-[20px] p-4" style={{ backgroundColor: bg }}>
+      <div className="flex items-start gap-3">
+        <span
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-sm font-bold"
+          style={{ backgroundColor: badge, color: badgeInk }}
+        >
+          {number}
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <span style={{ color: ink }}>{icon}</span>
+            <h3 className="font-display text-[20px] leading-none" style={{ color: ink }}>
+              {label}
+            </h3>
+          </div>
+          <p className="mt-1 text-[12px] font-semibold uppercase tracking-[0.1em]" style={{ color: ink, opacity: 0.7 }}>
+            {support}
+          </p>
+          <p className="mt-1.5 text-[13.5px] leading-relaxed" style={{ color: "#26352E", opacity: 0.85 }}>
+            {text}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BenefitIcon({ icon }: { icon: ReactNode }) {
+  return (
+    <span
+      className="grid h-7 w-7 place-items-center rounded-full"
+      style={{ backgroundColor: "#DCEBDD", color: "#173D32" }}
+    >
+      {icon}
+    </span>
   );
 }
 
