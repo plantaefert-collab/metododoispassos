@@ -394,17 +394,6 @@ function StepCard({
   );
 }
 
-function BenefitIcon({ icon }: { icon: ReactNode }) {
-  return (
-    <span
-      className="grid h-7 w-7 place-items-center rounded-full"
-      style={{ backgroundColor: "#DCEBDD", color: "#173D32" }}
-    >
-      {icon}
-    </span>
-  );
-}
-
 /* ---------------- Signup ---------------- */
 
 function SignupScreen({ onNext }: { onNext: () => void }) {
