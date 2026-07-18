@@ -77,14 +77,21 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Guia Prático Orquídeas Floridas — PlantaeFert" },
+      {
+        name: "description",
+        content:
+          "Protocolo interativo de 21 dias da PlantaeFert para diagnosticar, enraizar, nutrir e acompanhar sua orquídea.",
+      },
+      { name: "author", content: "PlantaeFert Nutrição Vegetal" },
+      { property: "og:title", content: "Guia Prático Orquídeas Floridas — PlantaeFert" },
+      {
+        property: "og:description",
+        content:
+          "Plano guiado de 21 dias com o Método de 2 Passos: Enraizar e Nutrir.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {
