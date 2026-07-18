@@ -1,4 +1,10 @@
 import { useEffect, useState, useCallback } from "react";
+import {
+  computeDiagnosisResult,
+  type DiagnosisAnswers,
+  type DiagnosisCategory,
+  type DiagnosisResult,
+} from "./diagnosis-matrix";
 
 export type PlantInfo = {
   name: string;
@@ -11,12 +17,7 @@ export type PlantInfo = {
   photo: string | null;
 };
 
-export type Diagnosis = {
-  roots: string[];
-  leaves: string[];
-  environment: string[];
-  routine: string[];
-};
+export type DiagnosisStatus = "none" | "fresh" | "outdated";
 
 export type DayEntry = {
   checklist: Record<string, boolean>;
@@ -39,16 +40,29 @@ export type FinalEvaluation = {
   path: "" | "evolved" | "stable" | "worsening" | "healthy-no-bloom";
 };
 
-export type ProtocolState = {
-  currentDay: number;
-  plant: PlantInfo;
-  diagnosis: Diagnosis;
-  days: Record<number, DayEntry>;
-  finalEval: FinalEvaluation;
-  onboarded: boolean;
+export type ApplicationRecord = {
+  id: string;
+  day: number;
+  timestamp: string;
 };
 
-const STORAGE_KEY = "plantaefert-protocolo-21d-v1";
+export type ProtocolState = {
+  schemaVersion: 2;
+  currentDay: number;
+  plant: PlantInfo;
+  diagnosis: DiagnosisAnswers;
+  diagnosisResult: DiagnosisResult | null;
+  diagnosisStatus: DiagnosisStatus;
+  answersVersion: number;
+  days: Record<number, DayEntry>;
+  applications: ApplicationRecord[];
+  finalEval: FinalEvaluation;
+  onboarded: boolean;
+  guestMode: boolean;
+};
+
+const STORAGE_KEY = "plantaefert-protocolo-21d";
+const LEGACY_KEY_V1 = "plantaefert-protocolo-21d-v1";
 
 const emptyPlant: PlantInfo = {
   name: "",
@@ -61,23 +75,75 @@ const emptyPlant: PlantInfo = {
   photo: null,
 };
 
-const emptyDiag: Diagnosis = { roots: [], leaves: [], environment: [], routine: [] };
+const emptyDiag: DiagnosisAnswers = {
+  roots: [],
+  leaves: [],
+  environment: [],
+  potAndSubstrate: [],
+  wateringAndRoutine: [],
+};
 
 const defaultState: ProtocolState = {
+  schemaVersion: 2,
   currentDay: 3,
   plant: emptyPlant,
   diagnosis: emptyDiag,
+  diagnosisResult: null,
+  diagnosisStatus: "none",
+  answersVersion: 0,
   days: {},
+  applications: [],
   finalEval: { improved: "", same: "", attention: "", keep: "", path: "" },
   onboarded: false,
+  guestMode: false,
 };
+
+function migrateFromV1(v1: Record<string, unknown>): ProtocolState {
+  // v1 usava chaves: roots, leaves, environment, routine (mapeada para wateringAndRoutine).
+  const oldDiag = (v1.diagnosis as Record<string, string[]> | undefined) ?? {};
+  const diagnosis: DiagnosisAnswers = {
+    roots: [],
+    leaves: [],
+    environment: [],
+    potAndSubstrate: [],
+    wateringAndRoutine: oldDiag.routine ?? [],
+  };
+  return {
+    ...defaultState,
+    ...(v1 as Partial<ProtocolState>),
+    schemaVersion: 2,
+    diagnosis,
+    diagnosisResult: null,
+    diagnosisStatus: "none",
+    answersVersion: 0,
+    applications: [],
+  };
+}
 
 function loadState(): ProtocolState {
   if (typeof window === "undefined") return defaultState;
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (!raw) return defaultState;
-    return { ...defaultState, ...JSON.parse(raw) };
+    if (raw) {
+      const parsed = JSON.parse(raw) as Partial<ProtocolState> & { schemaVersion?: number };
+      if (parsed.schemaVersion === 2) {
+        return { ...defaultState, ...parsed, diagnosis: { ...emptyDiag, ...(parsed.diagnosis ?? {}) } };
+      }
+      // Versão desconhecida — descarta e usa default.
+      return defaultState;
+    }
+    const legacy = window.localStorage.getItem(LEGACY_KEY_V1);
+    if (legacy) {
+      const migrated = migrateFromV1(JSON.parse(legacy));
+      try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(migrated));
+        window.localStorage.removeItem(LEGACY_KEY_V1);
+      } catch {
+        /* ignore */
+      }
+      return migrated;
+    }
+    return defaultState;
   } catch {
     return defaultState;
   }
@@ -96,9 +162,13 @@ function setState(updater: (s: ProtocolState) => ProtocolState) {
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(currentState));
   } catch {
-    /* ignore quota */
+    /* quota exceeded — ignora silenciosamente */
   }
   listeners.forEach((l) => l());
+}
+
+function newId(): string {
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
 }
 
 export function useProtocolStore() {
@@ -121,11 +191,25 @@ export function useProtocolStore() {
     setState((s) => ({ ...s, plant: { ...s.plant, ...patch } }));
   }, []);
 
-  const toggleDiagnosis = useCallback((cat: keyof Diagnosis, value: string) => {
+  const toggleDiagnosis = useCallback((cat: DiagnosisCategory, value: string) => {
     setState((s) => {
       const arr = s.diagnosis[cat];
       const next = arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value];
-      return { ...s, diagnosis: { ...s.diagnosis, [cat]: next } };
+      const nextStatus: DiagnosisStatus =
+        s.diagnosisResult && s.diagnosisStatus !== "none" ? "outdated" : s.diagnosisStatus;
+      return {
+        ...s,
+        diagnosis: { ...s.diagnosis, [cat]: next },
+        answersVersion: s.answersVersion + 1,
+        diagnosisStatus: nextStatus,
+      };
+    });
+  }, []);
+
+  const saveDiagnosisResult = useCallback(() => {
+    setState((s) => {
+      const result = computeDiagnosisResult(s.diagnosis, s.answersVersion);
+      return { ...s, diagnosisResult: result, diagnosisStatus: "fresh" };
     });
   }, []);
 
@@ -144,12 +228,35 @@ export function useProtocolStore() {
     });
   }, []);
 
+  const toggleDayCompleted = useCallback((day: number) => {
+    setState((s) => {
+      const existing: DayEntry = s.days[day] ?? { checklist: {}, note: "", completed: false };
+      return { ...s, days: { ...s.days, [day]: { ...existing, completed: !existing.completed } } };
+    });
+  }, []);
+
+  const registerApplication = useCallback((day: number) => {
+    setState((s) => {
+      const record: ApplicationRecord = { id: newId(), day, timestamp: new Date().toISOString() };
+      const existing: DayEntry = s.days[day] ?? { checklist: {}, note: "", completed: false };
+      return {
+        ...s,
+        applications: [...s.applications, record],
+        days: { ...s.days, [day]: { ...existing, applicationDone: true } },
+      };
+    });
+  }, []);
+
   const setCurrentDay = useCallback((day: number) => {
     setState((s) => ({ ...s, currentDay: day }));
   }, []);
 
   const setOnboarded = useCallback((v: boolean) => {
-    setState((s) => ({ ...s, onboarded: v }));
+    setState((s) => ({ ...s, onboarded: v, guestMode: v ? false : s.guestMode }));
+  }, []);
+
+  const setGuestMode = useCallback((v: boolean) => {
+    setState((s) => ({ ...s, guestMode: v }));
   }, []);
 
   const updateFinalEval = useCallback((patch: Partial<FinalEvaluation>) => {
@@ -159,6 +266,7 @@ export function useProtocolStore() {
   const reset = useCallback(() => {
     try {
       window.localStorage.removeItem(STORAGE_KEY);
+      window.localStorage.removeItem(LEGACY_KEY_V1);
     } catch {
       /* ignore */
     }
@@ -171,20 +279,15 @@ export function useProtocolStore() {
     hydrated,
     updatePlant,
     toggleDiagnosis,
+    saveDiagnosisResult,
     updateDay,
     toggleChecklist,
+    toggleDayCompleted,
+    registerApplication,
     setCurrentDay,
     setOnboarded,
+    setGuestMode,
     updateFinalEval,
     reset,
   };
-}
-
-export async function fileToDataUrl(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => resolve(String(reader.result));
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
 }
