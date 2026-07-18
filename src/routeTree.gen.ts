@@ -9,8 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as Protocolo21DiasRouteImport } from './routes/protocolo-21-dias'
 import { Route as IndexRouteImport } from './routes/index'
 
+const Protocolo21DiasRoute = Protocolo21DiasRouteImport.update({
+  id: '/protocolo-21-dias',
+  path: '/protocolo-21-dias',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +25,39 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/protocolo-21-dias': typeof Protocolo21DiasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/protocolo-21-dias': typeof Protocolo21DiasRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/protocolo-21-dias': typeof Protocolo21DiasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/protocolo-21-dias'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/protocolo-21-dias'
+  id: '__root__' | '/' | '/protocolo-21-dias'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  Protocolo21DiasRoute: typeof Protocolo21DiasRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/protocolo-21-dias': {
+      id: '/protocolo-21-dias'
+      path: '/protocolo-21-dias'
+      fullPath: '/protocolo-21-dias'
+      preLoaderRoute: typeof Protocolo21DiasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,6 +70,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  Protocolo21DiasRoute: Protocolo21DiasRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
