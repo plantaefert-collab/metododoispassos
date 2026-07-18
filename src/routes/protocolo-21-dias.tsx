@@ -1089,7 +1089,7 @@ const DAY_META: Record<number, { title: string; goal: string; hint: string; chec
 };
 
 function PlanoTab() {
-  const { state, setCurrentDay, updateDay, toggleChecklist } = useProtocolStore();
+  const { state, setCurrentDay, updateDay, toggleChecklist, toggleDayCompleted } = useProtocolStore();
   const [showMethod, setShowMethod] = useState(false);
   const day = state.currentDay;
   const meta = DAY_META[day] ?? DAY_META[1];
@@ -1166,12 +1166,13 @@ function PlanoTab() {
         )}
 
         <button
-          onClick={() => updateDay(day, { completed: true })}
-          className={`mt-2 w-full rounded-full px-4 py-3 text-sm font-semibold active:scale-[0.98] ${
+          onClick={() => toggleDayCompleted(day)}
+          aria-pressed={entry.completed}
+          className={`mt-2 w-full rounded-full px-4 py-3 text-sm font-semibold active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
             entry.completed ? "bg-secondary text-secondary-foreground" : "bg-primary text-primary-foreground"
           }`}
         >
-          {entry.completed ? "Tarefa concluída ✓" : "Concluir tarefa"}
+          {entry.completed ? "Tarefa concluída ✓ · Desfazer" : "Concluir tarefa"}
         </button>
       </div>
 
@@ -1183,8 +1184,8 @@ function PlanoTab() {
 }
 
 function MethodDrawer({ day, onClose }: { day: number; onClose: () => void }) {
-  const { updateDay, state } = useProtocolStore();
-  const entry = state.days[day];
+  const { registerApplication, state } = useProtocolStore();
+  const applicationsForDay = state.applications.filter((a) => a.day === day);
   return (
     <Drawer onClose={onClose} title="Método de 2 Passos">
       <p className="text-sm text-muted-foreground">
@@ -1219,14 +1220,24 @@ function MethodDrawer({ day, onClose }: { day: number; onClose: () => void }) {
         Sem indicação de quantidade nesta versão. Siga sempre o rótulo do produto e evite aplicação direta nas flores.
       </InfoCard>
 
+      {applicationsForDay.length > 0 && (
+        <div className="mt-4 rounded-xl border border-border bg-secondary/40 p-3 text-xs text-secondary-foreground">
+          <div className="font-semibold text-primary">Histórico de aplicações no Dia {day}</div>
+          <ul className="mt-1 space-y-0.5">
+            {applicationsForDay.map((a) => (
+              <li key={a.id}>{new Date(a.timestamp).toLocaleString("pt-BR")}</li>
+            ))}
+          </ul>
+        </div>
+      )}
       <button
         onClick={() => {
-          updateDay(day, { applicationDone: true });
+          registerApplication(day);
           onClose();
         }}
-        className="mt-4 w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground active:scale-[0.98]"
+        className="mt-4 w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
       >
-        {entry?.applicationDone ? "Registrar novamente" : "Registrar aplicação concluída"}
+        {applicationsForDay.length > 0 ? "Registrar nova aplicação" : "Registrar aplicação concluída"}
       </button>
     </Drawer>
   );
