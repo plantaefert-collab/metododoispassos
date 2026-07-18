@@ -905,6 +905,8 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
   const day = state.currentDay;
   const phase = phaseOf(day);
   const isApplicationDay = APPLICATION_DAYS.includes(day);
+  const trackingPoints = state.diagnosisResult?.trackingPoints ?? [];
+  const diagnosisFresh = state.diagnosisStatus === "fresh";
 
   return (
     <div className="space-y-4">
@@ -995,6 +997,28 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
       <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
         Aplique no horário fresco, evite sol forte e não atinja diretamente as flores.
       </InfoCard>
+
+      {diagnosisFresh && trackingPoints.length > 0 && (
+        <div className="rounded-3xl border border-primary/20 bg-secondary/40 p-5">
+          <div className="flex items-center gap-2 text-primary">
+            <Info size={16} />
+            <div className="text-sm font-bold">Pontos do seu diagnóstico para acompanhar</div>
+          </div>
+          <ul className="mt-3 space-y-1.5">
+            {trackingPoints.map((p) => (
+              <li key={p} className="flex gap-2 text-sm text-foreground/85">
+                <ChevronRight size={16} className="mt-0.5 shrink-0 text-primary" /> {p}
+              </li>
+            ))}
+          </ul>
+          <button
+            onClick={() => setTab("diagnostico")}
+            className="mt-3 text-xs font-semibold text-accent hover:underline"
+          >
+            Ver diagnóstico completo
+          </button>
+        </div>
+      )}
 
       <div className="rounded-3xl border border-border bg-card p-5">
         <div className="text-sm font-bold text-primary">Simular outro dia</div>
