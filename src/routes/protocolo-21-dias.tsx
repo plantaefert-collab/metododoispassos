@@ -75,13 +75,14 @@ function ProtocoloPage() {
   const store = useProtocolStore();
   const [tab, setTab] = useState<Tab>("inicio");
   const [screen, setScreen] = useState<
-    "welcome" | "signup" | "diagnosis" | "app" | null
+    "welcome" | "signup" | "diagnosis" | "result" | "app" | null
   >(null);
   const [showReset, setShowReset] = useState(false);
 
   // Resolve which screen we're on:
   // If not onboarded, show welcome -> signup -> diagnosis flow gated by explicit screen state.
-  const activeScreen = screen ?? (store.state.onboarded ? "app" : "welcome");
+  const activeScreen =
+    screen ?? (store.state.onboarded || store.state.guestMode ? "app" : "welcome");
 
   if (!store.hydrated) {
     return (
@@ -92,7 +93,16 @@ function ProtocoloPage() {
   }
 
   if (activeScreen === "welcome") {
-    return <WelcomeScreen onStart={() => setScreen("signup")} onExplore={() => { store.setOnboarded(true); setScreen("app"); setTab("aprender"); }} />;
+    return (
+      <WelcomeScreen
+        onStart={() => setScreen("signup")}
+        onExplore={() => {
+          store.setGuestMode(true);
+          setScreen("app");
+          setTab("aprender");
+        }}
+      />
+    );
   }
   if (activeScreen === "signup") {
     return <SignupScreen onNext={() => setScreen("diagnosis")} />;
@@ -100,6 +110,18 @@ function ProtocoloPage() {
   if (activeScreen === "diagnosis") {
     return (
       <DiagnosisScreen
+        onBack={() => setScreen("signup")}
+        onFinish={() => {
+          store.saveDiagnosisResult();
+          setScreen("result");
+        }}
+      />
+    );
+  }
+  if (activeScreen === "result") {
+    return (
+      <DiagnosisResultScreen
+        onBack={() => setScreen("diagnosis")}
         onFinish={() => {
           store.setOnboarded(true);
           setScreen("app");
