@@ -431,8 +431,8 @@ export function normalizeDiagnosisGuidance(value: unknown): DiagnosisGuidance | 
   if (typeof id !== "string" || id.length === 0) return null;
   if (typeof category !== "string" || !VALID_CATEGORIES.includes(category as DiagnosisCategory))
     return null;
-  if (typeof answer !== "string" || answer.length === 0) return null;
-  if (typeof title !== "string" || title.length === 0) return null;
+  if (typeof answer !== "string") return null;
+  if (typeof title !== "string") return null;
   if (
     typeof classification !== "string" ||
     !(VALID_CLASSIFICATIONS as readonly string[]).includes(classification)
@@ -441,7 +441,9 @@ export function normalizeDiagnosisGuidance(value: unknown): DiagnosisGuidance | 
   if (typeof explanation !== "string") return null;
   if (typeof action !== "string") return null;
   if (!Array.isArray(tracking)) return null;
-  const trackingClean = tracking.filter((t): t is string => typeof t === "string");
+  for (const t of tracking) if (typeof t !== "string") return null;
+  if (avoid !== undefined && typeof avoid !== "string") return null;
+  if (warning !== undefined && typeof warning !== "string") return null;
   const out: DiagnosisGuidance = {
     id,
     category: category as DiagnosisCategory,
@@ -450,7 +452,7 @@ export function normalizeDiagnosisGuidance(value: unknown): DiagnosisGuidance | 
     classification: classification as DiagnosisGuidance["classification"],
     explanation,
     action,
-    tracking: trackingClean,
+    tracking: tracking as string[],
   };
   if (typeof avoid === "string") out.avoid = avoid;
   if (typeof warning === "string") out.warning = warning;
@@ -462,7 +464,8 @@ function normalizeGuidanceList(v: unknown): DiagnosisGuidance[] | null {
   const out: DiagnosisGuidance[] = [];
   for (const item of v) {
     const g = normalizeDiagnosisGuidance(item);
-    if (g) out.push(g);
+    if (!g) return null;
+    out.push(g);
   }
   return out;
 }
@@ -475,10 +478,17 @@ function normalizeDiagnosisResult(v: unknown): DiagnosisResult | null {
   const insufficientInformation = normalizeGuidanceList(v.insufficientInformation);
   if (!favorable || !adjustments || !priorities || !insufficientInformation) return null;
   if (!Array.isArray(v.trackingPoints)) return null;
-  const trackingPoints = v.trackingPoints.filter((t): t is string => typeof t === "string");
-  if (typeof v.answersVersion !== "number" || !Number.isFinite(v.answersVersion)) return null;
-  const completedAt =
-    v.completedAt === null || typeof v.completedAt === "string" ? v.completedAt : null;
+  for (const t of v.trackingPoints) if (typeof t !== "string") return null;
+  const trackingPoints = v.trackingPoints as string[];
+  if (
+    typeof v.answersVersion !== "number" ||
+    !Number.isFinite(v.answersVersion) ||
+    !Number.isInteger(v.answersVersion) ||
+    v.answersVersion < 0
+  )
+    return null;
+  if (v.completedAt !== null && typeof v.completedAt !== "string") return null;
+  const completedAt = v.completedAt;
   return {
     favorable,
     adjustments,
