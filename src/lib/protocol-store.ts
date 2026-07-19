@@ -121,6 +121,55 @@ const defaultState: ProtocolState = {
   onboarded: false,
 };
 
+let currentState: ProtocolState | null = null;
+const listeners = new Set<() => void>();
+
+function notify() {
+  for (const l of listeners) l();
+}
+
+/**
+ * Carrega o estado inicial do localStorage ou migra dados V1.
+ */
+function loadState(): ProtocolState {
+  if (typeof window === "undefined") return defaultState;
+  try {
+    const saved = window.localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      return migrateProtocolState(JSON.parse(saved));
+    }
+    const legacy = window.localStorage.getItem(LEGACY_KEY_V1);
+    if (legacy) {
+      const migrated = migrateProtocolState(JSON.parse(legacy));
+      const res = persistState(migrated);
+      if (res.ok) {
+        window.localStorage.removeItem(LEGACY_KEY_V1);
+      } else if (res.reason === "quota") {
+        migrated.saveError = SAVE_ERROR_MESSAGE;
+      }
+      return migrated;
+    }
+  } catch (err) {
+    console.error("Failed to load state", err);
+  }
+  return defaultState;
+}
+
+/**
+ * Garante que o store foi carregado apenas uma vez.
+ */
+export function ensureStoreInitialized(): ProtocolState {
+  if (currentState === null) {
+    currentState = loadState();
+  }
+  return currentState;
+}
+
+export function getState(): ProtocolState {
+  return ensureStoreInitialized();
+}
+
+
 // ---------- Normalização defensiva ----------
 
 function isPlainObject(v: unknown): v is Record<string, unknown> {
