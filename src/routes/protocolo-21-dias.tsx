@@ -1226,7 +1226,11 @@ function MethodDrawer({ day, onClose }: { day: number; onClose: () => void }) {
           <div className="font-semibold text-primary">Histórico de aplicações no Dia {day}</div>
           <ul className="mt-1 space-y-0.5">
             {applicationsForDay.map((a) => (
-              <li key={a.id}>{new Date(a.timestamp).toLocaleString("pt-BR")}</li>
+              <li key={a.id}>
+                {a.timestamp && !a.migrated
+                  ? new Date(a.timestamp).toLocaleString("pt-BR")
+                  : "Aplicação registrada na versão anterior"}
+              </li>
             ))}
           </ul>
         </div>
