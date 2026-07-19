@@ -74,6 +74,7 @@ function phaseOf(day: number): { label: string; range: string; tone: "green" | "
 function ProtocoloPage() {
   const store = useProtocolStore();
   const [tab, setTab] = useState<Tab>("inicio");
+  const [guestMode, setGuestMode] = useState(false);
   const [screen, setScreen] = useState<
     "welcome" | "signup" | "diagnosis" | "result" | "app" | null
   >(null);
@@ -82,7 +83,7 @@ function ProtocoloPage() {
   // Resolve which screen we're on:
   // If not onboarded, show welcome -> signup -> diagnosis flow gated by explicit screen state.
   const activeScreen =
-    screen ?? (store.state.onboarded || store.state.guestMode ? "app" : "welcome");
+    screen ?? (store.state.onboarded || guestMode ? "app" : "welcome");
 
   if (!store.hydrated) {
     return (
@@ -97,7 +98,7 @@ function ProtocoloPage() {
       <WelcomeScreen
         onStart={() => setScreen("signup")}
         onExplore={() => {
-          store.setGuestMode(true);
+          setGuestMode(true);
           setScreen("app");
           setTab("aprender");
         }}
