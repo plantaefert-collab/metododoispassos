@@ -855,6 +855,7 @@ describe("Inicialização única do Store", () => {
     ensureStoreInitialized();
     expect(getCount).toBeGreaterThan(0);
   });
+});
 
 describe("Protocol Plan — Regras de aplicação e marcos", () => {
   it("Valida dias de aplicação 1, 7, 14, 21", () => {
