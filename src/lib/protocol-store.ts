@@ -655,9 +655,15 @@ function notifyListeners() {
   listeners.forEach((l) => l());
 }
 
-export function getState(): ProtocolState {
-  if (currentState === null) currentState = loadState();
+export function ensureStoreInitialized(): ProtocolState {
+  if (currentState === null) {
+    currentState = loadState();
+  }
   return currentState;
+}
+
+export function getState(): ProtocolState {
+  return ensureStoreInitialized();
 }
 
 export function subscribe(listener: () => void): () => void {
@@ -705,7 +711,7 @@ export function useProtocolStore() {
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
-    currentState = loadState();
+    ensureStoreInitialized();
     setHydrated(true);
     const unsub = subscribe(() => force((n) => n + 1));
     return unsub;

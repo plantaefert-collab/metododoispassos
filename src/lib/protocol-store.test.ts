@@ -14,8 +14,10 @@ import {
   normalizeAnswersVersion,
   reconcileDiagnosisResultState,
   isDiagnosisCurrent,
+  ensureStoreInitialized,
   type ProtocolState,
 } from "./protocol-store";
+import { computeDiagnosisResult } from "./diagnosis-matrix";
 
 // -------- localStorage mock --------
 
@@ -762,4 +764,94 @@ describe("saveDiagnosisResult", () => {
     // resultado antigo não passa a ser considerado atual
     expect(isDiagnosisCurrent(st)).toBe(false);
   });
+
+describe("Inicialização única do Store", () => {
+  it("TESTE 1 — Primeira inicialização: lê localStorage", () => {
+    mockLS.setItem("plantaefert-protocolo-21d", JSON.stringify({ schemaVersion: 2, currentDay: 10 }));
+    const state = ensureStoreInitialized();
+    expect(state.currentDay).toBe(10);
+  });
+
+  it("TESTE 2 — Segunda inicialização: não lê localStorage novamente", () => {
+    ensureStoreInitialized();
+    const getSpy = mockLS.getItem.bind(mockLS);
+    let getCount = 0;
+    mockLS.getItem = (k: string) => {
+      getCount++;
+      return getSpy(k);
+    };
+
+    const state2 = ensureStoreInitialized();
+    expect(getCount).toBe(0);
+    expect(state2).toBe(getState());
+  });
+
+  it("TESTE 3 — Estado em memória preservado após alteração", () => {
+    ensureStoreInitialized();
+    setState((s) => ({ ...s, plant: { ...s.plant, name: "Persistida" } }));
+
+    const stateAfter = ensureStoreInitialized();
+    expect(stateAfter.plant.name).toBe("Persistida");
+  });
+
+  it("TESTE 4 — saveError preservado", () => {
+    ensureStoreInitialized();
+    mockLS.setMode = "quota";
+    setState((s) => ({ ...s, currentDay: 20 }));
+
+    expect(getState().saveError).toBe(SAVE_ERROR_MESSAGE);
+
+    const stateAgain = ensureStoreInitialized();
+    expect(stateAgain.saveError).toBe(SAVE_ERROR_MESSAGE);
+  });
+
+  it("TESTE 5 — Dois consumidores do store: mesma referência e estado transitório", () => {
+    const s1 = ensureStoreInitialized();
+    mockLS.setMode = "quota";
+    setState((s) => ({ ...s, onboarded: true }));
+    expect(getState().saveError).toBeDefined();
+
+    const s2 = ensureStoreInitialized();
+    expect(s1).toBe(s2);
+    expect(s2.saveError).toBeDefined();
+  });
+
+  it("TESTE 6 — Reset preservado: dados antigos não retornam", () => {
+    mockLS.setItem("plantaefert-protocolo-21d", JSON.stringify({ schemaVersion: 2, currentDay: 15 }));
+    ensureStoreInitialized();
+    expect(getState().currentDay).toBe(15);
+
+    // Simulando ação do reset() via setState pois reset é interno ao hook
+    setState((s) => ({
+      schemaVersion: 2,
+      currentDay: 3,
+      plant: { name: "", species: "", unknownSpecies: false, location: "", pot: "", substrate: "", difficulty: "", photo: null },
+      diagnosis: { roots: [], leaves: [], environment: [], potAndSubstrate: [], wateringAndRoutine: [] },
+      diagnosisResult: null,
+      diagnosisStatus: "none",
+      answersVersion: 0,
+      days: {},
+      applications: [],
+      finalEval: { improved: "", same: "", attention: "", keep: "", path: "" },
+      onboarded: false,
+    }));
+    
+    expect(getState().currentDay).toBe(3);
+    const stateAgain = ensureStoreInitialized();
+    expect(stateAgain.currentDay).toBe(3);
+  });
+
+  it("TESTE 7 — Reset exclusivo para testes", () => {
+    ensureStoreInitialized();
+    __resetStoreForTests();
+    const getSpy = mockLS.getItem.bind(mockLS);
+    let getCount = 0;
+    mockLS.getItem = (k: string) => {
+      getCount++;
+      return getSpy(k);
+    };
+    ensureStoreInitialized();
+    expect(getCount).toBeGreaterThan(0);
+  });
 });
+
