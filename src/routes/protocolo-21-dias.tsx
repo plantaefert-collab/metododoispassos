@@ -624,7 +624,7 @@ const DIAG_CATEGORIES: Array<{ key: DiagnosisCategory; icon: ReactNode }> = [
 ];
 
 function DiagnosisScreen({ onFinish, onBack }: { onFinish: () => void; onBack: () => void }) {
-  const { state, toggleDiagnosis } = useProtocolStore();
+  const { state, toggleDiagnosis, clearSaveError } = useProtocolStore();
   const [stepIdx, setStepIdx] = useState(0);
   const total = DIAG_CATEGORIES.length;
   const current = DIAG_CATEGORIES[stepIdx];
@@ -643,6 +643,23 @@ function DiagnosisScreen({ onFinish, onBack }: { onFinish: () => void; onBack: (
         />
 
         <ProgressBar value={((stepIdx + 1) / total) * 100} className="mt-4" />
+        {state.saveError && (
+          <div
+            role="alert"
+            className="mt-3 flex items-start gap-2 rounded-2xl border border-accent/40 bg-accent/10 px-3 py-2.5 text-sm text-accent"
+          >
+            <AlertTriangle size={16} className="mt-0.5 shrink-0" />
+            <span className="flex-1">{state.saveError}</span>
+            <button
+              type="button"
+              onClick={clearSaveError}
+              aria-label="Fechar aviso"
+              className="rounded-full p-1 text-accent hover:bg-accent/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        )}
         <div className="mt-2 flex flex-wrap gap-1.5" aria-label="Etapas do diagnóstico">
           {DIAG_CATEGORIES.map((c, i) => (
             <span
