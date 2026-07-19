@@ -924,7 +924,10 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
   const phase = phaseOf(day);
   const isApplicationDay = APPLICATION_DAYS.includes(day);
   const trackingPoints = state.diagnosisResult?.trackingPoints ?? [];
-  const diagnosisFresh = state.diagnosisStatus === "fresh";
+  const diagnosisFresh =
+    state.diagnosisStatus === "fresh" &&
+    state.diagnosisResult !== null &&
+    state.diagnosisResult.answersVersion === state.answersVersion;
 
   return (
     <div className="space-y-4">

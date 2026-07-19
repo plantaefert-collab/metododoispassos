@@ -11,6 +11,8 @@ import {
   clearSaveError,
   __resetStoreForTests,
   SAVE_ERROR_MESSAGE,
+  normalizeAnswersVersion,
+  reconcileDiagnosisResultState,
   type ProtocolState,
 } from "./protocol-store";
 
@@ -443,5 +445,214 @@ describe("normalizeDiagnosisResult — validação profunda", () => {
     expect(
       withResult(baseResult({ priorities: [{ ...validGuidance, warning: true }] })),
     ).toBeNull();
+  });
+});
+// -------- Reconciliação answersVersion / status --------
+
+const validGuidance = {
+  id: "g1",
+  category: "roots" as const,
+  answer: "Firmes",
+  title: "Título",
+  classification: "favorable" as const,
+  explanation: "explicação",
+  action: "ação",
+  tracking: ["ponto"],
+};
+const buildResult = (answersVersion: number) => ({
+  favorable: [{ ...validGuidance }],
+  adjustments: [],
+  priorities: [],
+  insufficientInformation: [],
+  trackingPoints: ["p"],
+  completedAt: "2026-07-19T00:00:00.000Z",
+  answersVersion,
+});
+
+describe("normalizeAnswersVersion — TESTE 9", () => {
+  it("aceita inteiro ≥ 0 e rejeita valores inválidos", () => {
+    expect(normalizeAnswersVersion(0)).toBe(0);
+    expect(normalizeAnswersVersion(5)).toBe(5);
+    expect(normalizeAnswersVersion(-1)).toBe(0);
+    expect(normalizeAnswersVersion(1.5)).toBe(0);
+    expect(normalizeAnswersVersion(Number.NaN)).toBe(0);
+    expect(normalizeAnswersVersion(Number.POSITIVE_INFINITY)).toBe(0);
+    expect(normalizeAnswersVersion("3")).toBe(0);
+    expect(normalizeAnswersVersion(undefined)).toBe(0);
+  });
+
+  it("migrateProtocolState normaliza answersVersion inválido para 0", () => {
+    for (const v of [-1, 1.5, Number.NaN, Number.POSITIVE_INFINITY, "3", undefined]) {
+      const s = migrateProtocolState({ schemaVersion: 2, answersVersion: v });
+      expect(s.answersVersion).toBe(0);
+    }
+  });
+});
+
+describe("reconcileDiagnosisResultState", () => {
+  it("TESTE 1 — versões iguais e status fresh → mantém fresh", () => {
+    const r = buildResult(3);
+    const out = reconcileDiagnosisResultState(r, "fresh", 3);
+    expect(out.diagnosisResult).toBe(r);
+    expect(out.diagnosisStatus).toBe("fresh");
+  });
+
+  it("TESTE 2 — versão salva anterior → outdated preservando resultado", () => {
+    const r = buildResult(3);
+    const out = reconcileDiagnosisResultState(r, "fresh", 4);
+    expect(out.diagnosisResult).toBe(r);
+    expect(out.diagnosisStatus).toBe("outdated");
+  });
+
+  it("TESTE 3 — resultado mais novo que as respostas → outdated", () => {
+    const r = buildResult(3);
+    const out = reconcileDiagnosisResultState(r, "fresh", 2);
+    expect(out.diagnosisResult).toBe(r);
+    expect(out.diagnosisStatus).toBe("outdated");
+  });
+
+  it("TESTE 4 — resultado null com status fresh → none", () => {
+    const out = reconcileDiagnosisResultState(null, "fresh", 3);
+    expect(out.diagnosisResult).toBeNull();
+    expect(out.diagnosisStatus).toBe("none");
+  });
+
+  it("TESTE 5 — resultado null com status outdated → none", () => {
+    const out = reconcileDiagnosisResultState(null, "outdated", 3);
+    expect(out.diagnosisStatus).toBe("none");
+  });
+
+  it("TESTE 6 — outdated não volta automaticamente para fresh", () => {
+    const r = buildResult(3);
+    const out = reconcileDiagnosisResultState(r, "outdated", 3);
+    expect(out.diagnosisStatus).toBe("outdated");
+  });
+
+  it("TESTE 7 — status none com resultado compatível → fresh", () => {
+    const r = buildResult(3);
+    const out = reconcileDiagnosisResultState(r, "none", 3);
+    expect(out.diagnosisStatus).toBe("fresh");
+  });
+
+  it("TESTE 8 — status inválido tratado como none → fresh quando compatível", () => {
+    const r = buildResult(3);
+    // status inválido é normalizado para "none" pelo normalizeDiagnosisStatus;
+    // aqui simulamos o comportamento passando "none" e via migrateProtocolState.
+    const out = reconcileDiagnosisResultState(r, "none", 3);
+    expect(out.diagnosisStatus).toBe("fresh");
+
+    const s = migrateProtocolState({
+      schemaVersion: 2,
+      answersVersion: 3,
+      diagnosisResult: buildResult(3),
+      diagnosisStatus: "banana",
+    });
+    expect(s.diagnosisStatus).toBe("fresh");
+    expect(s.diagnosisResult).not.toBeNull();
+  });
+});
+
+describe("migrateProtocolState reconciliação", () => {
+  it("preserva resultado antigo e marca outdated quando versões diferem", () => {
+    const s = migrateProtocolState({
+      schemaVersion: 2,
+      answersVersion: 4,
+      diagnosisResult: buildResult(3),
+      diagnosisStatus: "fresh",
+    });
+    expect(s.diagnosisResult).not.toBeNull();
+    expect(s.diagnosisResult!.completedAt).toBe("2026-07-19T00:00:00.000Z");
+    expect(s.diagnosisResult!.answersVersion).toBe(3);
+    expect(s.diagnosisStatus).toBe("outdated");
+    expect(s.answersVersion).toBe(4);
+  });
+});
+
+// -------- TESTE 10 / 11 / 12: fluxo via hook actions --------
+// Reproduz a lógica das ações do useProtocolStore sem montar React.
+
+import { computeDiagnosisResult } from "./diagnosis-matrix";
+
+describe("Fluxo de alteração e nova conclusão", () => {
+  it("TESTE 10 — toggle após resultado válido incrementa versão e marca outdated", () => {
+    // Semear estado válido com versão 2 e resultado compatível.
+    __resetStoreForTests();
+    const seeded = computeDiagnosisResult(
+      { roots: ["Firmes, verdes ou prateadas"], leaves: [], environment: [], potAndSubstrate: [], wateringAndRoutine: [] },
+      2,
+    );
+    setState((s) => ({
+      ...s,
+      diagnosis: { roots: ["Firmes, verdes ou prateadas"], leaves: [], environment: [], potAndSubstrate: [], wateringAndRoutine: [] },
+      diagnosisResult: seeded,
+      diagnosisStatus: "fresh",
+      answersVersion: 2,
+    }));
+
+    // Reproduz toggleDiagnosis inline (mesma lógica).
+    setState((s) => {
+      const arr = s.diagnosis.roots;
+      const value = "Pontas novas em crescimento";
+      const next = arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value];
+      const nextStatus =
+        s.diagnosisResult && s.diagnosisStatus !== "none" ? "outdated" : s.diagnosisStatus;
+      return {
+        ...s,
+        diagnosis: { ...s.diagnosis, roots: next },
+        answersVersion: s.answersVersion + 1,
+        diagnosisStatus: nextStatus,
+      };
+    });
+
+    const st = getState();
+    expect(st.answersVersion).toBe(3);
+    expect(st.diagnosisResult).not.toBeNull();
+    expect(st.diagnosisStatus).toBe("outdated");
+  });
+
+  it("TESTE 11 — nova conclusão traz status para fresh com versão sincronizada", () => {
+    __resetStoreForTests();
+    setState((s) => ({
+      ...s,
+      diagnosis: { roots: ["Firmes, verdes ou prateadas"], leaves: [], environment: [], potAndSubstrate: [], wateringAndRoutine: [] },
+      diagnosisResult: buildResult(2),
+      diagnosisStatus: "outdated",
+      answersVersion: 5,
+    }));
+    // reproduz saveDiagnosisResult
+    setState((s) => {
+      const result = computeDiagnosisResult(s.diagnosis, s.answersVersion);
+      return { ...s, diagnosisResult: result, diagnosisStatus: "fresh" };
+    });
+    const st = getState();
+    expect(st.diagnosisResult).not.toBeNull();
+    expect(st.diagnosisResult!.answersVersion).toBe(5);
+    expect(st.diagnosisStatus).toBe("fresh");
+    expect(st.answersVersion).toBe(5);
+  });
+
+  it("TESTE 12 — resultado desatualizado não é 'atual'", () => {
+    const isCurrent = (s: ProtocolState) =>
+      s.diagnosisStatus === "fresh" &&
+      s.diagnosisResult !== null &&
+      s.diagnosisResult.answersVersion === s.answersVersion;
+
+    __resetStoreForTests();
+    setState((s) => ({
+      ...s,
+      diagnosisResult: buildResult(2),
+      diagnosisStatus: "outdated",
+      answersVersion: 3,
+    }));
+    expect(isCurrent(getState())).toBe(false);
+
+    // Versões diferentes com status "fresh" salvo — migração deve reconciliar.
+    const migrated = migrateProtocolState({
+      schemaVersion: 2,
+      answersVersion: 3,
+      diagnosisResult: buildResult(2),
+      diagnosisStatus: "fresh",
+    });
+    expect(isCurrent(migrated)).toBe(false);
   });
 });

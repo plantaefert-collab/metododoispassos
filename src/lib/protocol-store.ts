@@ -400,6 +400,44 @@ function normalizeDiagnosisStatus(v: unknown): DiagnosisStatus {
   return v === "fresh" || v === "outdated" || v === "none" ? v : "none";
 }
 
+/**
+ * Aceita apenas inteiros finitos ≥ 0. Qualquer outro valor retorna 0.
+ */
+export function normalizeAnswersVersion(value: unknown): number {
+  if (typeof value !== "number") return 0;
+  if (!Number.isFinite(value)) return 0;
+  if (!Number.isInteger(value)) return 0;
+  if (value < 0) return 0;
+  return value;
+}
+
+/**
+ * Reconciliação entre resultado do diagnóstico, status e versão de respostas.
+ *
+ * - Resultado ausente → status forçado a "none";
+ * - Resultado com versão diferente → preservado, status "outdated";
+ * - Versões iguais e status salvo "fresh" → "fresh";
+ * - Versões iguais e status salvo "outdated" → permanece "outdated"
+ *   (apenas uma nova conclusão pode retornar para "fresh");
+ * - Versões iguais e status "none"/inválido → "fresh".
+ */
+export function reconcileDiagnosisResultState(
+  diagnosisResult: DiagnosisResult | null,
+  diagnosisStatus: DiagnosisStatus,
+  answersVersion: number,
+): { diagnosisResult: DiagnosisResult | null; diagnosisStatus: DiagnosisStatus } {
+  if (diagnosisResult === null) {
+    return { diagnosisResult: null, diagnosisStatus: "none" };
+  }
+  if (diagnosisResult.answersVersion !== answersVersion) {
+    return { diagnosisResult, diagnosisStatus: "outdated" };
+  }
+  if (diagnosisStatus === "outdated") {
+    return { diagnosisResult, diagnosisStatus: "outdated" };
+  }
+  return { diagnosisResult, diagnosisStatus: "fresh" };
+}
+
 const VALID_CATEGORIES: DiagnosisCategory[] = [
   "roots",
   "leaves",
@@ -510,15 +548,23 @@ export function migrateProtocolState(saved: unknown): ProtocolState {
     if (!isPlainObject(saved)) return { ...defaultState };
     const days = normalizeDays(saved.days);
     const diagnosis = migrateLegacyDiagnosis(saved.diagnosis);
+    const answersVersion = normalizeAnswersVersion(saved.answersVersion);
+    const diagnosisResult = normalizeDiagnosisResult(saved.diagnosisResult);
+    const diagnosisStatus = normalizeDiagnosisStatus(saved.diagnosisStatus);
+    const reconciled = reconcileDiagnosisResultState(
+      diagnosisResult,
+      diagnosisStatus,
+      answersVersion,
+    );
 
     return {
       schemaVersion: 2,
       currentDay: normalizeCurrentDay(saved.currentDay),
       plant: normalizePlant(saved.plant),
       diagnosis,
-      diagnosisResult: normalizeDiagnosisResult(saved.diagnosisResult),
-      diagnosisStatus: normalizeDiagnosisStatus(saved.diagnosisStatus),
-      answersVersion: asNumber(saved.answersVersion, 0),
+      diagnosisResult: reconciled.diagnosisResult,
+      diagnosisStatus: reconciled.diagnosisStatus,
+      answersVersion,
       days,
       applications: normalizeApplications(saved.applications, days),
       finalEval: normalizeFinalEval(saved.finalEval),
