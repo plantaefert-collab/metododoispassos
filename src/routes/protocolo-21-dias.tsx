@@ -69,14 +69,20 @@ export const Route = createFileRoute("/protocolo-21-dias")({
 
 type Tab = "inicio" | "plano" | "diagnostico" | "diario" | "aprender";
 
-const KEY_DAYS = [1, 3, 7, 10, 14, 17, 21];
-const APPLICATION_DAYS = [3, 10, 17];
-const RECORD_DAYS = [1, 7, 14, 21];
+const KEY_DAYS = [1, 7, 14, 21];
 
-function phaseOf(day: number): { label: string; range: string; tone: "green" | "lilac" | "accent" } {
-  if (day <= 7) return { label: "Fase 1 — Diagnosticar e iniciar", range: "Dias 1–7", tone: "green" };
-  if (day <= 14) return { label: "Fase 2 — Manter e acompanhar", range: "Dias 8–14", tone: "lilac" };
-  return { label: "Fase 3 — Consolidar e avaliar", range: "Dias 15–21", tone: "accent" };
+function phaseOf(day: number) {
+  const phase = getProtocolPhase(day);
+  const tones = {
+    "fase-1": "green",
+    "fase-2": "lilac",
+    "fase-3": "accent",
+  } as const;
+  return {
+    label: phase.title,
+    range: phase.range,
+    tone: tones[phase.id as keyof typeof tones] || "green",
+  };
 }
 
 function ProtocoloPage() {
