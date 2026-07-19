@@ -1251,15 +1251,32 @@ function MethodDrawer({ day, onClose }: { day: number; onClose: () => void }) {
           </ul>
         </div>
       )}
-      <button
-        onClick={() => {
-          registerApplication(day);
-          onClose();
-        }}
-        className="mt-4 w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      >
-        {applicationsForDay.length > 0 ? "Registrar nova aplicação" : "Registrar aplicação concluída"}
-      </button>
+      {(() => {
+        const entry = state.days[day] ?? { checklist: {}, note: "", completed: false };
+        const checklist = getProtocolDay(day).checklist;
+        const allChecked = checklist.every((item) => !!entry.checklist[item]);
+        const canRegister = !APPLICATION_DAYS.includes(day) || allChecked;
+
+        return (
+          <div className="mt-4 space-y-3">
+            {!canRegister && (
+              <p className="text-center text-[11px] font-medium text-accent">
+                Complete todo o checklist para liberar o registro.
+              </p>
+            )}
+            <button
+              disabled={!canRegister}
+              onClick={() => {
+                registerApplication(day);
+                onClose();
+              }}
+              className="w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              {applicationsForDay.length > 0 ? "Registrar nova aplicação" : "Registrar aplicação concluída"}
+            </button>
+          </div>
+        );
+      })()}
     </Drawer>
   );
 }
