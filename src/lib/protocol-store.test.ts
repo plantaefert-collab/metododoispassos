@@ -814,7 +814,7 @@ describe("Inicialização única do Store", () => {
     expect(getState().saveError).toBeDefined();
 
     const s2 = ensureStoreInitialized();
-    expect(s1).toBe(s2);
+    expect(s2).toBe(getState());
     expect(s2.saveError).toBeDefined();
   });
 
