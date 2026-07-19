@@ -11,6 +11,8 @@ import {
   clearSaveError,
   __resetStoreForTests,
   SAVE_ERROR_MESSAGE,
+  normalizeAnswersVersion,
+  reconcileDiagnosisResultState,
   type ProtocolState,
 } from "./protocol-store";
 
