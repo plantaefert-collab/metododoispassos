@@ -3,6 +3,7 @@ import {
   computeDiagnosisResult,
   type DiagnosisAnswers,
   type DiagnosisCategory,
+  type DiagnosisGuidance,
   type DiagnosisResult,
 } from "./diagnosis-matrix";
 
@@ -399,19 +400,94 @@ function normalizeDiagnosisStatus(v: unknown): DiagnosisStatus {
   return v === "fresh" || v === "outdated" || v === "none" ? v : "none";
 }
 
+const VALID_CATEGORIES: DiagnosisCategory[] = [
+  "roots",
+  "leaves",
+  "environment",
+  "potAndSubstrate",
+  "wateringAndRoutine",
+];
+const VALID_CLASSIFICATIONS = ["favorable", "adjustment", "priority", "insufficient"] as const;
+
+/**
+ * Valida uma orientação (item das listas do diagnóstico). Retorna `null`
+ * quando qualquer campo obrigatório está ausente ou com tipo inválido, para
+ * que um item corrompido não derrube a interface ao acessar propriedades.
+ */
+export function normalizeDiagnosisGuidance(value: unknown): DiagnosisGuidance | null {
+  if (!isPlainObject(value)) return null;
+  const {
+    id,
+    category,
+    answer,
+    title,
+    classification,
+    explanation,
+    action,
+    tracking,
+    avoid,
+    warning,
+  } = value;
+  if (typeof id !== "string" || id.length === 0) return null;
+  if (typeof category !== "string" || !VALID_CATEGORIES.includes(category as DiagnosisCategory))
+    return null;
+  if (typeof answer !== "string" || answer.length === 0) return null;
+  if (typeof title !== "string" || title.length === 0) return null;
+  if (
+    typeof classification !== "string" ||
+    !(VALID_CLASSIFICATIONS as readonly string[]).includes(classification)
+  )
+    return null;
+  if (typeof explanation !== "string") return null;
+  if (typeof action !== "string") return null;
+  if (!Array.isArray(tracking)) return null;
+  const trackingClean = tracking.filter((t): t is string => typeof t === "string");
+  const out: DiagnosisGuidance = {
+    id,
+    category: category as DiagnosisCategory,
+    answer,
+    title,
+    classification: classification as DiagnosisGuidance["classification"],
+    explanation,
+    action,
+    tracking: trackingClean,
+  };
+  if (typeof avoid === "string") out.avoid = avoid;
+  if (typeof warning === "string") out.warning = warning;
+  return out;
+}
+
+function normalizeGuidanceList(v: unknown): DiagnosisGuidance[] | null {
+  if (!Array.isArray(v)) return null;
+  const out: DiagnosisGuidance[] = [];
+  for (const item of v) {
+    const g = normalizeDiagnosisGuidance(item);
+    if (g) out.push(g);
+  }
+  return out;
+}
+
 function normalizeDiagnosisResult(v: unknown): DiagnosisResult | null {
   if (!isPlainObject(v)) return null;
-  const listKeys = [
-    "favorable",
-    "adjustments",
-    "priorities",
-    "insufficientInformation",
-    "trackingPoints",
-  ] as const;
-  for (const k of listKeys) if (!Array.isArray(v[k])) return null;
+  const favorable = normalizeGuidanceList(v.favorable);
+  const adjustments = normalizeGuidanceList(v.adjustments);
+  const priorities = normalizeGuidanceList(v.priorities);
+  const insufficientInformation = normalizeGuidanceList(v.insufficientInformation);
+  if (!favorable || !adjustments || !priorities || !insufficientInformation) return null;
+  if (!Array.isArray(v.trackingPoints)) return null;
+  const trackingPoints = v.trackingPoints.filter((t): t is string => typeof t === "string");
   if (typeof v.answersVersion !== "number" || !Number.isFinite(v.answersVersion)) return null;
-  if (!(v.completedAt === null || typeof v.completedAt === "string")) return null;
-  return v as unknown as DiagnosisResult;
+  const completedAt =
+    v.completedAt === null || typeof v.completedAt === "string" ? v.completedAt : null;
+  return {
+    favorable,
+    adjustments,
+    priorities,
+    insufficientInformation,
+    trackingPoints,
+    completedAt,
+    answersVersion: v.answersVersion,
+  };
 }
 
 /**
