@@ -1103,50 +1103,7 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
 
 /* ---------------- Plano ---------------- */
 
-const DAY_META: Record<number, { title: string; goal: string; hint: string; checklist: string[] }> = {
-  1: {
-    title: "Dia 1 — Diagnóstico e foto inicial",
-    goal: "Registrar o ponto de partida da sua orquídea.",
-    hint: "Fotografe raízes, folhas e a planta inteira em luz natural.",
-    checklist: ["Fotografei a planta inteira", "Anotei observação inicial", "Revisei o resumo do diagnóstico"],
-  },
-  3: {
-    title: "Dia 3 — Primeira aplicação",
-    goal: "Aplicar o Método de 2 Passos pela primeira vez.",
-    hint: "Horário fresco, sem sol forte, sem atingir as flores.",
-    checklist: ["Preparei ambiente e planta", "Apliquei Passo 1 (Enraizar)", "Apliquei Passo 2 (Nutrir)"],
-  },
-  7: {
-    title: "Dia 7 — Primeira avaliação",
-    goal: "Comparar com o Dia 1 e registrar a evolução.",
-    hint: "Observe cor das raízes, firmeza das folhas e novos sinais.",
-    checklist: ["Fotografei a planta", "Anotei observações", "Comparei com o Dia 1"],
-  },
-  10: {
-    title: "Dia 10 — Segunda aplicação",
-    goal: "Reforçar o método após uma semana de acompanhamento.",
-    hint: "Mantenha o intervalo semanal em horário fresco.",
-    checklist: ["Preparei ambiente", "Apliquei Passo 1 (Enraizar)", "Apliquei Passo 2 (Nutrir)"],
-  },
-  14: {
-    title: "Dia 14 — Avaliação intermediária",
-    goal: "Verificar continuidade do progresso.",
-    hint: "Se algo piorou, registre e ajuste a observação.",
-    checklist: ["Fotografei a planta", "Comparei com Dia 7", "Registrei observações"],
-  },
-  17: {
-    title: "Dia 17 — Terceira aplicação",
-    goal: "Consolidar o ciclo com a última aplicação do protocolo.",
-    hint: "Mesmo cuidado das aplicações anteriores.",
-    checklist: ["Preparei ambiente", "Apliquei Passo 1 (Enraizar)", "Apliquei Passo 2 (Nutrir)"],
-  },
-  21: {
-    title: "Dia 21 — Avaliação final",
-    goal: "Comparar o antes e depois do plano de 21 dias.",
-    hint: "Preencha a avaliação final para consolidar o aprendizado.",
-    checklist: ["Fotografei a planta", "Comparei com Dia 1", "Preenchi a avaliação final"],
-  },
-};
+// O DAY_META agora é derivado do PROTOCOL_DAYS no lib/protocol-plan.ts
 
 function PlanoTab() {
   const { state, setCurrentDay, updateDay, toggleChecklist, toggleDayCompleted } = useProtocolStore();
