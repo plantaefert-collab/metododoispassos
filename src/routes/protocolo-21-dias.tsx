@@ -25,7 +25,7 @@ import {
   Flower2,
   Sparkles,
 } from "lucide-react";
-import { useProtocolStore } from "@/lib/protocol-store";
+import { useProtocolStore, isDiagnosisCurrent } from "@/lib/protocol-store";
 import {
   compressImage,
   PHOTO_ERROR_MESSAGE,
@@ -113,8 +113,10 @@ function ProtocoloPage() {
       <DiagnosisScreen
         onBack={() => setScreen("signup")}
         onFinish={() => {
-          store.saveDiagnosisResult();
-          setScreen("result");
+          const persistResult = store.saveDiagnosisResult();
+          if (persistResult.ok) {
+            setScreen("result");
+          }
         }}
       />
     );
@@ -622,7 +624,7 @@ const DIAG_CATEGORIES: Array<{ key: DiagnosisCategory; icon: ReactNode }> = [
 ];
 
 function DiagnosisScreen({ onFinish, onBack }: { onFinish: () => void; onBack: () => void }) {
-  const { state, toggleDiagnosis } = useProtocolStore();
+  const { state, toggleDiagnosis, clearSaveError } = useProtocolStore();
   const [stepIdx, setStepIdx] = useState(0);
   const total = DIAG_CATEGORIES.length;
   const current = DIAG_CATEGORIES[stepIdx];
@@ -641,6 +643,23 @@ function DiagnosisScreen({ onFinish, onBack }: { onFinish: () => void; onBack: (
         />
 
         <ProgressBar value={((stepIdx + 1) / total) * 100} className="mt-4" />
+        {state.saveError && (
+          <div
+            role="alert"
+            className="mt-3 flex items-start gap-2 rounded-2xl border border-accent/40 bg-accent/10 px-3 py-2.5 text-sm text-accent"
+          >
+            <AlertTriangle size={16} className="mt-0.5 shrink-0" />
+            <span className="flex-1">{state.saveError}</span>
+            <button
+              type="button"
+              onClick={clearSaveError}
+              aria-label="Fechar aviso"
+              className="rounded-full p-1 text-accent hover:bg-accent/15 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        )}
         <div className="mt-2 flex flex-wrap gap-1.5" aria-label="Etapas do diagnóstico">
           {DIAG_CATEGORIES.map((c, i) => (
             <span
@@ -727,8 +746,9 @@ function DiagnosisResultScreen({
   onFinish: () => void;
 }) {
   const { state } = useProtocolStore();
-  const result = state.diagnosisResult;
   const observations = totalObservations(state.diagnosis);
+  const current = isDiagnosisCurrent(state);
+  const result = current ? state.diagnosisResult : null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -747,7 +767,13 @@ function DiagnosisResultScreen({
           {observations} {observations === 1 ? "sinal observado" : "sinais observados"}. Este resultado orienta o acompanhamento — não é um diagnóstico definitivo.
         </div>
 
-        {result && <ResultBlocks result={result} />}
+        {current && result ? (
+          <ResultBlocks result={result} />
+        ) : (
+          <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
+            Este resultado não está atualizado. Revise as respostas e gere o diagnóstico novamente.
+          </InfoCard>
+        )}
 
         <div className="mt-6 flex gap-2">
           <button
@@ -756,12 +782,14 @@ function DiagnosisResultScreen({
           >
             <ChevronLeft size={16} /> Revisar respostas
           </button>
-          <button
-            onClick={onFinish}
-            className="ml-auto flex items-center gap-1 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            Ir para meu plano <ChevronRight size={16} />
-          </button>
+          {current && (
+            <button
+              onClick={onFinish}
+              className="ml-auto flex items-center gap-1 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              Ir para meu plano <ChevronRight size={16} />
+            </button>
+          )}
         </div>
       </div>
     </div>
@@ -924,10 +952,7 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
   const phase = phaseOf(day);
   const isApplicationDay = APPLICATION_DAYS.includes(day);
   const trackingPoints = state.diagnosisResult?.trackingPoints ?? [];
-  const diagnosisFresh =
-    state.diagnosisStatus === "fresh" &&
-    state.diagnosisResult !== null &&
-    state.diagnosisResult.answersVersion === state.answersVersion;
+  const diagnosisFresh = isDiagnosisCurrent(state);
 
   return (
     <div className="space-y-4">
@@ -1287,7 +1312,7 @@ function DiagnosticoTab({ onRedo }: { onRedo: () => void }) {
     Object.keys(CATEGORY_LABEL) as DiagnosisCategory[]
   ).map((k) => ({ key: k, label: CATEGORY_LABEL[k], values: state.diagnosis[k] }));
   const result = state.diagnosisResult;
-  const isOutdated = state.diagnosisStatus === "outdated";
+  const current = isDiagnosisCurrent(state);
 
   return (
     <div className="space-y-4">
@@ -1297,7 +1322,7 @@ function DiagnosticoTab({ onRedo }: { onRedo: () => void }) {
         <p className="mt-1 text-sm text-muted-foreground">Este resumo orienta sua observação. Um sinal isolado não fecha um diagnóstico.</p>
       </div>
 
-      {isOutdated && (
+      {result && !current && (
         <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
           Você editou respostas depois de gerar o resultado. Refaça o diagnóstico para atualizar as orientações.
         </InfoCard>
@@ -1320,7 +1345,7 @@ function DiagnosticoTab({ onRedo }: { onRedo: () => void }) {
         </div>
       ))}
 
-      {result && !isOutdated && <ResultBlocks result={result} />}
+      {current && result && <ResultBlocks result={result} />}
 
       <button onClick={onRedo} className="w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground">
         Refazer diagnóstico

@@ -13,6 +13,7 @@ import {
   SAVE_ERROR_MESSAGE,
   normalizeAnswersVersion,
   reconcileDiagnosisResultState,
+  isDiagnosisCurrent,
   type ProtocolState,
 } from "./protocol-store";
 
@@ -654,5 +655,111 @@ describe("Fluxo de alteração e nova conclusão", () => {
       diagnosisStatus: "fresh",
     });
     expect(isCurrent(migrated)).toBe(false);
+  });
+});
+
+// -------- isDiagnosisCurrent + saveDiagnosisResult persistence contract --------
+
+describe("isDiagnosisCurrent", () => {
+  it("true quando status fresh, resultado presente e versões iguais", () => {
+    const s: ProtocolState = {
+      ...getState(),
+      diagnosisResult: buildResult(4),
+      diagnosisStatus: "fresh",
+      answersVersion: 4,
+    };
+    expect(isDiagnosisCurrent(s)).toBe(true);
+  });
+  it("false quando status outdated", () => {
+    const s: ProtocolState = {
+      ...getState(),
+      diagnosisResult: buildResult(4),
+      diagnosisStatus: "outdated",
+      answersVersion: 4,
+    };
+    expect(isDiagnosisCurrent(s)).toBe(false);
+  });
+  it("false quando resultado é null", () => {
+    const s: ProtocolState = {
+      ...getState(),
+      diagnosisResult: null,
+      diagnosisStatus: "fresh",
+      answersVersion: 4,
+    };
+    expect(isDiagnosisCurrent(s)).toBe(false);
+  });
+  it("false quando versões diferem", () => {
+    const s: ProtocolState = {
+      ...getState(),
+      diagnosisResult: buildResult(3),
+      diagnosisStatus: "fresh",
+      answersVersion: 4,
+    };
+    expect(isDiagnosisCurrent(s)).toBe(false);
+  });
+});
+
+// Reproduz saveDiagnosisResult com a mesma semântica do hook (chama setState
+// diretamente e retorna o PersistResult). O hook faz exatamente isto.
+function callSaveDiagnosisResult() {
+  return setState((s) => {
+    const result = computeDiagnosisResult(s.diagnosis, s.answersVersion);
+    return { ...s, diagnosisResult: result, diagnosisStatus: "fresh" as const };
+  });
+}
+
+describe("saveDiagnosisResult", () => {
+  it("retorna { ok: true } e marca fresh com answersVersion atual", () => {
+    __resetStoreForTests();
+    setState((s) => ({
+      ...s,
+      diagnosis: {
+        roots: ["Firmes, verdes ou prateadas"],
+        leaves: [],
+        environment: [],
+        potAndSubstrate: [],
+        wateringAndRoutine: [],
+      },
+      answersVersion: 7,
+      diagnosisStatus: "none",
+      diagnosisResult: null,
+    }));
+    const r = callSaveDiagnosisResult();
+    expect(r.ok).toBe(true);
+    const st = getState();
+    expect(st.diagnosisStatus).toBe("fresh");
+    expect(st.diagnosisResult).not.toBeNull();
+    expect(st.diagnosisResult!.answersVersion).toBe(7);
+    expect(isDiagnosisCurrent(st)).toBe(true);
+  });
+
+  it("em quota: retorna { ok: false, reason: 'quota' }, preserva estado anterior e sinaliza saveError", () => {
+    __resetStoreForTests();
+    const prevResult = buildResult(2);
+    setState((s) => ({
+      ...s,
+      diagnosis: {
+        roots: ["Firmes, verdes ou prateadas"],
+        leaves: [],
+        environment: [],
+        potAndSubstrate: [],
+        wateringAndRoutine: [],
+      },
+      answersVersion: 5,
+      diagnosisResult: prevResult,
+      diagnosisStatus: "outdated",
+    }));
+    mockLS.setMode = "quota";
+    const r = callSaveDiagnosisResult();
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.reason).toBe("quota");
+    const st = getState();
+    // resultado anterior preservado
+    expect(st.diagnosisResult).toBe(prevResult);
+    expect(st.diagnosisStatus).toBe("outdated");
+    expect(st.answersVersion).toBe(5);
+    expect(st.saveError).toBe(SAVE_ERROR_MESSAGE);
+    // resultado antigo não passa a ser considerado atual
+    expect(isDiagnosisCurrent(st)).toBe(false);
   });
 });

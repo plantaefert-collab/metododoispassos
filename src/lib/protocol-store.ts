@@ -71,6 +71,19 @@ export type PersistResult =
 export const SAVE_ERROR_MESSAGE =
   "Não foi possível salvar esta alteração no navegador. Libere espaço ou remova alguma fotografia e tente novamente.";
 
+/**
+ * Condição única para determinar se o resultado do diagnóstico salvo pode
+ * ser exibido como “atual”. Toda tela deve reutilizar esta função em vez
+ * de recomputar a mesma verificação.
+ */
+export function isDiagnosisCurrent(state: ProtocolState): boolean {
+  return (
+    state.diagnosisStatus === "fresh" &&
+    state.diagnosisResult !== null &&
+    state.diagnosisResult.answersVersion === state.answersVersion
+  );
+}
+
 const STORAGE_KEY = "plantaefert-protocolo-21d";
 const LEGACY_KEY_V1 = "plantaefert-protocolo-21d-v1";
 const DEFAULT_CURRENT_DAY = 3;
@@ -720,7 +733,7 @@ export function useProtocolStore() {
   }, []);
 
   const saveDiagnosisResult = useCallback(() => {
-    setState((s) => {
+    return setState((s) => {
       const result = computeDiagnosisResult(s.diagnosis, s.answersVersion);
       return { ...s, diagnosisResult: result, diagnosisStatus: "fresh" };
     });
