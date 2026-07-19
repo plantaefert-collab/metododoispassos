@@ -169,7 +169,7 @@ function AppShell({
   onReset: () => void;
   children: ReactNode;
 }) {
-  const { state } = useProtocolStore();
+  const { state, clearSaveError } = useProtocolStore();
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto flex min-h-screen max-w-[440px] flex-col shadow-[0_0_60px_-30px_rgba(0,80,40,0.25)] sm:my-4 sm:min-h-[calc(100vh-2rem)] sm:rounded-3xl sm:border sm:border-border sm:bg-card">
@@ -199,6 +199,23 @@ function AppShell({
             </button>
           </div>
         </header>
+
+        {state.saveError && (
+          <div
+            role="alert"
+            className="flex items-start gap-2 border-b border-destructive/30 bg-destructive/10 px-4 py-2.5 text-[13px] leading-snug text-destructive"
+          >
+            <AlertTriangle size={16} className="mt-0.5 shrink-0" />
+            <span className="flex-1">{state.saveError}</span>
+            <button
+              onClick={clearSaveError}
+              aria-label="Fechar aviso"
+              className="ml-1 rounded-full p-1 text-destructive hover:bg-destructive/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <X size={14} />
+            </button>
+          </div>
+        )}
 
         <main className="flex-1 overflow-y-auto px-4 pb-28 pt-4">{children}</main>
 
@@ -1226,7 +1243,11 @@ function MethodDrawer({ day, onClose }: { day: number; onClose: () => void }) {
           <div className="font-semibold text-primary">Histórico de aplicações no Dia {day}</div>
           <ul className="mt-1 space-y-0.5">
             {applicationsForDay.map((a) => (
-              <li key={a.id}>{new Date(a.timestamp).toLocaleString("pt-BR")}</li>
+              <li key={a.id}>
+                {a.timestamp && !a.migrated
+                  ? new Date(a.timestamp).toLocaleString("pt-BR")
+                  : "Aplicação registrada na versão anterior"}
+              </li>
             ))}
           </ul>
         </div>
