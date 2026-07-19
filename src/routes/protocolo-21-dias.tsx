@@ -1141,11 +1141,11 @@ function PlanoTab() {
       <div className="rounded-3xl border border-border bg-card p-5">
         <div className="text-xs font-semibold uppercase tracking-wider text-accent">{phaseOf(day).range}</div>
         <h2 className="mt-1 text-lg font-bold text-primary">{meta.title}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">{meta.goal}</p>
-        <p className="mt-2 text-sm text-foreground/80">{meta.hint}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{meta.objective}</p>
+        <p className="mt-2 text-sm text-foreground/80">{meta.mainAction}</p>
 
         <div className="mt-4 space-y-2">
-          {meta.checklist.map((item) => {
+          {meta.checklist.map((item: string) => {
             const checked = !!entry.checklist[item];
             return (
               <button
