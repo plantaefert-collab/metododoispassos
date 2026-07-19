@@ -952,10 +952,7 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
   const phase = phaseOf(day);
   const isApplicationDay = APPLICATION_DAYS.includes(day);
   const trackingPoints = state.diagnosisResult?.trackingPoints ?? [];
-  const diagnosisFresh =
-    state.diagnosisStatus === "fresh" &&
-    state.diagnosisResult !== null &&
-    state.diagnosisResult.answersVersion === state.answersVersion;
+  const diagnosisFresh = isDiagnosisCurrent(state);
 
   return (
     <div className="space-y-4">
@@ -1315,7 +1312,7 @@ function DiagnosticoTab({ onRedo }: { onRedo: () => void }) {
     Object.keys(CATEGORY_LABEL) as DiagnosisCategory[]
   ).map((k) => ({ key: k, label: CATEGORY_LABEL[k], values: state.diagnosis[k] }));
   const result = state.diagnosisResult;
-  const isOutdated = state.diagnosisStatus === "outdated";
+  const current = isDiagnosisCurrent(state);
 
   return (
     <div className="space-y-4">
@@ -1325,7 +1322,7 @@ function DiagnosticoTab({ onRedo }: { onRedo: () => void }) {
         <p className="mt-1 text-sm text-muted-foreground">Este resumo orienta sua observação. Um sinal isolado não fecha um diagnóstico.</p>
       </div>
 
-      {isOutdated && (
+      {result && !current && (
         <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
           Você editou respostas depois de gerar o resultado. Refaça o diagnóstico para atualizar as orientações.
         </InfoCard>
@@ -1348,7 +1345,7 @@ function DiagnosticoTab({ onRedo }: { onRedo: () => void }) {
         </div>
       ))}
 
-      {result && !isOutdated && <ResultBlocks result={result} />}
+      {current && result && <ResultBlocks result={result} />}
 
       <button onClick={onRedo} className="w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground">
         Refazer diagnóstico
