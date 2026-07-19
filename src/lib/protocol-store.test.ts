@@ -826,7 +826,7 @@ describe("Inicialização única do Store", () => {
     // Simulando ação do reset() via setState pois reset é interno ao hook
     setState((s) => ({
       schemaVersion: 2,
-      currentDay: 3,
+      currentDay: 1,
       plant: { name: "", species: "", unknownSpecies: false, location: "", pot: "", substrate: "", difficulty: "", photo: null },
       diagnosis: { roots: [], leaves: [], environment: [], potAndSubstrate: [], wateringAndRoutine: [] },
       diagnosisResult: null,
