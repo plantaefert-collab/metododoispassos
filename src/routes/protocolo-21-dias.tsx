@@ -1109,7 +1109,7 @@ function PlanoTab() {
   const { state, setCurrentDay, updateDay, toggleChecklist, toggleDayCompleted } = useProtocolStore();
   const [showMethod, setShowMethod] = useState(false);
   const day = state.currentDay;
-  const meta = DAY_META[day] ?? DAY_META[1];
+  const meta = getProtocolDay(day);
   const entry = state.days[day] ?? { checklist: {}, note: "", completed: false };
   const isApplication = APPLICATION_DAYS.includes(day);
 
@@ -1120,20 +1120,20 @@ function PlanoTab() {
         <h1 className="text-2xl font-black tracking-tight text-primary">Tela do dia</h1>
       </div>
 
-      <div className="flex gap-1.5 overflow-x-auto pb-1">
-        {KEY_DAYS.map((d) => (
+      <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+        {PROTOCOL_DAYS.map((d) => (
           <button
-            key={d}
-            onClick={() => setCurrentDay(d)}
+            key={d.day}
+            onClick={() => setCurrentDay(d.day)}
             className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
-              day === d
+              day === d.day
                 ? "bg-primary text-primary-foreground"
-                : APPLICATION_DAYS.includes(d)
+                : APPLICATION_DAYS.includes(d.day)
                 ? "border border-accent/40 bg-accent/10 text-accent"
                 : "border border-border bg-card text-foreground"
             }`}
           >
-            Dia {d}
+            Dia {d.day}
           </button>
         ))}
       </div>
