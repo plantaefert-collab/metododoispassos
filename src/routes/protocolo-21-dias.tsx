@@ -1206,7 +1206,7 @@ function MethodDrawer({ day, onClose }: { day: number; onClose: () => void }) {
   return (
     <Drawer onClose={onClose} title="Método de 2 Passos">
       <p className="text-sm text-muted-foreground">
-        Uma vez por semana, nos Dias 3, 10 e 17. Produtos prontos para uso. Prefira horário fresco, evite sol forte e não atinja diretamente as flores.
+        Aplicação nos Dias 1, 7, 14 e 21. Produtos prontos para uso. Prefira horário fresco, evite sol forte e não atinja diretamente as flores.
       </p>
 
       <div className="mt-4 space-y-4">
