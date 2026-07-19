@@ -31,9 +31,17 @@ import {
   PHOTO_ERROR_MESSAGE,
 } from "@/lib/image-compress";
 import {
+  getProtocolDay,
+  getProtocolPhase,
+  APPLICATION_DAYS,
+  PHOTO_DAYS,
+  PROTOCOL_DAYS,
+  PROTOCOL_PHASES,
+  type ProtocolDay,
+} from "@/lib/protocol-plan";
+import {
   CATEGORY_LABEL,
   DIAGNOSIS_OPTIONS,
-  GUIDANCE_BY_CATEGORY,
   totalObservations,
   type DiagnosisCategory,
   type DiagnosisGuidance,
