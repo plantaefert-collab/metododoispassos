@@ -356,3 +356,92 @@ describe("normalizeDiagnosisResult", () => {
     expect(s.diagnosisResult).not.toBeNull();
   });
 });
+
+describe("normalizeDiagnosisResult — validação profunda", () => {
+  const validGuidance = {
+    id: "g1",
+    category: "roots",
+    answer: "Firmes",
+    title: "Título",
+    classification: "favorable",
+    explanation: "explicação",
+    action: "ação",
+    tracking: ["ponto"],
+  };
+  const withResult = (r: unknown) =>
+    migrateProtocolState({ schemaVersion: 2, diagnosisResult: r }).diagnosisResult;
+  const baseResult = (over: Record<string, unknown> = {}) => ({
+    favorable: [],
+    adjustments: [],
+    priorities: [],
+    insufficientInformation: [],
+    trackingPoints: [],
+    completedAt: null,
+    answersVersion: 0,
+    ...over,
+  });
+
+  it("1. preserva resultado completo e válido", () => {
+    const r = withResult(baseResult({ priorities: [validGuidance], trackingPoints: ["a"] }));
+    expect(r).not.toBeNull();
+    expect(r!.priorities).toHaveLength(1);
+    expect(r!.priorities[0].tracking).toEqual(["ponto"]);
+  });
+
+  it("2. orientação sem tracking retorna null", () => {
+    const { tracking: _t, ...g } = validGuidance;
+    void _t;
+    expect(withResult(baseResult({ priorities: [g] }))).toBeNull();
+  });
+
+  it("3. tracking não-array retorna null", () => {
+    expect(
+      withResult(baseResult({ priorities: [{ ...validGuidance, tracking: "x" }] })),
+    ).toBeNull();
+  });
+
+  it("4. categoria inválida retorna null", () => {
+    expect(
+      withResult(baseResult({ priorities: [{ ...validGuidance, category: "foo" }] })),
+    ).toBeNull();
+  });
+
+  it("5. valor não-objeto dentro de priorities retorna null", () => {
+    expect(withResult(baseResult({ priorities: ["oi"] }))).toBeNull();
+  });
+
+  it("6. trackingPoints com número retorna null", () => {
+    expect(withResult(baseResult({ trackingPoints: ["ok", 3] }))).toBeNull();
+  });
+
+  it("7. answersVersion negativo retorna null", () => {
+    expect(withResult(baseResult({ answersVersion: -1 }))).toBeNull();
+  });
+
+  it("8. answersVersion decimal retorna null", () => {
+    expect(withResult(baseResult({ answersVersion: 1.5 }))).toBeNull();
+  });
+
+  it("9. answersVersion NaN retorna null", () => {
+    expect(withResult(baseResult({ answersVersion: Number.NaN }))).toBeNull();
+  });
+
+  it("10. completedAt inválido retorna null", () => {
+    expect(withResult(baseResult({ completedAt: 123 }))).toBeNull();
+  });
+
+  it("11. id vazio retorna null", () => {
+    expect(
+      withResult(baseResult({ priorities: [{ ...validGuidance, id: "" }] })),
+    ).toBeNull();
+  });
+
+  it("12. avoid/warning com tipo inválido retorna null", () => {
+    expect(
+      withResult(baseResult({ priorities: [{ ...validGuidance, avoid: 5 }] })),
+    ).toBeNull();
+    expect(
+      withResult(baseResult({ priorities: [{ ...validGuidance, warning: true }] })),
+    ).toBeNull();
+  });
+});
