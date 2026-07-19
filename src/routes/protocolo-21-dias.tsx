@@ -1010,21 +1010,21 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
               Ver tarefa
             </button>
             <button onClick={() => setTab("plano")} className="rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground">
-              Registrar aplicação
+              Abrir protocolo
             </button>
             <button onClick={() => setTab("diario")} className="rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground">
               Adicionar foto
             </button>
             <button onClick={() => setTab("plano")} className="rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground">
-              Fazer anotação
+              Ver tarefa do dia
             </button>
           </div>
         </div>
       ) : (
         <div className="rounded-3xl border border-border bg-card p-5">
           <div className="text-xs font-bold uppercase tracking-wider text-primary">Tarefa do dia</div>
-          <h2 className="mt-1 text-lg font-bold text-foreground">Observe sua orquídea hoje</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Confira raízes, folhas e ambiente. Registre no seu plano.</p>
+          <h2 className="mt-1 text-lg font-bold text-foreground">{getProtocolDay(day).title}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{getProtocolDay(day).objective}</p>
           <button onClick={() => setTab("plano")} className="mt-3 inline-flex items-center gap-1 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground">
             Abrir meu plano <ChevronRight size={16} />
           </button>
