@@ -273,10 +273,10 @@ describe("Migração atômica — TESTE 9", () => {
 
 describe("Dias inválidos — TESTE 10", () => {
   it("normalizeCurrentDay rejeita valores fora de 1..21", () => {
-    expect(normalizeCurrentDay(999)).toBe(3);
-    expect(normalizeCurrentDay(-1)).toBe(3);
-    expect(normalizeCurrentDay(2.5)).toBe(3);
-    expect(normalizeCurrentDay("abc")).toBe(3);
+    expect(normalizeCurrentDay(999)).toBe(1);
+    expect(normalizeCurrentDay(-1)).toBe(1);
+    expect(normalizeCurrentDay(2.5)).toBe(1);
+    expect(normalizeCurrentDay("abc")).toBe(1);
     expect(normalizeCurrentDay(1)).toBe(1);
     expect(normalizeCurrentDay(21)).toBe(21);
   });
@@ -826,7 +826,7 @@ describe("Inicialização única do Store", () => {
     // Simulando ação do reset() via setState pois reset é interno ao hook
     setState((s) => ({
       schemaVersion: 2,
-      currentDay: 3,
+      currentDay: 1,
       plant: { name: "", species: "", unknownSpecies: false, location: "", pot: "", substrate: "", difficulty: "", photo: null },
       diagnosis: { roots: [], leaves: [], environment: [], potAndSubstrate: [], wateringAndRoutine: [] },
       diagnosisResult: null,
@@ -838,9 +838,9 @@ describe("Inicialização única do Store", () => {
       onboarded: false,
     }));
     
-    expect(getState().currentDay).toBe(3);
+    expect(getState().currentDay).toBe(1);
     const stateAgain = ensureStoreInitialized();
-    expect(stateAgain.currentDay).toBe(3);
+    expect(stateAgain.currentDay).toBe(1);
   });
 
   it("TESTE 7 — Reset exclusivo para testes", () => {
@@ -854,6 +854,35 @@ describe("Inicialização única do Store", () => {
     };
     ensureStoreInitialized();
     expect(getCount).toBeGreaterThan(0);
+  });
+});
+
+describe("Protocol Plan — Regras de aplicação e marcos", () => {
+  it("Valida dias de aplicação 1, 7, 14, 21", () => {
+    const s = migrateProtocolState({
+      schemaVersion: 2,
+      applications: [
+        { id: "a1", day: 1, timestamp: "2026-07-19T10:00:00Z" },
+        { id: "a7", day: 7, timestamp: "2026-07-19T10:00:00Z" },
+        { id: "a14", day: 14, timestamp: "2026-07-19T10:00:00Z" },
+        { id: "a21", day: 21, timestamp: "2026-07-19T10:00:00Z" },
+      ],
+    });
+    expect(s.applications).toHaveLength(4);
+    expect(s.applications.map((a) => a.day)).toEqual([1, 7, 14, 21]);
+  });
+
+  it("Garante 21 dias únicos no plano completo", () => {
+    const s = migrateProtocolState({
+      schemaVersion: 2,
+      days: Array.from({ length: 21 }, (_, i) => i + 1).reduce(
+        (acc, day) => ({ ...acc, [day]: { note: `Dia ${day}` } }),
+        {},
+      ),
+    });
+    expect(Object.keys(s.days)).toHaveLength(21);
+    expect(s.days[1].note).toBe("Dia 1");
+    expect(s.days[21].note).toBe("Dia 21");
   });
 });
 

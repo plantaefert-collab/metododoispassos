@@ -86,7 +86,7 @@ export function isDiagnosisCurrent(state: ProtocolState): boolean {
 
 const STORAGE_KEY = "plantaefert-protocolo-21d";
 const LEGACY_KEY_V1 = "plantaefert-protocolo-21d-v1";
-const DEFAULT_CURRENT_DAY = 3;
+const DEFAULT_CURRENT_DAY = 1;
 
 const emptyPlant: PlantInfo = {
   name: "",

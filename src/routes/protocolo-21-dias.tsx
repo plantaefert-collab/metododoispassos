@@ -31,9 +31,17 @@ import {
   PHOTO_ERROR_MESSAGE,
 } from "@/lib/image-compress";
 import {
+  getProtocolDay,
+  getProtocolPhase,
+  APPLICATION_DAYS,
+  PHOTO_DAYS,
+  PROTOCOL_DAYS,
+  PROTOCOL_PHASES,
+  type ProtocolDay,
+} from "@/lib/protocol-plan";
+import {
   CATEGORY_LABEL,
   DIAGNOSIS_OPTIONS,
-  GUIDANCE_BY_CATEGORY,
   totalObservations,
   type DiagnosisCategory,
   type DiagnosisGuidance,
@@ -61,14 +69,20 @@ export const Route = createFileRoute("/protocolo-21-dias")({
 
 type Tab = "inicio" | "plano" | "diagnostico" | "diario" | "aprender";
 
-const KEY_DAYS = [1, 3, 7, 10, 14, 17, 21];
-const APPLICATION_DAYS = [3, 10, 17];
-const RECORD_DAYS = [1, 7, 14, 21];
 
-function phaseOf(day: number): { label: string; range: string; tone: "green" | "lilac" | "accent" } {
-  if (day <= 7) return { label: "Fase 1 — Diagnosticar e iniciar", range: "Dias 1–7", tone: "green" };
-  if (day <= 14) return { label: "Fase 2 — Manter e acompanhar", range: "Dias 8–14", tone: "lilac" };
-  return { label: "Fase 3 — Consolidar e avaliar", range: "Dias 15–21", tone: "accent" };
+
+function phaseOf(day: number) {
+  const phase = getProtocolPhase(day);
+  const tones = {
+    "fase-1": "green",
+    "fase-2": "lilac",
+    "fase-3": "accent",
+  } as const;
+  return {
+    label: phase.title,
+    range: phase.range,
+    tone: tones[phase.id as keyof typeof tones] || "green",
+  };
 }
 
 function ProtocoloPage() {
@@ -996,21 +1010,21 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
               Ver tarefa
             </button>
             <button onClick={() => setTab("plano")} className="rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground">
-              Registrar aplicação
+              Abrir protocolo
             </button>
             <button onClick={() => setTab("diario")} className="rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground">
               Adicionar foto
             </button>
             <button onClick={() => setTab("plano")} className="rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground">
-              Fazer anotação
+              Ver tarefa do dia
             </button>
           </div>
         </div>
       ) : (
         <div className="rounded-3xl border border-border bg-card p-5">
           <div className="text-xs font-bold uppercase tracking-wider text-primary">Tarefa do dia</div>
-          <h2 className="mt-1 text-lg font-bold text-foreground">Observe sua orquídea hoje</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Confira raízes, folhas e ambiente. Registre no seu plano.</p>
+          <h2 className="mt-1 text-lg font-bold text-foreground">{getProtocolDay(day).title}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{getProtocolDay(day).objective}</p>
           <button onClick={() => setTab("plano")} className="mt-3 inline-flex items-center gap-1 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground">
             Abrir meu plano <ChevronRight size={16} />
           </button>
@@ -1070,7 +1084,7 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
         <div className="text-sm font-bold text-primary">Simular outro dia</div>
         <p className="mt-1 text-xs text-muted-foreground">Esta versão é uma demonstração local. Escolha um dia para explorar.</p>
         <div className="mt-3 flex flex-wrap gap-1.5">
-          {KEY_DAYS.map((d) => (
+          {[1, 7, 14, 21].map((d) => (
             <button
               key={d}
               onClick={() => setCurrentDay(d)}
@@ -1089,56 +1103,13 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
 
 /* ---------------- Plano ---------------- */
 
-const DAY_META: Record<number, { title: string; goal: string; hint: string; checklist: string[] }> = {
-  1: {
-    title: "Dia 1 — Diagnóstico e foto inicial",
-    goal: "Registrar o ponto de partida da sua orquídea.",
-    hint: "Fotografe raízes, folhas e a planta inteira em luz natural.",
-    checklist: ["Fotografei a planta inteira", "Anotei observação inicial", "Revisei o resumo do diagnóstico"],
-  },
-  3: {
-    title: "Dia 3 — Primeira aplicação",
-    goal: "Aplicar o Método de 2 Passos pela primeira vez.",
-    hint: "Horário fresco, sem sol forte, sem atingir as flores.",
-    checklist: ["Preparei ambiente e planta", "Apliquei Passo 1 (Enraizar)", "Apliquei Passo 2 (Nutrir)"],
-  },
-  7: {
-    title: "Dia 7 — Primeira avaliação",
-    goal: "Comparar com o Dia 1 e registrar a evolução.",
-    hint: "Observe cor das raízes, firmeza das folhas e novos sinais.",
-    checklist: ["Fotografei a planta", "Anotei observações", "Comparei com o Dia 1"],
-  },
-  10: {
-    title: "Dia 10 — Segunda aplicação",
-    goal: "Reforçar o método após uma semana de acompanhamento.",
-    hint: "Mantenha o intervalo semanal em horário fresco.",
-    checklist: ["Preparei ambiente", "Apliquei Passo 1 (Enraizar)", "Apliquei Passo 2 (Nutrir)"],
-  },
-  14: {
-    title: "Dia 14 — Avaliação intermediária",
-    goal: "Verificar continuidade do progresso.",
-    hint: "Se algo piorou, registre e ajuste a observação.",
-    checklist: ["Fotografei a planta", "Comparei com Dia 7", "Registrei observações"],
-  },
-  17: {
-    title: "Dia 17 — Terceira aplicação",
-    goal: "Consolidar o ciclo com a última aplicação do protocolo.",
-    hint: "Mesmo cuidado das aplicações anteriores.",
-    checklist: ["Preparei ambiente", "Apliquei Passo 1 (Enraizar)", "Apliquei Passo 2 (Nutrir)"],
-  },
-  21: {
-    title: "Dia 21 — Avaliação final",
-    goal: "Comparar o antes e depois do plano de 21 dias.",
-    hint: "Preencha a avaliação final para consolidar o aprendizado.",
-    checklist: ["Fotografei a planta", "Comparei com Dia 1", "Preenchi a avaliação final"],
-  },
-};
+// O DAY_META agora é derivado do PROTOCOL_DAYS no lib/protocol-plan.ts
 
 function PlanoTab() {
   const { state, setCurrentDay, updateDay, toggleChecklist, toggleDayCompleted } = useProtocolStore();
   const [showMethod, setShowMethod] = useState(false);
   const day = state.currentDay;
-  const meta = DAY_META[day] ?? DAY_META[1];
+  const meta = getProtocolDay(day);
   const entry = state.days[day] ?? { checklist: {}, note: "", completed: false };
   const isApplication = APPLICATION_DAYS.includes(day);
 
@@ -1149,20 +1120,20 @@ function PlanoTab() {
         <h1 className="text-2xl font-black tracking-tight text-primary">Tela do dia</h1>
       </div>
 
-      <div className="flex gap-1.5 overflow-x-auto pb-1">
-        {KEY_DAYS.map((d) => (
+      <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
+        {PROTOCOL_DAYS.map((d) => (
           <button
-            key={d}
-            onClick={() => setCurrentDay(d)}
+            key={d.day}
+            onClick={() => setCurrentDay(d.day)}
             className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
-              day === d
+              day === d.day
                 ? "bg-primary text-primary-foreground"
-                : APPLICATION_DAYS.includes(d)
+                : APPLICATION_DAYS.includes(d.day)
                 ? "border border-accent/40 bg-accent/10 text-accent"
                 : "border border-border bg-card text-foreground"
             }`}
           >
-            Dia {d}
+            Dia {d.day}
           </button>
         ))}
       </div>
@@ -1170,11 +1141,11 @@ function PlanoTab() {
       <div className="rounded-3xl border border-border bg-card p-5">
         <div className="text-xs font-semibold uppercase tracking-wider text-accent">{phaseOf(day).range}</div>
         <h2 className="mt-1 text-lg font-bold text-primary">{meta.title}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">{meta.goal}</p>
-        <p className="mt-2 text-sm text-foreground/80">{meta.hint}</p>
+        <p className="mt-1 text-sm text-muted-foreground">{meta.objective}</p>
+        <p className="mt-2 text-sm text-foreground/80">{meta.mainAction}</p>
 
         <div className="mt-4 space-y-2">
-          {meta.checklist.map((item) => {
+          {meta.checklist.map((item: string) => {
             const checked = !!entry.checklist[item];
             return (
               <button
@@ -1235,7 +1206,7 @@ function MethodDrawer({ day, onClose }: { day: number; onClose: () => void }) {
   return (
     <Drawer onClose={onClose} title="Método de 2 Passos">
       <p className="text-sm text-muted-foreground">
-        Uma vez por semana, nos Dias 3, 10 e 17. Produtos prontos para uso. Prefira horário fresco, evite sol forte e não atinja diretamente as flores.
+        Aplicação nos Dias 1, 7, 14 e 21. Produtos prontos para uso. Prefira horário fresco, evite sol forte e não atinja diretamente as flores.
       </p>
 
       <div className="mt-4 space-y-4">
@@ -1280,15 +1251,32 @@ function MethodDrawer({ day, onClose }: { day: number; onClose: () => void }) {
           </ul>
         </div>
       )}
-      <button
-        onClick={() => {
-          registerApplication(day);
-          onClose();
-        }}
-        className="mt-4 w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-      >
-        {applicationsForDay.length > 0 ? "Registrar nova aplicação" : "Registrar aplicação concluída"}
-      </button>
+      {(() => {
+        const entry = state.days[day] ?? { checklist: {}, note: "", completed: false };
+        const checklist = getProtocolDay(day).checklist;
+        const allChecked = checklist.every((item) => !!entry.checklist[item]);
+        const canRegister = !APPLICATION_DAYS.includes(day) || allChecked;
+
+        return (
+          <div className="mt-4 space-y-3">
+            {!canRegister && (
+              <p className="text-center text-[11px] font-medium text-accent">
+                Complete todo o checklist para liberar o registro.
+              </p>
+            )}
+            <button
+              disabled={!canRegister}
+              onClick={() => {
+                registerApplication(day);
+                onClose();
+              }}
+              className="w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              {applicationsForDay.length > 0 ? "Registrar nova aplicação" : "Registrar aplicação concluída"}
+            </button>
+          </div>
+        );
+      })()}
     </Drawer>
   );
 }
@@ -1379,7 +1367,7 @@ function DiarioTab() {
       </div>
 
       <div className="space-y-3">
-        {RECORD_DAYS.map((d) => {
+        {PHOTO_DAYS.map((d) => {
           const entry = state.days[d] ?? { checklist: {}, note: "", completed: false };
           return (
             <div key={d} className="rounded-3xl border border-border bg-card p-4">
@@ -1462,7 +1450,7 @@ function FinalEvaluation() {
       <h2 className="mt-1 text-lg font-bold text-primary">Comparação e reflexão</h2>
 
       <div className="mt-4 grid grid-cols-4 gap-2">
-        {RECORD_DAYS.map((d) => {
+        {PHOTO_DAYS.map((d) => {
           const p = state.days[d]?.photo;
           return (
             <div key={d} className="aspect-square overflow-hidden rounded-lg border border-border bg-muted/40">
