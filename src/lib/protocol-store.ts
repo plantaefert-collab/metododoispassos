@@ -58,7 +58,6 @@ export type ProtocolState = {
   applications: ApplicationRecord[];
   finalEval: FinalEvaluation;
   onboarded: boolean;
-  guestMode: boolean;
 };
 
 const STORAGE_KEY = "plantaefert-protocolo-21d";
@@ -95,7 +94,6 @@ const defaultState: ProtocolState = {
   applications: [],
   finalEval: { improved: "", same: "", attention: "", keep: "", path: "" },
   onboarded: false,
-  guestMode: false,
 };
 
 function migrateFromV1(v1: Record<string, unknown>): ProtocolState {
@@ -252,11 +250,7 @@ export function useProtocolStore() {
   }, []);
 
   const setOnboarded = useCallback((v: boolean) => {
-    setState((s) => ({ ...s, onboarded: v, guestMode: v ? false : s.guestMode }));
-  }, []);
-
-  const setGuestMode = useCallback((v: boolean) => {
-    setState((s) => ({ ...s, guestMode: v }));
+    setState((s) => ({ ...s, onboarded: v }));
   }, []);
 
   const updateFinalEval = useCallback((patch: Partial<FinalEvaluation>) => {
@@ -286,7 +280,6 @@ export function useProtocolStore() {
     registerApplication,
     setCurrentDay,
     setOnboarded,
-    setGuestMode,
     updateFinalEval,
     reset,
   };
