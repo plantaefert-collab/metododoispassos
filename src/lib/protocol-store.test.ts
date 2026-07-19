@@ -764,6 +764,8 @@ describe("saveDiagnosisResult", () => {
     // resultado antigo não passa a ser considerado atual
     expect(isDiagnosisCurrent(st)).toBe(false);
   });
+});
+
 
 describe("Inicialização única do Store", () => {
   it("TESTE 1 — Primeira inicialização: lê localStorage", () => {
