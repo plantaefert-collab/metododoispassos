@@ -273,10 +273,10 @@ describe("Migração atômica — TESTE 9", () => {
 
 describe("Dias inválidos — TESTE 10", () => {
   it("normalizeCurrentDay rejeita valores fora de 1..21", () => {
-    expect(normalizeCurrentDay(999)).toBe(3);
-    expect(normalizeCurrentDay(-1)).toBe(3);
-    expect(normalizeCurrentDay(2.5)).toBe(3);
-    expect(normalizeCurrentDay("abc")).toBe(3);
+    expect(normalizeCurrentDay(999)).toBe(1);
+    expect(normalizeCurrentDay(-1)).toBe(1);
+    expect(normalizeCurrentDay(2.5)).toBe(1);
+    expect(normalizeCurrentDay("abc")).toBe(1);
     expect(normalizeCurrentDay(1)).toBe(1);
     expect(normalizeCurrentDay(21)).toBe(21);
   });
