@@ -1476,7 +1476,7 @@ function FinalEvaluation() {
       <h2 className="mt-1 text-lg font-bold text-primary">Comparação e reflexão</h2>
 
       <div className="mt-4 grid grid-cols-4 gap-2">
-        {RECORD_DAYS.map((d) => {
+        {PHOTO_DAYS.map((d) => {
           const p = state.days[d]?.photo;
           return (
             <div key={d} className="aspect-square overflow-hidden rounded-lg border border-border bg-muted/40">
