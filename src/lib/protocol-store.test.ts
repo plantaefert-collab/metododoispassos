@@ -855,5 +855,33 @@ describe("Inicialização única do Store", () => {
     ensureStoreInitialized();
     expect(getCount).toBeGreaterThan(0);
   });
+
+describe("Protocol Plan — Regras de aplicação e marcos", () => {
+  it("Valida dias de aplicação 1, 7, 14, 21", () => {
+    const s = migrateProtocolState({
+      schemaVersion: 2,
+      applications: [
+        { id: "a1", day: 1, timestamp: "2026-07-19T10:00:00Z" },
+        { id: "a7", day: 7, timestamp: "2026-07-19T10:00:00Z" },
+        { id: "a14", day: 14, timestamp: "2026-07-19T10:00:00Z" },
+        { id: "a21", day: 21, timestamp: "2026-07-19T10:00:00Z" },
+      ],
+    });
+    expect(s.applications).toHaveLength(4);
+    expect(s.applications.map((a) => a.day)).toEqual([1, 7, 14, 21]);
+  });
+
+  it("Garante 21 dias únicos no plano completo", () => {
+    const s = migrateProtocolState({
+      schemaVersion: 2,
+      days: Array.from({ length: 21 }, (_, i) => i + 1).reduce(
+        (acc, day) => ({ ...acc, [day]: { note: `Dia ${day}` } }),
+        {},
+      ),
+    });
+    expect(Object.keys(s.days)).toHaveLength(21);
+    expect(s.days[1].note).toBe("Dia 1");
+    expect(s.days[21].note).toBe("Dia 21");
+  });
 });
 
