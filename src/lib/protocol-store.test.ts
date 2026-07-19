@@ -13,6 +13,7 @@ import {
   SAVE_ERROR_MESSAGE,
   normalizeAnswersVersion,
   reconcileDiagnosisResultState,
+  isDiagnosisCurrent,
   type ProtocolState,
 } from "./protocol-store";
 
