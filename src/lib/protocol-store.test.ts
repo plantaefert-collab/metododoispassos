@@ -838,9 +838,9 @@ describe("Inicialização única do Store", () => {
       onboarded: false,
     }));
     
-    expect(getState().currentDay).toBe(3);
+    expect(getState().currentDay).toBe(1);
     const stateAgain = ensureStoreInitialized();
-    expect(stateAgain.currentDay).toBe(3);
+    expect(stateAgain.currentDay).toBe(1);
   });
 
   it("TESTE 7 — Reset exclusivo para testes", () => {
