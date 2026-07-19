@@ -69,7 +69,7 @@ export const Route = createFileRoute("/protocolo-21-dias")({
 
 type Tab = "inicio" | "plano" | "diagnostico" | "diario" | "aprender";
 
-const KEY_DAYS = [1, 7, 14, 21];
+
 
 function phaseOf(day: number) {
   const phase = getProtocolPhase(day);
