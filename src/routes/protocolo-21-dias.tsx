@@ -25,7 +25,7 @@ import {
   Flower2,
   Sparkles,
 } from "lucide-react";
-import { useProtocolStore } from "@/lib/protocol-store";
+import { useProtocolStore, isDiagnosisCurrent } from "@/lib/protocol-store";
 import {
   compressImage,
   PHOTO_ERROR_MESSAGE,
@@ -113,8 +113,10 @@ function ProtocoloPage() {
       <DiagnosisScreen
         onBack={() => setScreen("signup")}
         onFinish={() => {
-          store.saveDiagnosisResult();
-          setScreen("result");
+          const persistResult = store.saveDiagnosisResult();
+          if (persistResult.ok) {
+            setScreen("result");
+          }
         }}
       />
     );
