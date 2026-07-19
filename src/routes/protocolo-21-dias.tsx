@@ -746,8 +746,9 @@ function DiagnosisResultScreen({
   onFinish: () => void;
 }) {
   const { state } = useProtocolStore();
-  const result = state.diagnosisResult;
   const observations = totalObservations(state.diagnosis);
+  const current = isDiagnosisCurrent(state);
+  const result = current ? state.diagnosisResult : null;
 
   return (
     <div className="min-h-screen bg-background">
@@ -766,7 +767,13 @@ function DiagnosisResultScreen({
           {observations} {observations === 1 ? "sinal observado" : "sinais observados"}. Este resultado orienta o acompanhamento — não é um diagnóstico definitivo.
         </div>
 
-        {result && <ResultBlocks result={result} />}
+        {current && result ? (
+          <ResultBlocks result={result} />
+        ) : (
+          <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
+            Este resultado não está atualizado. Revise as respostas e gere o diagnóstico novamente.
+          </InfoCard>
+        )}
 
         <div className="mt-6 flex gap-2">
           <button
@@ -775,12 +782,14 @@ function DiagnosisResultScreen({
           >
             <ChevronLeft size={16} /> Revisar respostas
           </button>
-          <button
-            onClick={onFinish}
-            className="ml-auto flex items-center gap-1 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          >
-            Ir para meu plano <ChevronRight size={16} />
-          </button>
+          {current && (
+            <button
+              onClick={onFinish}
+              className="ml-auto flex items-center gap-1 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              Ir para meu plano <ChevronRight size={16} />
+            </button>
+          )}
         </div>
       </div>
     </div>
