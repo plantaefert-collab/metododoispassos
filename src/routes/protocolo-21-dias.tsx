@@ -299,9 +299,13 @@ function AppShell({
           </div>
         )}
 
-        <main className="flex-1 overflow-y-auto px-4 pb-28 pt-4">{children}</main>
+        <main className="flex-1 overflow-y-auto px-4 pb-28 pt-4">
+          <div className="relative">
+            {children}
+          </div>
+        </main>
 
-        <nav className="sticky bottom-0 z-20 border-t border-border bg-card sm:rounded-b-2xl">
+        <nav className="sticky bottom-0 z-20 border-t border-border bg-card/80 backdrop-blur-md sm:rounded-b-2xl">
           <div className="grid grid-cols-5">
             <TabBtn
               active={tab === "inicio"}
