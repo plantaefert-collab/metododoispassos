@@ -1,40 +1,142 @@
-import { ProtocolDay } from "./protocol-plan";
+import type { ProtocolDay } from "./protocol-plan";
 
+/**
+ * Transcrição editorial fiel do arquivo "Plano_editorial_21_dias.md" fornecido
+ * pela PlantaeFert, com as adaptações oficiais autorizadas para os Dias 1, 7,
+ * 10, 14, 16, 17, 18 e 21 (aplicações consolidadas nos Dias 1, 7, 14 e 21).
+ *
+ * Nenhuma orientação foi resumida. Todas as listas do arquivo original estão
+ * preservadas integralmente.
+ */
 export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
   1: {
     day: 1,
     phase: 1,
     title: "Diagnóstico e início do protocolo",
-    objective: "Registrar o ponto de partida, compreender as condições da planta e iniciar o Método de 2 Passos quando a aplicação estiver indicada.",
-    mainAction: "Registrar orquídea, realizar diagnóstico e primeira aplicação.",
-    howTo: [
-      "Fotografe a planta inteira, folhas e raízes em ambiente claro.",
-      "Marque sinais nas raízes, folhas, ambiente, vaso, substrato e rega.",
-      "Avalie luz, ventilação, drenagem e substrato.",
-      "Realize o Método de 2 Passos."
-    ],
-    observe: [
-      "Firmeza e coloração das folhas",
-      "Raízes visíveis",
-      "Sinais favoráveis ou pontos de ajuste"
-    ],
-    avoid: [
-      "Filtros em fotos",
-      "Marcar respostas por suposição",
-      "Trocar vaso ou substrato por impulso",
-      "Aplicar diretamente nas flores"
-    ],
+    objective:
+      "Registrar o ponto de partida, compreender as condições da planta e iniciar o Método de 2 Passos quando a aplicação estiver indicada.",
+    mainAction:
+      "Realize as quatro etapas do Dia 1 na ordem sugerida. Você pode parar e continuar depois de qualquer etapa.",
+    recordPrompt:
+      "Registre o que observou hoje em cada etapa e conclua com a primeira aplicação.",
     checklist: [
-      "Registrei a orquídea",
-      "Fiz o diagnóstico",
-      "Avaliei ambiente e substrato",
-      "Realizei o Passo 1 (Enraizar)",
-      "Realizei o Passo 2 (Nutrir)"
+      "Concluí a Etapa 1 — Registrar a orquídea",
+      "Concluí a Etapa 2 — Fazer o diagnóstico guiado",
+      "Concluí a Etapa 3 — Avaliar ambiente, vaso e substrato",
+      "Concluí a Etapa 4 — Primeira aplicação",
     ],
-    recordPrompt: "Registre nome, espécie (se souber), local, tipo de vaso e substrato.",
     isApplicationDay: true,
     requiresPhoto: true,
+    stages: [
+      {
+        id: "etapa-1-registrar",
+        title: "Etapa 1 — Registrar a orquídea",
+        mainAction:
+          "Preencher as informações básicas e adicionar a fotografia inicial.",
+        howTo: [
+          "Fotografe a planta inteira, as folhas e as raízes visíveis em um ambiente claro.",
+          "Procure usar um ângulo que possa ser repetido nos Dias 7, 14 e 21.",
+        ],
+        observe: [
+          "Aparência geral",
+          "Firmeza e coloração das folhas",
+          "Raízes visíveis",
+          "Brotos ou hastes",
+          "Estabilidade da planta no vaso",
+        ],
+        avoid: [
+          "Filtros",
+          "Fotografias muito escuras",
+          "Manipular excessivamente a planta",
+          "Retirar a orquídea do vaso apenas para fotografar",
+        ],
+        registerText:
+          "Nome da planta; espécie, quando conhecida; local de cultivo; tipo de vaso; tipo de substrato; principal dificuldade; foto inicial.",
+        tip: "Tente repetir o mesmo enquadramento nos próximos registros.",
+      },
+      {
+        id: "etapa-2-diagnostico",
+        title: "Etapa 2 — Fazer o diagnóstico guiado",
+        mainAction:
+          "Marcar os sinais observados nas raízes, folhas, ambiente, vaso, substrato, rega e rotina.",
+        howTo: [
+          "Selecione somente o que consegue observar atualmente.",
+          "Quando não souber avaliar uma categoria, use a opção correspondente.",
+        ],
+        observe: [
+          "Sinais favoráveis",
+          "Pontos que pedem ajustes",
+          "Sinais que merecem acompanhamento próximo",
+          "Informações que ainda não foi possível observar",
+        ],
+        avoid: [
+          "Marcar uma resposta apenas porque parece provável",
+          "Interpretar um sinal isolado como diagnóstico definitivo",
+          "Fazer várias mudanças antes de concluir a observação",
+        ],
+        registerText:
+          "Resultado personalizado e até três pontos prioritários para acompanhamento.",
+      },
+      {
+        id: "etapa-3-ambiente",
+        title: "Etapa 3 — Avaliar ambiente, vaso e substrato",
+        mainAction:
+          "Conferir se as condições de cultivo estão adequadas.",
+        howTo: [
+          "Observe o local em diferentes horários.",
+          "Confira vaso, drenagem, umidade e estabilidade da planta.",
+        ],
+        observe: [
+          "Luz indireta",
+          "Sol direto forte",
+          "Ambiente muito escuro",
+          "Circulação de ar",
+          "Água acumulada",
+          "Substrato compactado",
+          "Secagem muito lenta",
+          "Mau cheiro",
+          "Planta solta no vaso",
+        ],
+        avoid: [
+          "Mudar a planta de lugar várias vezes",
+          "Trocar vaso ou substrato por impulso",
+          "Regar novamente quando o substrato ainda estiver muito úmido",
+          "Realizar várias correções simultâneas",
+        ],
+        registerText:
+          "Condição da luz, ventilação, drenagem e substrato.",
+      },
+      {
+        id: "etapa-4-aplicacao",
+        title: "Etapa 4 — Primeira aplicação",
+        mainAction:
+          "Realizar o Método de 2 Passos conforme a orientação técnica oficial.",
+        howTo: [
+          "Abra a seção Método de 2 Passos abaixo e siga as duas etapas na ordem indicada.",
+        ],
+        observe: [
+          "Raízes",
+          "Firmeza das folhas",
+          "Tempo de secagem",
+          "Alterações inesperadas",
+        ],
+        avoid: [
+          "Misturar produtos não previstos",
+          "Repetir a aplicação por engano",
+          "Alterar a quantidade recomendada",
+          "Aplicar diretamente nas flores, caso essa restrição seja confirmada",
+        ],
+        attention: [
+          "Verifique a umidade do substrato antes de iniciar.",
+          "Confirme se houve aplicação recente de outro produto.",
+          "Observe se a planta apresenta sinais de deterioração rápida.",
+        ],
+        registerText:
+          "Data e horário; passos realizados; condição da planta; observação adicional.",
+      },
+    ],
   },
+
   2: {
     day: 2,
     phase: 1,
@@ -42,29 +144,37 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     objective: "Acompanhar a planta sem realizar novas intervenções.",
     mainAction: "Observar raízes, folhas, substrato e ambiente.",
     howTo: [
-      "Compare com o registro do Dia 1.",
-      "Anote somente alterações visíveis.",
-      "Mantenha a planta no local escolhido."
+      "Compare com o registro do Dia 1 e anote somente alterações visíveis.",
     ],
     observe: [
       "Firmeza das folhas",
       "Alteração na aparência das raízes",
       "Tempo de secagem",
-      "Reação inesperada após a aplicação"
+      "Manchas ou sinais novos",
+      "Reação inesperada após a aplicação",
     ],
     avoid: [
       "Repetir a aplicação",
       "Mudar a planta de lugar sem necessidade",
-      "Regar apenas por calendário"
+      "Regar apenas porque chegou um novo dia",
+      "Fazer várias correções ao mesmo tempo",
     ],
+    registerText:
+      "Selecione a opção que representa o que observou hoje e adicione uma observação, se quiser.",
+    registerOptions: [
+      { value: "sem-mudancas", label: "Sem mudanças" },
+      { value: "mudanca-leve", label: "Mudança leve" },
+      { value: "sinal-de-atencao", label: "Sinal de atenção" },
+    ],
+    recordPrompt: "Sem mudanças, mudança leve ou sinal de atenção?",
     checklist: [
-      "Observei as folhas",
       "Observei as raízes visíveis",
-      "Verifiquei o tempo de secagem",
-      "Mantive o local da planta"
+      "Observei a firmeza das folhas",
+      "Registrei o que percebi hoje",
     ],
-    recordPrompt: "Registre se houve mudança leve ou sinal de atenção.",
+    personalizedContext: true,
   },
+
   3: {
     day: 3,
     phase: 1,
@@ -72,28 +182,37 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     objective: "Criar critérios para decidir quando regar.",
     mainAction: "Avaliar a umidade antes de realizar qualquer rega.",
     howTo: [
-      "Observe a superfície e o interior do substrato.",
-      "Verifique o peso do vaso.",
-      "Observe a cor das raízes (verdes vs prateadas)."
+      "Observe as raízes, a superfície do substrato, o tempo desde a última rega e o peso do vaso.",
     ],
     observe: [
-      "Substrato úmido ou seco",
-      "Raízes prateadas (pedem água)",
-      "Peso do vaso"
+      "Substrato ainda úmido",
+      "Raízes verdes ou prateadas",
+      "Peso do vaso",
+      "Água acumulada",
+      "Secagem muito rápida ou muito lenta",
     ],
     avoid: [
       "Regar apenas por calendário",
-      "Deixar água acumulada no cachepot",
-      "Considerar somente a superfície"
+      "Deixar água parada no cachepot",
+      "Considerar somente a superfície do substrato",
+      "Aumentar a frequência sem observar a planta",
     ],
+    registerText:
+      "Escolha a opção que descreve o dia e, se quiser, anote o critério que utilizou.",
+    registerOptions: [
+      { value: "reguei", label: "Reguei" },
+      { value: "nao-foi-necessario", label: "Não foi necessário regar" },
+      { value: "nao-consegui-avaliar", label: "Não consegui avaliar" },
+    ],
+    recordPrompt: "Reguei, não foi necessário regar ou não consegui avaliar?",
     checklist: [
       "Verifiquei o peso do vaso",
       "Observei a cor das raízes",
       "Toquei no substrato",
-      "Decidi se regava ou não"
+      "Decidi se regava ou não",
     ],
-    recordPrompt: "Reguei, não precisei regar ou não consegui avaliar?",
   },
+
   4: {
     day: 4,
     phase: 1,
@@ -101,59 +220,84 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     objective: "Verificar se as raízes possuem drenagem, estabilidade e aeração.",
     mainAction: "Observar o estado do vaso e do substrato sem desmontar a planta.",
     howTo: [
-      "Confira furos e escoamento.",
-      "Confira compactação e cheiro.",
-      "Confira a estabilidade da planta."
+      "Confira furos, escoamento, compactação, cheiro e estabilidade.",
     ],
     observe: [
-      "Drenagem eficiente",
+      "Vaso com drenagem",
+      "Água acumulada",
       "Substrato solto ou compacto",
+      "Material se desfazendo",
+      "Planta balançando",
       "Mau cheiro",
-      "Planta balançando"
     ],
     avoid: [
       "Trocar o substrato sem avaliar o conjunto",
-      "Apertar as raízes",
-      "Manter água acumulada"
+      "Apertar ou movimentar excessivamente as raízes",
+      "Manter água acumulada",
+      "Fazer transplante apenas para concluir a tarefa",
     ],
+    registerText: "Como você classifica a condição geral do vaso e substrato?",
+    registerOptions: [
+      { value: "favoravel", label: "Favorável" },
+      { value: "acompanhamento", label: "Precisa de acompanhamento" },
+      { value: "avaliacao-especializada", label: "Precisa de avaliação especializada" },
+    ],
+    recordPrompt:
+      "Favorável, precisa de acompanhamento ou precisa de avaliação especializada?",
     checklist: [
       "Verifiquei a drenagem",
       "Observei a compactação",
       "Verifiquei o cheiro do substrato",
-      "Conferi a estabilidade da planta"
+      "Conferi a estabilidade da planta",
     ],
-    recordPrompt: "Condição geral: favorável, precisa acompanhamento ou avaliação especializada?",
   },
+
   5: {
     day: 5,
     phase: 1,
     title: "Observar as raízes",
-    objective: "Acompanhar sinais de atividade e possíveis alterações no sistema radicular.",
-    mainAction: "Observar as raízes visíveis (aéreas e no vaso).",
+    objective:
+      "Acompanhar sinais de atividade e possíveis alterações no sistema radicular.",
+    mainAction: "Observar as raízes visíveis.",
     howTo: [
-      "Veja raízes aéreas e próximas à parede do vaso.",
-      "Compare a firmeza e a cor.",
-      "Procure por pontas verdes ou avermelhadas."
+      "Veja raízes aéreas e raízes próximas à parede do vaso, quando ele for transparente.",
     ],
     observe: [
-      "Pontas novas",
       "Firmeza",
-      "Áreas secas ou escuras",
-      "Partes moles"
+      "Cor",
+      "Pontas novas",
+      "Áreas secas",
+      "Áreas escuras",
+      "Partes moles",
+      "Mau cheiro",
     ],
     avoid: [
       "Cortar raízes somente pela cor",
-      "Retirar a planta do vaso",
-      "Manipular raízes novas"
+      "Retirar a planta do vaso sem necessidade",
+      "Manipular raízes novas",
+      "Concluir que a planta está melhor apenas pela mudança de cor após a rega",
     ],
+    registerText:
+      "Selecione o que representa o que observou nas raízes hoje.",
+    registerOptions: [
+      { value: "sem-alteracoes", label: "Sem alterações" },
+      { value: "pontas-novas", label: "Pontas novas" },
+      { value: "firmes", label: "Raízes firmes" },
+      { value: "secas", label: "Raízes secas" },
+      { value: "escuras", label: "Raízes escuras" },
+      { value: "moles", label: "Raízes moles" },
+      { value: "nao-consegui-avaliar", label: "Não consegui avaliar" },
+    ],
+    recordPrompt:
+      "Sem alterações, pontas novas, raízes firmes, secas, escuras, moles ou não consegui avaliar?",
     checklist: [
       "Observei as raízes aéreas",
       "Observei as raízes no vaso",
       "Procurei pontas novas",
-      "Verifiquei a firmeza"
+      "Verifiquei a firmeza",
     ],
-    recordPrompt: "Sem alterações, pontas novas, raízes firmes ou sinais de atenção?",
   },
+
   6: {
     day: 6,
     phase: 1,
@@ -161,62 +305,78 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     objective: "Acompanhar o vigor visível da planta.",
     mainAction: "Verificar firmeza, coloração e novos crescimentos.",
     howTo: [
-      "Observe folhas antigas e novas separadamente.",
-      "Compare com a fotografia inicial.",
-      "Procure por brotação ou novas hastes."
+      "Observe folhas antigas e novas separadamente e compare com a fotografia inicial.",
     ],
     observe: [
-      "Firmeza e enrugamento",
-      "Amarelamento ou manchas",
-      "Folha nova ou broto",
-      "Haste em desenvolvimento"
+      "Firmeza",
+      "Enrugamento",
+      "Amarelamento",
+      "Manchas",
+      "Folha nova",
+      "Brotação",
+      "Haste em desenvolvimento",
+      "Deterioração rápida",
     ],
     avoid: [
-      "Retirar folhas sem compreender o contexto",
+      "Retirar folhas amareladas sem compreender o contexto",
       "Confundir folha nova com haste",
-      "Interpretar ausência de flor como falha"
+      "Interpretar ausência de flor como ausência de evolução",
+      "Molhar folhas no fim do dia, quando isso representar risco",
     ],
+    registerText: "Quais foram os principais sinais encontrados hoje?",
+    recordPrompt: "Quais os principais sinais encontrados na parte aérea?",
     checklist: [
       "Observei as folhas antigas",
       "Observei as folhas novas",
       "Procurei brotos ou hastes",
-      "Verifiquei manchas"
+      "Verifiquei manchas",
     ],
-    recordPrompt: "Quais os principais sinais encontrados na parte aérea?",
   },
+
   7: {
     day: 7,
     phase: 1,
     title: "Primeira avaliação e segunda aplicação",
-    objective: "Comparar a primeira semana com o ponto de partida e realizar a segunda aplicação.",
-    mainAction: "Adicionar fotografia, comparar e aplicar o Método de 2 Passos.",
+    objective:
+      "Comparar a primeira semana com o ponto de partida e realizar a segunda aplicação do Método de 2 Passos.",
+    mainAction:
+      "Adicionar uma nova fotografia, comparar com o Dia 1, conferir as condições da planta e realizar a segunda aplicação.",
     howTo: [
-      "Use iluminação semelhante ao Dia 1.",
-      "Compare raízes, folhas e tempo de secagem.",
-      "Realize a aplicação completa."
+      "Use enquadramento e iluminação semelhantes aos do Dia 1.",
+      "Depois da avaliação, abra a seção Método de 2 Passos e realize a segunda aplicação.",
     ],
     observe: [
       "Mudanças nas raízes",
       "Firmeza das folhas",
-      "Estabilidade geral"
+      "Brotos",
+      "Manchas",
+      "Tempo de secagem",
+      "Estabilidade geral",
     ],
     avoid: [
-      "Avaliar apenas a floração",
-      "Ângulos de foto muito diferentes",
-      "Ignorar sinais de deterioração rápida"
+      "Avaliar apenas a presença ou ausência de flores",
+      "Comparar fotografias com ângulos muito diferentes",
+      "Fazer alterações imediatas por causa de uma mudança pequena",
+      "Ignorar sinais de deterioração rápida",
     ],
+    registerText:
+      "Registre o que melhorou, o que permaneceu igual, o que piorou e o que deve ser acompanhado na próxima semana.",
+    recordPrompt:
+      "O que melhorou, o que permaneceu igual, o que piorou e o que deve ser acompanhado?",
     checklist: [
       "Registrei a foto do Dia 7",
       "Comparei com o Dia 1",
-      "Registrei o que melhorou",
+      "Registrei a avaliação da primeira semana",
+      "Conferi as condições da planta antes da aplicação",
       "Realizei o Passo 1 (Enraizar)",
-      "Realizei o Passo 2 (Nutrir)"
+      "Realizei o Passo 2 (Nutrir)",
+      "Registrei a segunda aplicação",
     ],
-    recordPrompt: "O que melhorou, o que permaneceu igual e o que piorou?",
     isApplicationDay: true,
     requiresPhoto: true,
-    evaluationType: "intermediate",
+    evaluationType: "first",
   },
+
   8: {
     day: 8,
     phase: 2,
@@ -224,28 +384,31 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     objective: "Retomar os pontos identificados no início do plano.",
     mainAction: "Revisar as prioridades e os ajustes do diagnóstico.",
     howTo: [
-      "Compare as orientações iniciais com os últimos registros.",
-      "Veja quais sinais desapareceram ou surgiram.",
-      "Identifique informações que agora consegue avaliar."
+      "Compare as orientações iniciais com os registros dos últimos dias.",
     ],
     observe: [
-      "Sinais que continuam presentes",
-      "Novos sinais observados",
-      "Melhoria na percepção da planta"
+      "Pontos que continuam presentes",
+      "Sinais que desapareceram",
+      "Informações que agora consegue avaliar",
+      "Novos sinais",
     ],
     avoid: [
+      "Refazer o diagnóstico sem ter alterado as respostas",
       "Ignorar um resultado desatualizado",
-      "Tentar corrigir tudo ao mesmo tempo",
-      "Mudar o plano sem necessidade"
+      "Tentar corrigir todos os itens ao mesmo tempo",
     ],
+    registerText:
+      "Registre até três pontos que continuarão sendo acompanhados.",
+    recordPrompt: "Quais três pontos continuarei acompanhando?",
     checklist: [
       "Revisei o diagnóstico inicial",
       "Comparei com o estado atual",
       "Identifiquei sinais que mudaram",
-      "Escolhi três pontos para continuar acompanhando"
+      "Escolhi até três pontos para continuar acompanhando",
     ],
-    recordPrompt: "Quais três pontos continuarei acompanhando?",
+    personalizedContext: true,
   },
+
   9: {
     day: 9,
     phase: 2,
@@ -253,323 +416,412 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     objective: "Identificar excessos e mudanças desnecessárias.",
     mainAction: "Revisar tudo o que foi realizado desde o Dia 1.",
     howTo: [
-      "Consulte aplicações, regas e anotações.",
-      "Identifique se houve rega sem verificação.",
-      "Avalie se houve muitas mudanças de local."
+      "Consulte aplicações, regas, mudanças de local e anotações.",
     ],
     observe: [
-      "Consistência nos registros",
+      "Rega sem verificação",
+      "Uso simultâneo de produtos",
+      "Mudanças frequentes de local",
+      "Falta de registros",
       "Intervenções repetidas",
-      "Excesso de produtos ou rega"
     ],
     avoid: [
-      "Compensar falhas com mais produto",
-      "Alterar quantidade ou frequência",
-      "Misturar diferentes rotinas"
+      "Compensar uma falha aplicando mais produto",
+      "Alterar quantidade ou frequência sem orientação",
+      "Misturar diferentes rotinas",
+      "Tomar decisões sem registrar",
     ],
+    registerText: "Registre um hábito que deve ser mantido e um erro que será evitado.",
+    recordPrompt: "Um hábito a manter e um erro a evitar daqui em diante.",
     checklist: [
       "Revisei as regas registradas",
       "Revisei as aplicações",
       "Avaliei a estabilidade do local",
-      "Identifiquei um erro a evitar"
+      "Escolhi um hábito para manter e um erro para evitar",
     ],
-    recordPrompt: "Um hábito a manter e um erro a evitar daqui em diante.",
   },
+
   10: {
     day: 10,
     phase: 2,
-    title: "Avaliar a luz e o ambiente",
-    objective: "Confirmar se a planta está recebendo luminosidade adequada.",
-    mainAction: "Observar a planta em diferentes horários do dia.",
+    title: "Acompanhar a resposta e revisar a rotina",
+    objective:
+      "Acompanhar a planta depois da segunda aplicação e verificar se a rotina continua estável.",
+    mainAction:
+      "Observar raízes, folhas, substrato, umidade e ambiente sem realizar nova aplicação.",
     howTo: [
-      "Verifique sol direto forte (queima).",
-      "Verifique ambiente muito escuro.",
-      "Verifique a ventilação do local."
+      "Comparar com a foto e os registros do Dia 7",
+      "Conferir como o substrato está secando",
+      "Observar a firmeza das folhas",
+      "Verificar se surgiram alterações inesperadas",
+      "Revisar se houve rega, mudança de local ou uso de outro produto",
     ],
     observe: [
-      "Luz indireta constante",
-      "Folhas voltadas para a luz",
-      "Cor das folhas (clara vs escura)"
+      "Aparência das raízes",
+      "Firmeza das folhas",
+      "Tempo de secagem",
+      "Água acumulada",
+      "Manchas ou alterações novas",
+      "Mudanças recentes na rotina",
     ],
     avoid: [
-      "Mudar a planta de lugar várias vezes",
-      "Sol direto nas horas mais quentes",
-      "Local abafado"
+      "Repetir a aplicação",
+      "Compensar uma aplicação com quantidade maior",
+      "Misturar produtos",
+      "Alterar vários cuidados ao mesmo tempo",
+      "Regar sem avaliar a umidade",
     ],
+    registerText:
+      "Como a planta está depois da segunda aplicação e qual cuidado precisa continuar estável?",
+    recordPrompt:
+      "Como a planta está depois da segunda aplicação e qual cuidado precisa continuar estável?",
     checklist: [
-      "Observei a luz pela manhã",
-      "Observei a luz à tarde",
-      "Verifiquei se há ventilação",
-      "Observei a reação das folhas"
+      "Comparei com o Dia 7",
+      "Observei o tempo de secagem",
+      "Verifiquei sinais novos",
+      "Revisei a rotina desta semana",
     ],
-    recordPrompt: "A luz está adequada, excessiva ou insuficiente?",
   },
+
   11: {
     day: 11,
     phase: 2,
-    title: "Acompanhar a estabilidade",
-    objective: "Verificar se as condições básicas permanecem constantes.",
-    mainAction: "Revisar vaso, substrato, umidade e ventilação.",
+    title: "Comparar as raízes",
+    objective: "Verificar mudanças desde os Dias 1 e 5.",
+    mainAction: "Observar novamente o sistema radicular visível.",
     howTo: [
-      "Conferir se a orquídea continua firme no vaso.",
-      "Verificar se a drenagem está funcionando.",
-      "Confirmar se o local permanece o mesmo."
+      "Compare posição, firmeza e pontas novas com fotografias ou anotações anteriores.",
     ],
     observe: [
-      "Substrato estável",
-      "Boa circulação de ar",
-      "Escoamento da água"
+      "Surgimento de pontas",
+      "Manutenção da firmeza",
+      "Redução ou aumento de áreas escuras",
+      "Odor",
+      "Alteração rápida",
     ],
     avoid: [
-      "Mudar local por ansiedade",
-      "Ignorar água acumulada",
-      "Apertar as raízes"
+      "Esperar mudanças expressivas em poucos dias",
+      "Forçar a visualização das raízes",
+      "Confundir raízes molhadas com alteração permanente de cor",
     ],
+    registerText: "Como as raízes estão em comparação com os Dias 1 e 5?",
+    registerOptions: [
+      { value: "melhorou", label: "Melhorou" },
+      { value: "permaneceu-igual", label: "Permaneceu igual" },
+      { value: "piorou", label: "Piorou" },
+      { value: "nao-foi-possivel-avaliar", label: "Não foi possível avaliar" },
+    ],
+    recordPrompt: "Melhorou, permaneceu igual, piorou ou não foi possível avaliar?",
     checklist: [
-      "Verifiquei a firmeza da planta",
-      "Conferi a drenagem",
-      "Observei a circulação de ar",
-      "Mantive a estabilidade"
+      "Observei as raízes aéreas",
+      "Comparei com registros anteriores",
+      "Verifiquei firmeza e pontas novas",
+      "Registrei a comparação",
     ],
-    recordPrompt: "A condição básica é favorável ou precisa de ajuste?",
   },
+
   12: {
     day: 12,
     phase: 2,
-    title: "Observar o vigor das folhas",
-    objective: "Verificar sinais de hidratação e saúde na parte aérea.",
-    mainAction: "Acompanhar firmeza, cor e evolução de manchas.",
+    title: "Comparar folhas e brotações",
+    objective: "Identificar mudanças visíveis no vigor da planta.",
+    mainAction: "Comparar folhas e novos crescimentos com os registros anteriores.",
     howTo: [
-      "Toque nas folhas para sentir a firmeza.",
-      "Observe se as folhas novas são menores que as antigas.",
-      "Verifique se manchas estão aumentando."
+      "Observe separadamente folhas antigas, folhas novas, brotos e hastes.",
     ],
     observe: [
-      "Firmeza e cor",
+      "Firmeza",
+      "Coloração",
       "Evolução de manchas",
-      "Novas folhas e brotos"
+      "Folhas novas",
+      "Brotos",
+      "Hastes",
     ],
     avoid: [
-      "Avaliar sucesso apenas pela floração",
+      "Usar apenas a floração como indicador",
       "Ignorar manchas em expansão",
-      "Fazer mudanças bruscas de luz"
+      "Fazer mudanças bruscas de luz",
+      "Manipular brotações novas",
     ],
+    registerText: "Registre as alterações encontradas nas folhas e brotações.",
+    recordPrompt: "Quais alterações foram encontradas nas folhas e brotações?",
     checklist: [
       "Conferi a firmeza ao toque",
       "Observei a coloração",
       "Verifiquei manchas existentes",
-      "Procurei novos crescimentos"
+      "Procurei novos crescimentos",
     ],
-    recordPrompt: "Quais as principais alterações encontradas nas folhas?",
   },
+
   13: {
     day: 13,
     phase: 2,
     title: "Corrigir apenas o necessário",
     objective: "Evitar excesso de intervenções.",
-    mainAction: "Escolher no máximo um ajuste simples, se houver necessidade.",
+    mainAction:
+      "Escolher no máximo um ajuste simples, quando houver necessidade clara.",
     howTo: [
-      "Identifique qual fator está relacionado ao problema.",
-      "Melhore ventilação ou retire água acumulada.",
-      "Evite sol direto excessivo."
+      "Use os registros para identificar qual fator está mais relacionado ao problema observado.",
     ],
     observe: [
-      "Necessidade real de mudança",
-      "Sinais que já estão estáveis",
-      "Impacto de ajustes anteriores"
+      "Retirar água acumulada",
+      "Melhorar ventilação",
+      "Evitar sol direto",
+      "Verificar melhor a umidade",
+      "Manter o local estável",
     ],
     avoid: [
-      "Trocar tudo ao mesmo tempo",
-      "Realizar mudanças sem registro",
-      "Mudar planta por expectativa de flor"
+      "Trocar vaso, substrato, local, rega e produtos ao mesmo tempo",
+      "Realizar mudanças sem registrar",
+      "Corrigir um sinal que já está estável",
+      "Tomar decisões baseadas apenas em expectativa de floração",
     ],
+    registerText: "Qual ajuste foi escolhido e por quê?",
+    recordPrompt: "Qual ajuste foi escolhido e por quê?",
+    tip: "Escolha no máximo um ajuste simples e observe o efeito antes de mudar mais alguma coisa.",
     checklist: [
-      "Avaliei a necessidade de ajuste",
+      "Avaliei se realmente havia necessidade",
       "Escolhi no máximo uma ação",
       "Registrei o motivo do ajuste",
-      "Mantive o restante estável"
+      "Mantive o restante da rotina estável",
     ],
-    recordPrompt: "Qual ajuste foi escolhido e por quê?",
   },
+
   14: {
     day: 14,
     phase: 2,
     title: "Avaliação intermediária e terceira aplicação",
-    objective: "Comparar os Dias 1, 7 e 14 e realizar a terceira aplicação.",
-    mainAction: "Fotografar, avaliar e aplicar o Método de 2 Passos.",
+    objective:
+      "Comparar os Dias 1, 7 e 14 e realizar a terceira aplicação do Método de 2 Passos.",
+    mainAction:
+      "Adicionar fotografia, comparar com os Dias 1 e 7, registrar a melhor evolução, conferir as condições da planta e realizar a terceira aplicação.",
     howTo: [
-      "Use iluminação e enquadramento semelhantes.",
-      "Compare a evolução das raízes e folhas.",
-      "Conclua a aplicação conforme orientação."
+      "Use iluminação e enquadramento semelhantes aos dos registros anteriores.",
+      "Depois da avaliação, abra a seção Método de 2 Passos e realize a terceira aplicação.",
     ],
     observe: [
       "Evolução das raízes",
       "Firmeza e cor das folhas",
-      "Estabilidade do substrato"
+      "Brotações",
+      "Manchas",
+      "Estabilidade do substrato",
+      "Mudanças na rotina",
     ],
     avoid: [
       "Desconsiderar pequenas evoluções",
       "Considerar ausência de flores como fracasso",
-      "Ignorar sinais de piora"
+      "Alterar o protocolo sem revisar o conjunto",
+      "Ignorar sinais de piora",
     ],
+    registerText:
+      "Registre a melhor evolução, o principal ponto ainda pendente e o cuidado que será mantido.",
+    recordPrompt:
+      "Melhor evolução, principal ponto pendente e cuidado que será mantido?",
     checklist: [
       "Registrei a foto do Dia 14",
       "Comparei com os Dias 1 e 7",
       "Registrei a melhor evolução",
+      "Registrei o principal ponto pendente",
+      "Registrei o cuidado que será mantido",
+      "Conferi as condições da planta antes da aplicação",
       "Realizei o Passo 1 (Enraizar)",
-      "Realizei o Passo 2 (Nutrir)"
+      "Realizei o Passo 2 (Nutrir)",
+      "Registrei a terceira aplicação",
     ],
-    recordPrompt: "Melhor evolução e principal ponto pendente?",
     isApplicationDay: true,
     requiresPhoto: true,
     evaluationType: "intermediate",
   },
+
   15: {
     day: 15,
     phase: 3,
     title: "Identificar o que está funcionando",
-    objective: "Reconhecer os cuidados que contribuíram para a estabilidade.",
-    mainAction: "Revisar anotações e escolher hábitos consistentes.",
+    objective:
+      "Reconhecer os cuidados que contribuíram para a estabilidade da planta.",
+    mainAction:
+      "Revisar as anotações e escolher os hábitos mais consistentes.",
     howTo: [
-      "Procure relações entre ações e sinais.",
-      "Identifique o melhor critério de rega.",
-      "Avalie a estabilidade do local."
+      "Procure relações entre as ações realizadas e os sinais observados.",
     ],
     observe: [
-      "Melhor drenagem",
-      "Consistência nos registros",
-      "Sinais favoráveis recorrentes"
+      "Melhor critério de rega",
+      "Local mais estável",
+      "Melhora na drenagem",
+      "Maior consistência nos registros",
+      "Sinais favoráveis",
     ],
     avoid: [
-      "Atribuir mudança a um único fator",
+      "Atribuir toda mudança a um único produto ou ação",
+      "Criar promessa de floração",
       "Abandonar cuidados básicos",
-      "Introduzir novos produtos agora"
+      "Introduzir novos produtos antes da conclusão",
     ],
-    checklist: [
-      "Revisei meus registros",
-      "Identifiquei o hábito mais eficaz",
-      "Observei sinais favoráveis",
-      "Escolhi dois cuidados para manter"
-    ],
+    registerText: "Escolha dois cuidados que serão mantidos.",
     recordPrompt: "Quais dois cuidados serão mantidos?",
+    checklist: [
+      "Revisei minhas anotações",
+      "Identifiquei o hábito mais eficaz",
+      "Observei sinais favoráveis recorrentes",
+      "Escolhi dois cuidados para manter",
+    ],
   },
+
   16: {
     day: 16,
     phase: 3,
-    title: "Preparar a última aplicação",
-    objective: "Verificar se a planta está pronta para a terceira aplicação.",
-    mainAction: "Revisar raízes, folhas e umidade.",
+    title: "Revisar as condições antes da fase final",
+    objective:
+      "Verificar se a planta permanece estável antes dos últimos registros do plano.",
+    mainAction:
+      "Revisar raízes, folhas, umidade, drenagem, ambiente e histórico das últimas semanas.",
     howTo: [
-      "Compare sinais atuais com o diagnóstico inicial.",
-      "Verifique se o substrato não está excessivamente úmido.",
-      "Confirme se não houve aplicação recente de outros produtos."
+      "Comparar os registros dos Dias 1, 7 e 14",
+      "Verificar a umidade do substrato",
+      "Conferir se existe água acumulada",
+      "Observar raízes e folhas",
+      "Verificar sinais de deterioração rápida",
+      "Revisar quais cuidados apresentaram maior consistência",
     ],
     observe: [
-      "Umidade do substrato",
-      "Deterioração rápida (contraindicado)",
-      "Condições normais da planta"
+      "Substrato muito úmido",
+      "Água acumulada",
+      "Mau cheiro",
+      "Raízes firmes ou alteradas",
+      "Folhas firmes ou com alterações",
+      "Brotos ou hastes",
+      "Estabilidade geral da planta",
     ],
     avoid: [
-      "Aplicação obrigatória se houver sinal de atenção",
-      "Ignorar o rótulo",
-      "Repetir produtos desnecessários"
+      "Fazer nova aplicação",
+      "Introduzir outros produtos",
+      "Alterar vários fatores",
+      "Mudar o local da planta sem necessidade",
+      "Criar conclusões somente pela presença ou ausência de flores",
     ],
+    registerText:
+      "A planta está estável, precisa de acompanhamento ou apresenta algum sinal de atenção?",
+    registerOptions: [
+      { value: "estavel", label: "Estável" },
+      { value: "acompanhamento", label: "Precisa de acompanhamento" },
+      { value: "sinal-de-atencao", label: "Apresenta sinal de atenção" },
+    ],
+    recordPrompt:
+      "A planta está estável, precisa de acompanhamento ou apresenta algum sinal de atenção?",
     checklist: [
-      "Revisei o histórico de aplicações",
+      "Revisei os registros anteriores",
       "Verifiquei a umidade do substrato",
-      "Observei sinais de alerta",
-      "Liberei ou adiei a aplicação"
+      "Observei raízes e folhas",
+      "Registrei a condição atual",
     ],
-    recordPrompt: "Aplicação liberada, adiada ou precisa de orientação?",
   },
+
   17: {
     day: 17,
     phase: 3,
-    title: "Terceira aplicação",
-    objective: "Concluir o ciclo previsto do Método de 2 Passos.",
-    mainAction: "Realizar a aplicação conforme instruções oficiais.",
+    title: "Comparar novamente as raízes",
+    objective: "Acompanhar o sistema radicular antes da avaliação final.",
+    mainAction:
+      "Observar as raízes visíveis e compará-las com os registros anteriores.",
     howTo: [
-      "Siga os mesmos critérios de segurança e registro.",
-      "Mantenha a quantidade recomendada.",
-      "Observe a resposta posterior da planta."
+      "Observar as mesmas regiões avaliadas anteriormente",
+      "Comparar firmeza",
+      "Comparar coloração",
+      "Procurar pontas novas",
+      "Verificar áreas secas, escuras ou moles",
+      "Registrar somente mudanças que possam ser observadas",
     ],
     observe: [
-      "Condição antes da aplicação",
-      "Passos realizados",
-      "Sinais inesperados posteriores"
+      "Pontas novas",
+      "Firmeza",
+      "Coloração",
+      "Partes secas",
+      "Áreas escuras",
+      "Partes moles",
+      "Mau cheiro",
     ],
     avoid: [
-      "Aumentar a quantidade por ser a última",
-      "Combinar com outros fertilizantes",
-      "Registrar sem realizar"
+      "Retirar a planta do vaso sem necessidade",
+      "Manipular raízes novas",
+      "Cortar raízes apenas pela aparência",
+      "Forçar a visualização",
+      "Fazer conclusões por um único sinal",
     ],
+    registerText:
+      "Qual foi a principal mudança observada nas raízes desde o início do plano?",
+    recordPrompt:
+      "Qual foi a principal mudança observada nas raízes desde o início do plano?",
     checklist: [
-      "Conferi as instruções",
-      "Realizei o Passo 1 (Enraizar)",
-      "Realizei o Passo 2 (Nutrir)",
-      "Registrei a aplicação"
+      "Observei as mesmas regiões avaliadas antes",
+      "Comparei firmeza e coloração",
+      "Procurei pontas novas",
+      "Registrei a principal mudança",
     ],
-    recordPrompt: "Data, horário e observação da aplicação.",
-    isApplicationDay: true,
   },
+
   18: {
     day: 18,
     phase: 3,
     title: "Observar sem interferir",
-    objective: "Acompanhar a resposta após a última aplicação.",
+    objective: "Acompanhar a planta durante a fase final sem realizar novas mudanças.",
     mainAction: "Observar sem realizar novas mudanças.",
     howTo: [
-      "Confira os pontos avaliados nos Dias 2 e 4.",
-      "Mantenha a rotina estável.",
-      "Compare sinais com a avaliação do Dia 14."
+      "Confira os mesmos pontos avaliados nos Dias 2 e 4.",
     ],
     observe: [
-      "Firmeza das raízes e folhas",
-      "Evolução de brotos",
-      "Reações inesperadas"
+      "Raízes",
+      "Folhas",
+      "Brotos",
+      "Umidade",
+      "Tempo de secagem",
+      "Reações inesperadas",
     ],
     avoid: [
-      "Repetir a aplicação",
-      "Fazer novas correções",
-      "Mudar a planta de local"
+      "Fazer nova aplicação",
+      "Fazer nova correção sem necessidade",
+      "Mudar a planta de local",
+      "Criar conclusões a partir de um único dia",
     ],
+    registerText: "Registre a condição geral e o sinal mais importante observado hoje.",
+    recordPrompt: "Qual é o sinal mais importante observado hoje?",
     checklist: [
-      "Observei a firmeza das folhas",
-      "Verifiquei as raízes",
+      "Observei as raízes e folhas",
+      "Verifiquei umidade e tempo de secagem",
       "Mantive o local estável",
-      "Registrei o sinal mais importante"
+      "Registrei o sinal mais importante",
     ],
-    recordPrompt: "Qual o sinal mais importante observado hoje?",
   },
+
   19: {
     day: 19,
     phase: 3,
     title: "Criar a rotina de manutenção",
     objective: "Planejar os cuidados depois do protocolo.",
-    mainAction: "Definir uma rotina simples e clara.",
+    mainAction: "Definir uma rotina simples, clara e possível de manter.",
     howTo: [
-      "Defina o critério de rega definitivo.",
-      "Defina onde a planta ficará.",
-      "Defina quando fará novos registros fotográficos."
-    ],
-    observe: [
-      "Hábitos que funcionaram",
-      "Sinais que precisam de acompanhamento",
-      "Consistência do cuidado"
+      "Como decidirei quando regar?",
+      "Onde a planta permanecerá?",
+      "Quais sinais acompanharei?",
+      "Quando farei novas fotografias?",
+      "O que farei diante de sinais de piora?",
+      "Como continuarei o uso dos produtos?",
     ],
     avoid: [
-      "Calendário rígido sem observação",
-      "Abandonar os registros",
-      "Misturar vários produtos"
+      "Criar calendário rígido sem observar a planta",
+      "Manter uma ação que não apresentou benefício claro",
+      "Misturar vários produtos",
+      "Deixar de registrar mudanças importantes",
     ],
+    registerText: "Descreva seu plano pessoal de manutenção.",
+    recordPrompt: "Como será seu plano pessoal de manutenção?",
     checklist: [
       "Defini meu critério de rega",
       "Defini o local da planta",
       "Planejei novos registros",
-      "Defini meu plano de manutenção"
+      "Escrevi meu plano de manutenção",
     ],
-    recordPrompt: "Como será meu plano pessoal de manutenção?",
   },
+
   20: {
     day: 20,
     phase: 3,
@@ -577,61 +829,85 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     objective: "Organizar os registros antes da conclusão.",
     mainAction: "Revisar fotos, anotações, tarefas e aplicações.",
     howTo: [
-      "Consulte os marcos dos Dias 1, 7 e 14.",
-      "Veja quais mudanças foram consistentes.",
-      "Escolha três aspectos principais para a comparação final."
+      "Consulte os Dias 1, 7, 14 e os registros de aplicação.",
     ],
     observe: [
-      "Mudanças graduais",
-      "Cuidados que foram mantidos",
-      "Lacunas nos registros"
+      "Mudanças consistentes",
+      "Pontos sem alteração",
+      "Sinais que pioraram",
+      "Cuidados mantidos",
+      "Lacunas nos registros",
     ],
     avoid: [
-      "Fazer novas intervenções agora",
-      "Alterar o ambiente antes da foto",
-      "Considerar apenas flores"
+      "Fazer uma nova intervenção antes da foto final",
+      "Alterar o ambiente",
+      "Escolher apenas a fotografia mais favorável",
+      "Considerar somente flores",
     ],
+    registerText:
+      "Escolha três aspectos principais que deseja comparar no Dia 21.",
+    recordPrompt: "Quais três aspectos você quer comparar amanhã?",
     checklist: [
       "Revisei todas as fotos",
       "Revisei minhas anotações",
       "Conferi as aplicações",
-      "Escolhi o que comparar no Dia 21"
+      "Escolhi três aspectos para comparar no Dia 21",
     ],
-    recordPrompt: "Quais três aspectos compararei amanhã?",
   },
+
   21: {
     day: 21,
     phase: 3,
-    title: "Avaliação final e próximo caminho",
-    objective: "Comparar o antes e depois e definir os próximos cuidados.",
-    mainAction: "Adicionar a fotografia final e preencher a conclusão.",
+    title: "Avaliação final, próximo caminho e quarta aplicação",
+    objective:
+      "Comparar o antes e depois, definir os próximos cuidados e realizar a quarta aplicação do plano.",
+    mainAction:
+      "Adicionar a fotografia final, preencher a conclusão da avaliação e realizar a quarta aplicação.",
     howTo: [
-      "Repita o enquadramento do Dia 1.",
-      "Compare os quatro marcos principais.",
-      "Defina os cuidados que serão mantidos permanentemente."
+      "Repita o enquadramento do Dia 1 e compare os quatro registros principais.",
+      "Depois de concluir a avaliação final, abra a seção Método de 2 Passos e realize a quarta aplicação do plano.",
     ],
     observe: [
-      "Vigor das raízes e folhas",
+      "Raízes",
+      "Folhas",
       "Brotos e hastes",
+      "Estabilidade da planta",
       "Comportamento do substrato",
-      "Consistência da rotina"
+      "Consistência da rotina",
+      "Sinais de atenção",
     ],
     avoid: [
-      "Avaliar sucesso somente pela flor",
-      "Alterar registros antigos",
-      "Ignorar sinais de atenção"
+      "Avaliar sucesso apenas pela floração",
+      "Fazer promessas de resultado",
+      "Ignorar deterioração",
+      "Alterar os registros antigos",
+    ],
+    registerText:
+      "Registre o que melhorou, o que permaneceu igual, o que ainda precisa de atenção, qual cuidado será mantido, a foto final e a classificação da evolução.",
+    recordPrompt:
+      "O que melhorou, o que permaneceu igual e o que ainda precisa de atenção?",
+    attention: [
+      "Possíveis resultados:",
+      "Apresentou evolução — Foram observados sinais favoráveis. Mantenha os cuidados que contribuíram para a estabilidade.",
+      "Permaneceu estável — Não houve mudança clara. Continue observando e mantenha uma rotina simples.",
+      "Apresentou piora — Existem sinais que merecem avaliação especializada.",
+      "Está saudável, mas ainda não floresceu — A ausência de flores não significa ausência de evolução. Continue acompanhando vigor, luz, raízes e ciclo natural.",
     ],
     checklist: [
-      "Registrei a foto final",
-      "Comparei os quatro marcos",
-      "Preenchi a avaliação final",
-      "Defini minha classificação",
-      "Realizei a aplicação de manutenção"
+      "Adicionei a foto final",
+      "Comparei com os Dias 1, 7 e 14",
+      "Registrei o que melhorou",
+      "Registrei o que permaneceu igual",
+      "Registrei o que ainda precisa de atenção",
+      "Selecionei a classificação da evolução",
+      "Defini o cuidado que será mantido",
+      "Conclui a avaliação",
+      "Realizei o Passo 1 (Enraizar)",
+      "Realizei o Passo 2 (Nutrir)",
+      "Registrei a quarta aplicação do plano",
     ],
-    recordPrompt: "O que melhorou, o que permaneceu igual e o que precisa de atenção?",
     requiresPhoto: true,
     isApplicationDay: true,
     evaluationType: "final",
   },
 };
-
