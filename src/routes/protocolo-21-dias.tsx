@@ -3127,7 +3127,7 @@ function AprenderTab() {
 
 function MetodoTab() {
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 pb-20">
       <div className="relative overflow-hidden rounded-[2rem] border border-primary/10 bg-gradient-to-br from-primary/[0.03] to-transparent p-8">
         <div className="absolute -right-8 -top-8 opacity-[0.05] text-primary rotate-12">
           <Sparkles size={160} />
@@ -3147,8 +3147,19 @@ function MetodoTab() {
       </div>
 
       <div className="space-y-4">
-        <div className="rounded-3xl border border-primary/20 bg-card p-6 shadow-sm">
-          <div className="flex items-center gap-4">
+        <div className="relative group overflow-hidden rounded-3xl border border-primary/20 bg-card p-6 shadow-sm">
+          {/* Ilustração Botânica Linear - Enraizar */}
+          <div className="absolute -right-4 -top-4 opacity-[0.07] pointer-events-none group-hover:scale-110 transition-transform duration-700">
+            <svg width="120" height="120" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-primary">
+              <path d="M50 90C50 90 45 70 45 50C45 30 50 10 50 10" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
+              <path d="M50 70C40 65 30 75 25 60C20 45 40 40 50 45" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round"/>
+              <path d="M50 70C60 65 70 75 75 60C80 45 60 40 50 45" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round"/>
+              <path d="M50 50C40 45 35 30 20 35" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round"/>
+              <path d="M50 50C60 45 65 30 80 35" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round"/>
+            </svg>
+          </div>
+
+          <div className="flex items-center gap-4 relative z-10">
             <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
               <Sprout size={28} />
             </div>
@@ -3157,7 +3168,7 @@ function MetodoTab() {
               <h2 className="font-display text-2xl text-primary">Enraizar</h2>
             </div>
           </div>
-          <div className="mt-6 space-y-4">
+          <div className="mt-6 space-y-4 relative z-10">
             <p className="text-[15px] leading-relaxed text-foreground/80">
               O segredo de uma orquídea florida começa onde ninguém vê: nas <span className="font-bold text-primary">raízes</span>. Sem um sistema radicular forte, a planta não consegue absorver os nutrientes necessários para florescer.
             </p>
@@ -3179,8 +3190,18 @@ function MetodoTab() {
           </div>
         </div>
 
-        <div className="rounded-3xl border border-accent/20 bg-card p-6 shadow-sm">
-          <div className="flex items-center gap-4">
+        <div className="relative group overflow-hidden rounded-3xl border border-accent/20 bg-card p-6 shadow-sm">
+          {/* Ilustração Botânica Linear - Nutrir */}
+          <div className="absolute -right-4 -top-4 opacity-[0.07] pointer-events-none group-hover:scale-110 transition-transform duration-700">
+            <svg width="120" height="120" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-accent">
+              <path d="M50 90V40" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
+              <path d="M50 40C50 40 70 35 80 20C90 5 70 0 50 15C30 0 10 5 20 20C30 35 50 40 50 40Z" stroke="currentColor" strokeWidth="0.8" fill="currentColor" fillOpacity="0.1"/>
+              <path d="M50 60C50 60 75 55 85 40" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round"/>
+              <path d="M50 60C50 60 25 55 15 40" stroke="currentColor" strokeWidth="0.8" strokeLinecap="round"/>
+            </svg>
+          </div>
+
+          <div className="flex items-center gap-4 relative z-10">
             <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-accent/10 text-accent">
               <Leaf size={28} />
             </div>
@@ -3189,7 +3210,7 @@ function MetodoTab() {
               <h2 className="font-display text-2xl text-accent">Nutrir</h2>
             </div>
           </div>
-          <div className="mt-6 space-y-4">
+          <div className="mt-6 space-y-4 relative z-10">
             <p className="text-[15px] leading-relaxed text-foreground/80">
               Com as raízes prontas, entramos com a <span className="font-bold text-accent">nutrição premium</span>. O Bokashi Orquídeas fornece os elementos exatos que a planta precisa para o vigor vegetativo e a futura floração.
             </p>
