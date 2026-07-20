@@ -1823,8 +1823,11 @@ function PlanoTab({ actorId, setTab }: PlanoTabProps) {
   return (
     <div ref={containerRef} className="space-y-4">
       <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-6">
-        <div className="absolute -right-4 -top-4 opacity-[0.08] text-primary rotate-12">
-          <Flower2 size={120} />
+        <div className="absolute -right-4 -top-4 opacity-[0.04] text-primary rotate-12">
+          <svg width="120" height="120" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+             <path d="M50 10C50 10 30 40 30 60C30 80 50 95 50 95C50 95 70 80 70 60C70 40 50 10 50 10Z" stroke="currentColor" strokeWidth="1"/>
+             <path d="M30 60C30 60 40 55 50 60C60 65 70 60 70 60" stroke="currentColor" strokeWidth="0.5"/>
+          </svg>
         </div>
         <div className="relative z-10">
           <div className="text-xs font-bold uppercase tracking-wider text-accent">Meu plano</div>
@@ -3248,7 +3251,7 @@ function ResumoTab({ actorId }: { actorId: string }) {
                 
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                    Semana {weekNum}
+                    Semana <span className="font-display text-sm">{weekNum}</span>
                   </span>
                   <span className="text-[10px] font-medium text-accent">
                     {weekCompleted}/7 concluídos
@@ -3280,7 +3283,7 @@ function StatCard({ label, value, icon }: { label: string; value: string | numbe
         {icon}
         <span className="text-[10px] font-bold uppercase tracking-wider">{label}</span>
       </div>
-      <div className="mt-1 text-xl font-display text-primary">{value}</div>
+      <div className="mt-1 text-2xl font-display text-primary leading-none">{value}</div>
     </div>
   );
 }
