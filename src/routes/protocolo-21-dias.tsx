@@ -2275,6 +2275,7 @@ function DayContentCard({
   onUpdate: (patch: { note?: string }) => void;
   diagnosisFresh: boolean;
   trackingPoints: string[];
+  setStatus?: (status: AuthBootstrapStatus) => void;
 }) {
   void entry;
   const tracking = diagnosisFresh ? trackingPoints.slice(0, 3) : [];
