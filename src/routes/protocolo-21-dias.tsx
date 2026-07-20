@@ -721,8 +721,9 @@ function StepCard({
 
 
 
-function SignupScreen({ onNext }: { onNext: () => void }) {
+function SignupScreen({ actorId, onNext }: { actorId: string; onNext: () => void }) {
   const { state, updatePlant } = useProtocolStore();
+
   const plant = state.plant;
 
   const handlePhoto = async (e: ChangeEvent<HTMLInputElement>) => {
