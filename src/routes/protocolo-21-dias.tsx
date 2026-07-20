@@ -1422,12 +1422,15 @@ function InfoCard({
 /* ---------------- Início ---------------- */
 
 function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t: Tab) => void; setStatus: (s: AuthBootstrapStatus) => void }) {
+  const planTitleRef = useRef<HTMLDivElement>(null);
+
   const handleRedirectToPlan = () => {
     setTab("plano");
     toast.success("Abrindo seu plano de 21 dias", {
       description: "Confira as tarefas para hoje.",
       duration: 3000,
     });
+    // O foco e scroll serão tratados pelo useEffect na PlanoTab
   };
 
   const { state, setCurrentDay } = useProtocolStore();
@@ -1475,10 +1478,10 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
 
       <div 
         onClick={handleRedirectToPlan}
-        className="cursor-pointer rounded-2xl border border-border bg-plantae-cream/40 p-5 transition-colors hover:border-primary/30 active:scale-[0.99]"
+        className="group relative cursor-pointer overflow-hidden rounded-2xl border border-border bg-plantae-cream/40 p-5 transition-all hover:border-primary/30 active:scale-[0.99]"
       >
         <div className="flex items-center gap-3">
-          <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-card">
+          <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-card transition-transform group-hover:scale-105">
             {state.plant.photo ? (
               <img
                 src={state.plant.photo}
@@ -1496,6 +1499,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             <div className="text-xs text-muted-foreground">{phase.label}</div>
           </div>
         </div>
+        
         <div className="mt-4">
           <div className="flex items-baseline justify-between text-primary">
             <div className="text-sm font-medium">Progresso do plano</div>
@@ -1506,6 +1510,18 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             value={(day / 21) * 100} 
             color={day <= 7 ? "bg-primary" : day <= 14 ? "bg-[#D946EF]" : "bg-accent"} 
           />
+        </div>
+
+        <div className="mt-4 border-t border-border/50 pt-4">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleRedirectToPlan();
+            }}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary/10 py-2.5 text-xs font-bold text-primary transition-colors hover:bg-primary/20"
+          >
+            Ir para o Plano <ChevronRight size={14} />
+          </button>
         </div>
       </div>
       {!isApplicationDay && (
@@ -1751,11 +1767,17 @@ type PlanoTabProps = {
 
 function PlanoTab({ actorId, setTab }: PlanoTabProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
   
   useEffect(() => {
     // Ao entrar na aba plano via redirecionamento (ou tab change), foca no topo
     if (containerRef.current) {
       containerRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    
+    // Melhora a acessibilidade movendo o foco para o título da aba
+    if (titleRef.current) {
+      titleRef.current.focus();
     }
   }, []);
 
@@ -1782,10 +1804,20 @@ function PlanoTab({ actorId, setTab }: PlanoTabProps) {
         <div className="relative z-10">
           <div className="text-xs font-bold uppercase tracking-wider text-accent">Meu plano</div>
           <motion.h1 
-            initial={{ opacity: 0.8 }}
-            animate={{ opacity: 1, scale: [1, 1.02, 1] }}
-            transition={{ duration: 0.5 }}
-            className="text-2xl font-display tracking-tight text-primary"
+            ref={titleRef}
+            tabIndex={-1}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ 
+              opacity: 1, 
+              y: 0,
+              scale: [1, 1.05, 1],
+            }}
+            transition={{ 
+              opacity: { duration: 0.4 },
+              y: { duration: 0.4 },
+              scale: { duration: 0.6, delay: 0.2, ease: "easeOut" }
+            }}
+            className="text-2xl font-display tracking-tight text-primary outline-none focus-visible:ring-2 focus-visible:ring-primary/20 rounded-lg"
           >
             Plano de 21 dias
           </motion.h1>
