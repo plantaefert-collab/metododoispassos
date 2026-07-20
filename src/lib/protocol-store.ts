@@ -86,6 +86,8 @@ export function isDiagnosisCurrent(state: ProtocolState): boolean {
   );
 }
 
+export { totalObservations };
+
 const DEFAULT_CURRENT_DAY = 1;
 
 const emptyPlant: PlantInfo = {
