@@ -646,6 +646,8 @@ function AuthScreen({ onBack, onSuccess }: { onBack: () => void; onSuccess: () =
 
   const handleGoogleAuth = async () => {
     try {
+      // Usando o protocolo de redirecionamento do Lovable Cloud para garantir que o 
+      // cookie de sessão seja devidamente processado antes de carregar o app.
       const { lovable } = await import("@/integrations/lovable/index");
       await lovable.auth.signInWithOAuth("google", {
         redirect_uri: window.location.origin + "/protocolo-21-dias",
