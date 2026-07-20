@@ -253,9 +253,9 @@ function AppShell({
 }) {
   const { state, clearSaveError } = useProtocolStore();
   return (
-    <div className="min-h-screen bg-background font-sans">
-      <div className="mx-auto flex min-h-screen max-w-[440px] flex-col shadow-[0_30px_90px_-20px_rgba(23,61,50,0.2)] sm:my-4 sm:min-h-[calc(100vh-2rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card">
-        <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-border bg-card px-4 py-4 sm:rounded-t-2xl">
+    <div className="min-h-screen bg-background font-sans selection:bg-primary/10">
+      <div className="mx-auto flex min-h-screen max-w-[440px] flex-col shadow-[0_30px_90px_-20px_rgba(23,61,50,0.1)] sm:my-4 sm:min-h-[calc(100vh-2rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card">
+        <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-border bg-card/80 px-4 py-4 backdrop-blur-md sm:rounded-t-2xl">
           <div className="flex items-center gap-2">
             <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground shadow-md shadow-primary/20">
               <Leaf size={18} strokeWidth={2.2} />
