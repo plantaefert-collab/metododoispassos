@@ -88,16 +88,9 @@ export function useAuthBootstrap() {
       hydrateStore(finalState);
 
       // Determinar destino
-      const hasPlant = profileRes.data?.plant_registered_at !== null;
-      const diagnosisReady = isDiagnosisCurrent(finalState);
-
-      if (!hasPlant) {
-        setStatus("needs_plant_registration");
-      } else {
-        // Agora sempre redireciona para "ready" (Início) para que o usuário 
-        // veja o card de diagnóstico lá dentro, em vez de ser forçado a fazer o exame agora.
-        setStatus("ready");
-      }
+      // O diagnóstico e o cadastro da planta agora são opcionais.
+      // Sempre redirecionamos para "ready" (Início) após o login.
+      setStatus("ready");
     } catch (err: any) {
       if (generation === bootstrapGenerationRef.current) {
         setError(err.message);

@@ -212,17 +212,7 @@ function ProtocoloPage() {
         {/* Overlay "Sincronizando..." é gerenciado pelo estado de carregamento
             inicial (booting/loading_remote_data) no early return acima. */}
 
-        {status === "needs_plant_registration" && (
-          <motion.div
-            key="signup"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
-          >
-            <SignupScreen actorId={actorId} onNext={() => setStatus("ready")} />
-          </motion.div>
-        )}
+        {/* O cadastro da planta agora é acessível via aba Início se o usuário desejar */}
 
         {((guestMode && !isDiagnosisCurrent(store.state) && tab !== "aprender")) && (
           <motion.div
