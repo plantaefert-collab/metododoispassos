@@ -1458,9 +1458,10 @@ type PlanoTabProps = {
 };
 
 
-function PlanoTab({ setTab }: PlanoTabProps) {
+function PlanoTab({ actorId, setTab }: PlanoTabProps) {
   const { state, setCurrentDay, updateDay, toggleChecklist, toggleDayCompleted } =
     useProtocolStore();
+
   const day = state.currentDay;
   const [showMethod, setShowMethod] = useState(false);
   const meta = getProtocolDay(day);
