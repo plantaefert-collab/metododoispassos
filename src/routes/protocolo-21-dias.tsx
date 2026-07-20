@@ -2158,6 +2158,9 @@ function WeekPicker({
             <motion.button
               key={d}
               onClick={() => onSelectDay(d)}
+              onPointerDown={() => startPress(d)}
+              onPointerUp={cancelPress}
+              onPointerLeave={cancelPress}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.95 }}
               aria-current={active ? "step" : undefined}
