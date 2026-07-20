@@ -158,12 +158,12 @@ function ProtocoloPage() {
             <AuthScreen
               onBack={() => setScreen("welcome")}
               onSuccess={() => {
-                const hasDiagnosis = isDiagnosisCurrent(store.state);
-                if (hasDiagnosis) {
+                const current = isDiagnosisCurrent(store.state);
+                if (current) {
                   setScreen("app");
                   setTab("plano");
                 } else {
-                  setScreen("signup");
+                  setScreen("diagnosis"); // Direto para o diagnóstico após login se não tiver um atual
                 }
               }}
             />
