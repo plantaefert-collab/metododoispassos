@@ -513,7 +513,7 @@ function AppShell({
                   )}
                 </div>
               }
-              label="Exame"
+              label="Diagnóstico"
             />
             <TabBtn
               active={tab === "diario"}
