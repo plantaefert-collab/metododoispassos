@@ -1,6 +1,3 @@
-/**
- * Criar um teste ponta a ponta simulando a transição de visitante para usuário autenticado via Google com migração do progresso e abertura correta do plano salvo.
- */
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState, type ReactNode, type ChangeEvent, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -254,6 +251,8 @@ function ProtocoloPage() {
             transition={{ duration: 0.3 }}
           >
             <DiagnosisResultScreen
+              actorId={actorId}
+
               onBack={() => setStatus("needs_diagnosis")}
               onFinish={() => {
                 store.setOnboarded(true, actorId);
@@ -1066,7 +1065,7 @@ function DiagnosisScreen({ actorId, onFinish, onBack }: { actorId: string; onFin
 
 /* ---------------- Diagnosis Result Screen ---------------- */
 
-function DiagnosisResultScreen({ onBack, onFinish }: { onBack: () => void; onFinish: () => void }) {
+function DiagnosisResultScreen({ actorId, onBack, onFinish }: { actorId: string; onBack: () => void; onFinish: () => void }) {
   const { state } = useProtocolStore();
   const observations = totalObservations(state.diagnosis);
   const current = isDiagnosisCurrent(state);
