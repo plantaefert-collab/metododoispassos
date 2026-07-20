@@ -2305,8 +2305,8 @@ function AprenderTab() {
       </div>
 
       {current && (
-        <Drawer onClose={() => setOpen(null)} title={current.title}>
-          <p className="text-sm leading-relaxed text-foreground/90">{current.body}</p>
+        <Drawer onClose={() => setOpen(null)} title={current.title} icon={current.icon}>
+          <p className="text-base leading-relaxed text-foreground/90">{current.body}</p>
         </Drawer>
       )}
     </div>
@@ -2319,30 +2319,60 @@ function Drawer({
   title,
   onClose,
   children,
+  icon,
 }: {
   title: string;
   onClose: () => void;
   children: ReactNode;
+  icon?: ReactNode;
 }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-primary/30 backdrop-blur-sm sm:items-center"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-[#173D32]/40 backdrop-blur-md sm:items-center"
       onClick={onClose}
     >
       <div
-        className="max-h-[90vh] w-full max-w-[440px] overflow-y-auto rounded-t-3xl border border-border bg-card p-5 shadow-2xl sm:rounded-3xl"
+        className="max-h-[90vh] w-full max-w-[440px] overflow-hidden rounded-t-[32px] border-t border-white/20 bg-[#F8F5EE] shadow-2xl animate-in slide-in-from-bottom duration-300 sm:rounded-[32px] sm:border"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="mb-4 flex items-center justify-between">
-          <div className="text-lg font-bold text-primary">{title}</div>
+        {/* Barra de arraste visual para mobile */}
+        <div className="mx-auto mt-3 h-1 w-12 rounded-full bg-primary/10 sm:hidden" />
+
+        <div className="px-6 pb-8 pt-6">
+          <div className="mb-6 flex items-start justify-between">
+            <div className="flex items-center gap-4">
+              {icon && (
+                <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[#DCEBDD] text-[#173D32]">
+                  {icon}
+                </div>
+              )}
+              <div>
+                <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-accent">
+                  Biblioteca
+                </div>
+                <div className="font-display text-2xl font-normal text-[#173D32]">{title}</div>
+              </div>
+            </div>
+            <button
+              onClick={onClose}
+              className="grid h-10 w-10 place-items-center rounded-full bg-white/50 text-[#173D32] transition-colors hover:bg-white"
+            >
+              <X size={20} />
+            </button>
+          </div>
+
+          <div className="relative">
+            <div className="absolute -left-2 top-0 h-4 w-1 rounded-full bg-accent" />
+            <div className="pl-4">{children}</div>
+          </div>
+
           <button
             onClick={onClose}
-            className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted"
+            className="mt-8 w-full rounded-full bg-[#173D32] py-4 text-sm font-semibold uppercase tracking-wider text-[#F8F5EE] transition-transform active:scale-[0.98]"
           >
-            <X size={16} />
+            Entendido
           </button>
         </div>
-        {children}
       </div>
     </div>
   );
