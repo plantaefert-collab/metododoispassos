@@ -256,7 +256,7 @@ function ProtocoloPage() {
             <DiagnosisResultScreen
               onBack={() => setStatus("needs_diagnosis")}
               onFinish={() => {
-                store.setOnboarded(true, actorId, actorId);
+                store.setOnboarded(true, actorId);
                 setStatus("ready");
                 setTab("plano");
               }}
