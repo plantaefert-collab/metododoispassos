@@ -192,11 +192,11 @@ function AppShell({
 }) {
   const { state, clearSaveError } = useProtocolStore();
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto flex min-h-screen max-w-[440px] flex-col shadow-[0_20px_60px_-20px_rgba(62,100,255,0.2)] sm:my-4 sm:min-h-[calc(100vh-2rem)] sm:rounded-3xl sm:border sm:border-border/60 sm:bg-card/90 sm:backdrop-blur-xl">
-        <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-border bg-background/95 px-4 py-3 backdrop-blur sm:rounded-t-3xl">
+    <div className="min-h-screen bg-background font-sans">
+      <div className="mx-auto flex min-h-screen max-w-[440px] flex-col shadow-[0_30px_90px_-20px_rgba(23,61,50,0.2)] sm:my-4 sm:min-h-[calc(100vh-2rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card">
+        <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-border bg-card px-4 py-4 sm:rounded-t-2xl">
           <div className="flex items-center gap-2">
-            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
+            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground shadow-md shadow-primary/20">
               <Leaf size={18} strokeWidth={2.2} />
             </div>
             <div className="min-w-0">
@@ -240,7 +240,7 @@ function AppShell({
 
         <main className="flex-1 overflow-y-auto px-4 pb-28 pt-4">{children}</main>
 
-        <nav className="sticky bottom-0 z-20 border-t border-border bg-background/95 backdrop-blur sm:rounded-b-3xl">
+        <nav className="sticky bottom-0 z-20 border-t border-border bg-card sm:rounded-b-2xl">
           <div className="grid grid-cols-5">
             <TabBtn
               active={tab === "inicio"}
@@ -299,8 +299,8 @@ function TabBtn({
       aria-current={active ? "page" : undefined}
     >
       <span
-        className={`grid h-8 w-8 place-items-center rounded-xl transition-all ${
-          active ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-110" : ""
+        className={`grid h-8 w-8 place-items-center rounded-lg transition-all ${
+          active ? "bg-primary text-primary-foreground shadow-sm scale-105" : ""
         }`}
       >
         {icon}
@@ -541,7 +541,7 @@ function SignupScreen({ onNext }: { onNext: () => void }) {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto min-h-screen max-w-[440px] px-5 py-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-3xl sm:border sm:border-border sm:bg-card sm:shadow-[0_10px_60px_-30px_rgba(0,80,40,0.35)]">
+      <div className="mx-auto min-h-screen max-w-[440px] px-5 py-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card sm:shadow-[0_15px_50px_-30px_rgba(23,61,50,0.25)]">
         <StepHeader
           step={1}
           total={3}
@@ -555,7 +555,7 @@ function SignupScreen({ onNext }: { onNext: () => void }) {
               value={plant.name}
               onChange={(e) => updatePlant({ name: e.target.value })}
               placeholder="Ex.: Minha Phalaenopsis"
-              className="w-full rounded-xl border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-2 focus:ring-ring"
+              className="w-full rounded-lg border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </Field>
 
@@ -565,7 +565,7 @@ function SignupScreen({ onNext }: { onNext: () => void }) {
               onChange={(e) => updatePlant({ species: e.target.value, unknownSpecies: false })}
               disabled={plant.unknownSpecies}
               placeholder="Ex.: Phalaenopsis, Cattleya…"
-              className="w-full rounded-xl border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
+              className="w-full rounded-lg border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
             />
             <label className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
               <input
@@ -697,7 +697,7 @@ function SelectField({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-xl border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-2 focus:ring-ring"
+        className="w-full rounded-lg border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-1 focus:ring-primary"
       >
         <option value="">Selecione…</option>
         {options.map((o) => (
@@ -726,7 +726,7 @@ function StepHeader({
       <div className="text-xs font-semibold uppercase tracking-wider text-accent">
         Passo {step} de {total}
       </div>
-      <h1 className="mt-1 text-2xl font-black tracking-tight text-primary">{title}</h1>
+      <h1 className="mt-1 text-2xl font-display tracking-tight text-primary">{title}</h1>
       <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
     </div>
   );
@@ -753,7 +753,7 @@ function DiagnosisScreen({ onFinish, onBack }: { onFinish: () => void; onBack: (
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto min-h-screen max-w-[440px] px-5 py-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-3xl sm:border sm:border-border sm:bg-card sm:shadow-[0_10px_60px_-30px_rgba(0,80,40,0.35)]">
+      <div className="mx-auto min-h-screen max-w-[440px] px-5 py-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card sm:shadow-[0_15px_50px_-30px_rgba(23,61,50,0.25)]">
         <StepHeader
           step={2}
           total={3}
@@ -819,7 +819,7 @@ function DiagnosisScreen({ onFinish, onBack }: { onFinish: () => void; onBack: (
                   type="button"
                   onClick={() => toggleDiagnosis(current.key, opt)}
                   aria-pressed={active}
-                  className={`flex items-center justify-between rounded-2xl border px-4 py-3.5 text-left text-[15px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                  className={`flex items-center justify-between rounded-xl border px-4 py-3.5 text-left text-[15px] transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
                     active
                       ? "border-primary bg-primary/5 text-primary"
                       : "border-border bg-card text-foreground hover:border-primary/40"
@@ -872,7 +872,7 @@ function DiagnosisResultScreen({ onBack, onFinish }: { onBack: () => void; onFin
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto min-h-screen max-w-[440px] px-5 py-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-3xl sm:border sm:border-border sm:bg-card sm:shadow-[0_10px_60px_-30px_rgba(0,80,40,0.35)]">
+      <div className="mx-auto min-h-screen max-w-[440px] px-5 py-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card sm:shadow-[0_15px_50px_-30px_rgba(23,61,50,0.25)]">
         <StepHeader
           step={3}
           total={3}
@@ -990,7 +990,7 @@ function ResultSection({
           : "border-border bg-card";
   return (
     <section className={`rounded-2xl border p-4 ${toneCls}`}>
-      <h3 className="text-sm font-bold text-primary">{title}</h3>
+      <h3 className="text-sm font-semibold text-primary">{title}</h3>
       <ul className="mt-3 space-y-3">
         {items.map((g) => (
           <li key={g.id} className="rounded-xl bg-card/70 p-3 border border-border/60">
@@ -1074,9 +1074,9 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-3xl border border-border bg-gradient-to-br from-secondary to-lilac/60 p-5">
+      <div className="rounded-2xl border border-border bg-plantae-cream/40 p-5">
         <div className="flex items-center gap-3">
-          <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-2xl bg-card">
+          <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-card">
             {state.plant.photo ? (
               <img
                 src={state.plant.photo}
@@ -1104,12 +1104,12 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
       </div>
 
       {isApplicationDay ? (
-        <div className="rounded-3xl border border-accent/30 bg-accent/10 p-5">
+        <div className="rounded-2xl border border-accent/20 bg-accent/5 p-5">
           <div className="flex items-center gap-2 text-accent">
             <Sparkles size={16} />
             <span className="text-xs font-bold uppercase tracking-wider">Dia de aplicação</span>
           </div>
-          <h2 className="mt-2 text-xl font-black text-primary">
+          <h2 className="mt-2 text-xl font-display text-primary">
             Hoje é dia de aplicar o Método de 2 Passos
           </h2>
           <p className="mt-1 text-sm text-primary/80">
@@ -1143,11 +1143,11 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
           </div>
         </div>
       ) : (
-        <div className="rounded-3xl border border-border bg-card p-5">
+        <div className="rounded-2xl border border-border bg-card p-5">
           <div className="text-xs font-bold uppercase tracking-wider text-primary">
             Tarefa do dia
           </div>
-          <h2 className="mt-1 text-lg font-bold text-foreground">{getProtocolDay(day).title}</h2>
+          <h2 className="mt-1 text-lg font-display text-foreground">{getProtocolDay(day).title}</h2>
           <p className="mt-1 text-sm text-muted-foreground">{getProtocolDay(day).objective}</p>
           <button
             onClick={() => setTab("plano")}
@@ -1158,7 +1158,7 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
         </div>
       )}
 
-      <div className="rounded-3xl border border-border bg-card p-5">
+      <div className="rounded-2xl border border-border bg-card p-5">
         <div className="mb-3 flex items-center justify-between">
           <div className="text-sm font-bold text-primary">Próximos marcos</div>
           <button
@@ -1176,12 +1176,12 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
                 setCurrentDay(d);
                 setTab("plano");
               }}
-              className="rounded-2xl border border-border bg-secondary/40 p-3 text-left transition-colors hover:border-primary/40"
+              className="rounded-xl border border-border bg-secondary/40 p-3 text-left transition-colors hover:border-primary/40"
             >
               <div className="text-[10px] font-semibold uppercase tracking-wider text-accent">
                 {d === 7 ? "1ª avaliação" : d === 14 ? "Intermediária" : "Final"}
               </div>
-              <div className="mt-1 text-base font-bold text-primary">Dia {d}</div>
+              <div className="mt-1 text-base font-display text-primary">Dia {d}</div>
             </button>
           ))}
         </div>
@@ -1192,7 +1192,7 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
       </InfoCard>
 
       {diagnosisFresh && trackingPoints.length > 0 && (
-        <div className="rounded-3xl border border-primary/20 bg-secondary/40 p-5">
+        <div className="rounded-2xl border border-primary/20 bg-secondary/40 p-5">
           <div className="flex items-center gap-2 text-primary">
             <Info size={16} />
             <div className="text-sm font-bold">Pontos do seu diagnóstico para acompanhar</div>
@@ -1213,7 +1213,7 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
         </div>
       )}
 
-      <div className="rounded-3xl border border-border bg-card p-5">
+      <div className="rounded-2xl border border-border bg-card p-5">
         <div className="text-sm font-bold text-primary">Explorar dias do plano</div>
         <p className="mt-1 text-xs text-muted-foreground">
           Escolha uma semana e um dia para consultar.
@@ -1262,11 +1262,11 @@ function PlanoTab({ setTab }: PlanoTabProps) {
     <div className="space-y-4">
       <div>
         <div className="text-xs font-bold uppercase tracking-wider text-accent">Meu plano</div>
-        <h1 className="text-2xl font-black tracking-tight text-primary">Plano de 21 dias</h1>
+        <h1 className="text-2xl font-display tracking-tight text-primary">Plano de 21 dias</h1>
       </div>
 
       {!diagnosisFresh && state.diagnosisResult && (
-        <div className="mb-2 rounded-2xl border border-primary/20 bg-primary/5 p-4">
+        <div className="mb-2 rounded-xl border border-primary/20 bg-primary/5 p-4">
           <div className="flex items-start gap-3">
             <Info className="mt-0.5 shrink-0 text-primary" size={18} />
             <div className="flex-1">
@@ -1322,7 +1322,7 @@ function PlanoTab({ setTab }: PlanoTabProps) {
         </button>
       )}
 
-      <div className="rounded-3xl border border-border bg-card p-5">
+      <div className="rounded-2xl border border-border bg-card p-5">
         <div className="grid gap-2">
           {meta.checklist.map((item) => {
             const checked = !!entry.checklist[item];
@@ -1331,7 +1331,7 @@ function PlanoTab({ setTab }: PlanoTabProps) {
                 key={item}
                 onClick={() => toggleChecklist(day, item)}
                 aria-pressed={checked}
-                className={`flex w-full items-start gap-3 rounded-2xl border px-4 py-3 text-left text-sm transition-colors ${
+                className={`flex w-full items-start gap-3 rounded-xl border px-4 py-3 text-left text-sm transition-colors ${
                   checked
                     ? "border-primary bg-primary/5 text-primary"
                     : "border-border bg-card text-foreground"
@@ -1366,14 +1366,14 @@ function PlanoTab({ setTab }: PlanoTabProps) {
           <div className="mt-3 grid grid-cols-2 gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
             <button
               onClick={() => setTab("inicio")}
-              className="flex items-center justify-center gap-1.5 rounded-2xl border border-primary/20 bg-primary/5 py-3 text-[12px] font-bold text-primary transition-colors hover:bg-primary/10"
+              className="flex items-center justify-center gap-1.5 rounded-xl border border-primary/20 bg-primary/5 py-3 text-[12px] font-bold text-primary transition-colors hover:bg-primary/10"
             >
               <Home size={14} />
               Início
             </button>
             <button
               onClick={() => setTab("diagnostico")}
-              className="flex items-center justify-center gap-1.5 rounded-2xl border border-accent/20 bg-accent/5 py-3 text-[12px] font-bold text-accent transition-colors hover:bg-accent/10"
+              className="flex items-center justify-center gap-1.5 rounded-xl border border-accent/20 bg-accent/5 py-3 text-[12px] font-bold text-accent transition-colors hover:bg-accent/10"
             >
               <Stethoscope size={14} />
               Diagnóstico
@@ -1442,7 +1442,7 @@ function WeekPicker({
               onClick={() => onSelectDay(d)}
               aria-current={active ? "step" : undefined}
               aria-label={isApp ? `Dia ${d}, dia de aplicação` : `Dia ${d}`}
-              className={`relative min-h-[44px] rounded-2xl border px-2 py-2 text-[13px] font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+              className={`relative min-h-[44px] rounded-xl border px-2 py-2 text-[13px] font-semibold transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
                 active
                   ? "border-primary bg-primary text-primary-foreground"
                   : "border-border bg-card text-foreground hover:border-primary/40"
