@@ -1471,12 +1471,6 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
                 <Stethoscope size={14} /> Fazer diagnóstico
               </button>
             )}
-            <button
-              onClick={() => setTab("plano")}
-              className="inline-flex items-center gap-1 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
-            >
-              Abrir meu plano <ChevronRight size={16} />
-            </button>
           </div>
         </div>
       )}
