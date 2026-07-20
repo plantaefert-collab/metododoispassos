@@ -291,7 +291,7 @@ function ProtocoloPage() {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  {tab === "inicio" && <InicioTab actorId={actorId} setTab={setTab} />}
+                  {tab === "inicio" && <InicioTab actorId={actorId} setTab={setTab} setStatus={setStatus} />}
                   {tab === "plano" && <PlanoTab actorId={actorId} setTab={setTab} />}
                   {tab === "diagnostico" && (
                     <DiagnosticoTab actorId={actorId} onRedo={() => setStatus("needs_diagnosis")} setTab={setTab} />
@@ -1287,7 +1287,7 @@ function InfoCard({
 
 /* ---------------- Início ---------------- */
 
-function InicioTab({ actorId, setTab }: { actorId: string; setTab: (t: Tab) => void }) {
+function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t: Tab) => void; setStatus: (s: AuthBootstrapStatus) => void }) {
   const { state, setCurrentDay } = useProtocolStore();
 
   const day = state.currentDay;
