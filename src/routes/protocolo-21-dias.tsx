@@ -3373,5 +3373,82 @@ function StatCard({ label, value, icon }: { label: string; value: string | numbe
   );
 }
 
+function DayPreviewModal({ 
+  day, 
+  onClose, 
+  onSelect 
+}: { 
+  day: number; 
+  onClose: () => void; 
+  onSelect: () => void;
+}) {
+  const meta = getProtocolDay(day);
+  const phase = getProtocolPhase(day);
+  
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-background/80 p-6 backdrop-blur-md">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-border bg-card shadow-2xl"
+      >
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-full bg-secondary/50 p-2 text-foreground/60 transition-colors hover:bg-secondary"
+        >
+          <X size={20} />
+        </button>
+
+        <div className="p-8">
+          <div className="flex items-center gap-2">
+             <span className="text-[10px] font-bold uppercase tracking-widest text-accent">{phase.range}</span>
+             <div className="h-1 flex-1 bg-border/40 rounded-full" />
+          </div>
+          
+          <h2 className="mt-4 font-display text-3xl tracking-tight text-primary">
+            Dia <span className="text-4xl text-accent">{day}</span>
+          </h2>
+          <h3 className="mt-1 text-xl font-bold text-primary/80">{meta.title}</h3>
+          
+          <div className="mt-6 space-y-4">
+            <div className="rounded-2xl bg-primary/5 p-4 border border-primary/10">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-primary/60">Objetivo</div>
+              <p className="mt-1 text-sm leading-relaxed text-foreground/80">{meta.objective}</p>
+            </div>
+            
+            <div>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-primary/60">Tarefa Principal</div>
+              <p className="mt-1 text-sm leading-relaxed text-foreground/90 font-medium">{meta.mainAction}</p>
+            </div>
+
+            {meta.tip && (
+              <div className="flex gap-3 rounded-2xl bg-accent/5 p-4 border border-accent/10">
+                <Sparkles size={18} className="shrink-0 text-accent" />
+                <p className="text-xs italic text-accent/80">{meta.tip}</p>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-8 flex flex-col gap-3">
+            <button
+              onClick={onSelect}
+              className="w-full rounded-2xl bg-primary py-4 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:brightness-110 active:scale-[0.98]"
+            >
+              Começar este dia agora
+            </button>
+            <button
+              onClick={onClose}
+              className="w-full rounded-2xl border border-border py-4 text-sm font-bold text-muted-foreground transition-all hover:bg-muted"
+            >
+              Voltar
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
 // Unused imports guard: reference to keep certain icons in bundle for clarity/future.
 export const _icons = { Plus };
