@@ -93,11 +93,9 @@ export function useAuthBootstrap() {
 
       if (!hasPlant) {
         setStatus("needs_plant_registration");
-      } else if (!diagnosisReady && !finalState.onboarded) {
-        // Se tem planta mas nunca completou o diagnóstico inicial (onboarded),
-        // força o diagnóstico antes de liberar o Início/Plano.
-        setStatus("needs_diagnosis");
       } else {
+        // Agora sempre redireciona para "ready" (Início) para que o usuário 
+        // veja o card de diagnóstico lá dentro, em vez de ser forçado a fazer o exame agora.
         setStatus("ready");
       }
     } catch (err: any) {

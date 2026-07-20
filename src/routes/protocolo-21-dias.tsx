@@ -234,7 +234,7 @@ function ProtocoloPage() {
           </motion.div>
         )}
 
-        {(status === "needs_diagnosis" || (guestMode && !isDiagnosisCurrent(store.state) && tab !== "aprender")) && (
+        {((guestMode && !isDiagnosisCurrent(store.state) && tab !== "aprender")) && (
           <motion.div
             key="diagnosis"
             initial={{ opacity: 0, x: 20 }}
