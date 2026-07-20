@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState, type ReactNode, type ChangeEvent, useEffect, useRef } from "react";
+import { useMemo, useState, type ReactNode, type ChangeEvent, useEffect, useRef, useLayoutEffect } from "react";
 import { toast, Toaster } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -153,16 +153,26 @@ function ProtocoloPage() {
 
   if (status === "booting" || status === "loading_remote_data") {
     return (
-      <div className="min-h-screen bg-[#F8F5EE] flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-screen bg-[#F8F5EE] relative flex flex-col items-center justify-center p-6 text-center overflow-hidden">
+        {/* Marca d'água botânica */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.03] flex items-center justify-center">
+          <svg width="400" height="400" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-[#173D32]">
+             <path d="M50 10C50 10 40 30 40 50C40 70 50 90 50 90M50 10C50 10 60 30 60 50C60 70 50 90 50 90M20 50C20 50 40 45 50 50C60 55 80 50 80 50" stroke="currentColor" strokeWidth="0.5" strokeLinecap="round"/>
+             <circle cx="50" cy="50" r="2" fill="currentColor"/>
+          </svg>
+        </div>
+        
         <motion.div 
           animate={{ rotate: 360 }} 
-          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          className="mb-4 text-[#173D32]"
+          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+          className="mb-6 text-[#173D32] relative z-10"
         >
-          <Loader2 size={40} strokeWidth={1.5} />
+          <div className="p-3 bg-white/50 backdrop-blur-sm rounded-full border border-[#173D32]/10 shadow-sm">
+            <Loader2 size={32} strokeWidth={1.5} />
+          </div>
         </motion.div>
-        <div className="font-display text-xl text-[#173D32]">Preparando sua jornada...</div>
-        <div className="mt-2 text-sm text-[#173D32]/60 font-medium uppercase tracking-widest">PlantaeFert Nutrição</div>
+        <div className="font-display text-2xl text-[#173D32] relative z-10 mb-2">Preparando sua jornada...</div>
+        <div className="text-[10px] text-[#173D32]/50 font-bold uppercase tracking-[0.2em] relative z-10">PlantaeFert Nutrição Vegetal</div>
       </div>
     );
   }
@@ -411,7 +421,7 @@ function PhaseProgressBar({ currentDay }: { currentDay: number }) {
           Progresso da {phaseInfo.label}
         </span>
         <span className="text-[10px] font-bold text-muted-foreground">
-          Dia {currentDay} de 21
+          Dia <span className="font-display text-lg text-primary">{currentDay}</span> de 21
         </span>
       </div>
       <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
