@@ -1658,7 +1658,9 @@ function DetailAccordions({
           className="overflow-hidden rounded-2xl border border-border bg-background/40"
         >
           <AccordionTrigger className="px-4 py-3 text-[14px] font-semibold text-primary hover:no-underline">
-            {s.title}
+            {s.id === "observe" && observe.length > 0 && sections.find(sec => sec.id === "observe")?.title !== "Observe" 
+              ? sections.find(sec => sec.id === "observe")?.title 
+              : s.title}
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-4 pt-0">{s.content}</AccordionContent>
         </AccordionItem>
