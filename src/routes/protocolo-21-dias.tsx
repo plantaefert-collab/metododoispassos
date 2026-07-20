@@ -220,7 +220,7 @@ function ProtocoloPage() {
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
           >
-            <SignupScreen actorId={actorId} onNext={() => setStatus("needs_diagnosis")} />
+            <SignupScreen actorId={actorId} onNext={() => setStatus("ready")} />
           </motion.div>
         )}
 
