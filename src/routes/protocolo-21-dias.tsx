@@ -120,6 +120,7 @@ function ProtocoloPage() {
   const store = useProtocolStore();
   const { status, user, error: authError, setStatus } = useAuthBootstrap();
   const [tab, setTab] = useState<Tab>("inicio");
+  const [previewDay, setPreviewDay] = useState<number | null>(null);
 
   // Retomar automaticamente para a aba correta quando o status mudar para ready
   useEffect(() => {
