@@ -487,6 +487,19 @@ function AppShell({
                   </div>
                   <ChevronRight size={16} className="ml-auto opacity-50" />
                 </button>
+                <button
+                  onClick={() => setTab("resumo")}
+                  className="flex items-center gap-2 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm font-medium text-primary transition-all hover:bg-primary/10"
+                >
+                  <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/20">
+                    <FileText size={20} />
+                  </div>
+                  <div className="text-left">
+                    <div className="font-bold">Resumo & PDF</div>
+                    <div className="text-xs text-muted-foreground">Exportar progresso e estatísticas</div>
+                  </div>
+                  <ChevronRight size={16} className="ml-auto opacity-50" />
+                </button>
               </div>
             )}
             {children}
