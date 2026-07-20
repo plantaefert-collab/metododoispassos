@@ -22,6 +22,7 @@
  * Me explique como ficará esse fluxo
  * 
  * Adicionar um teste automatizado no Playwright para confirmar que, após salvar a orquídea, eu avanço sempre para a tela Início e recebo status 2xx no PATCH /protocol_progress.
+ * Implementar um teste automatizado no Playwright para confirmar que, após salvar a orquídea, eu sempre avanço para a tela Início e recebo status 2xx no PATCH /protocol_progress.
  */
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
