@@ -1994,8 +1994,9 @@ function RegisterField({
   );
 }
 
-function MethodDrawer({ day, onClose }: { day: number; onClose: () => void }) {
+function MethodDrawer({ actorId, day, onClose }: { actorId: string; day: number; onClose: () => void }) {
   const { registerApplication, state } = useProtocolStore();
+
   const applicationsForDay = state.applications.filter((a) => a.day === day);
   const entry = state.days[day] ?? { checklist: {}, note: "", completed: false };
   const checklist = getProtocolDay(day).checklist;
