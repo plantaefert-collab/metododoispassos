@@ -2561,7 +2561,7 @@ function DiagnosticoTab({ actorId, onRedo, setTab }: { actorId: string; onRedo: 
         </div>
         <div className="relative z-10">
           <div className="text-xs font-bold uppercase tracking-wider text-accent">Diagnóstico</div>
-          <h1 className="text-2xl font-display tracking-tight text-primary">Sinais observados</h1>
+          <h1 className="text-2xl font-display tracking-tight text-primary">Sinais <span className="text-3xl text-accent">Observados</span></h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Este resumo orienta sua observação. Um sinal isolado não fecha um diagnóstico.
           </p>
