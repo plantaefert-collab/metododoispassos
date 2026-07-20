@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState, type ReactNode, type ChangeEvent, useEffect, useRef, useLayoutEffect } from "react";
 import { toast, Toaster } from "sonner";
+import confetti from "canvas-confetti";
 import { motion, AnimatePresence } from "framer-motion";
+import { playSuccessSound, playPopSound } from "@/lib/audio-feedback";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Sprout,
@@ -118,6 +120,7 @@ function ProtocoloPage() {
   const store = useProtocolStore();
   const { status, user, error: authError, setStatus } = useAuthBootstrap();
   const [tab, setTab] = useState<Tab>("inicio");
+  const [previewDay, setPreviewDay] = useState<number | null>(null);
 
   // Retomar automaticamente para a aba correta quando o status mudar para ready
   useEffect(() => {
@@ -322,6 +325,19 @@ function ProtocoloPage() {
           </motion.div>
         )}
 
+        <AnimatePresence>
+          {previewDay !== null && (
+            <DayPreviewModal
+              day={previewDay}
+              onClose={() => setPreviewDay(null)}
+              onSelect={() => {
+                store.setCurrentDay(previewDay, actorId);
+                setPreviewDay(null);
+              }}
+            />
+          )}
+        </AnimatePresence>
+
         {(status === "ready" || guestMode) && (
           <motion.div
             key="app"
@@ -344,7 +360,7 @@ function ProtocoloPage() {
                   style={{ perspective: "1000px" }}
                 >
                   {tab === "inicio" && <InicioTab actorId={actorId} setTab={setTab} setStatus={setStatus} />}
-                  {tab === "plano" && <PlanoTab actorId={actorId} setTab={setTab} />}
+                  {tab === "plano" && <PlanoTab actorId={actorId} setTab={setTab} onPreviewDay={setPreviewDay} />}
                   {tab === "diagnostico" && (
                     <DiagnosticoTab actorId={actorId} onRedo={() => setStatus("needs_diagnosis")} setTab={setTab} />
                   )}
@@ -1792,10 +1808,11 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
 type PlanoTabProps = {
   actorId: string;
   setTab: (tab: Tab) => void;
+  onPreviewDay: (day: number) => void;
 };
 
 
-function PlanoTab({ actorId, setTab }: PlanoTabProps) {
+function PlanoTab({ actorId, setTab, onPreviewDay }: PlanoTabProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   
@@ -1866,6 +1883,7 @@ function PlanoTab({ actorId, setTab }: PlanoTabProps) {
         }}
         currentDay={day}
         onSelectDay={(d) => setCurrentDay(d, actorId)}
+        onPreviewDay={onPreviewDay}
         weekDays={activeWeek.days}
       />
 
@@ -1926,7 +1944,10 @@ function PlanoTab({ actorId, setTab }: PlanoTabProps) {
               <motion.button
                 key={item}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => toggleChecklist(day, item, actorId)}
+                onClick={() => {
+                  toggleChecklist(day, item, actorId);
+                  if (!checked) playPopSound();
+                }}
                 aria-pressed={checked}
                 className={`flex w-full items-start gap-3 rounded-xl border px-4 py-3 text-left text-sm transition-colors ${
                   checked
@@ -1956,7 +1977,21 @@ function PlanoTab({ actorId, setTab }: PlanoTabProps) {
         <RegisterField meta={meta} entry={entry} onChange={(note) => updateDay(day, { note }, actorId)} />
 
         <button
-          onClick={() => toggleDayCompleted(day, actorId)}
+          onClick={() => {
+            toggleDayCompleted(day, actorId);
+            if (!entry.completed) {
+              playSuccessSound();
+              if ([7, 14, 21].includes(day)) {
+                confetti({
+                  particleCount: 150,
+                  spread: 70,
+                  origin: { y: 0.6 },
+                  colors: ['#D946EF', '#173D32', '#F8F5EE', '#FDF2F8']
+                });
+                toast.success(day === 7 ? "Fase 1 Concluída!" : day === 14 ? "Fase 2 Concluída!" : "Protocolo Concluído!");
+              }
+            }
+          }}
           aria-pressed={entry.completed}
           className={`mt-4 w-full rounded-full px-4 py-3 text-sm font-semibold active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
             entry.completed
@@ -2057,15 +2092,33 @@ function WeekPicker({
   onSelect,
   currentDay,
   onSelectDay,
+  onPreviewDay,
   weekDays,
 }: {
   currentWeek: 1 | 2 | 3;
   onSelect: (w: 1 | 2 | 3) => void;
   currentDay: number;
   onSelectDay: (day: number) => void;
+  onPreviewDay: (day: number) => void;
   weekDays: number[];
 }) {
   const { state } = useProtocolStore();
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const startPress = (d: number) => {
+    longPressTimer.current = setTimeout(() => {
+      onPreviewDay(d);
+      longPressTimer.current = null;
+    }, 600);
+  };
+
+  const cancelPress = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  };
+
   return (
     <div className="space-y-3">
       <div
@@ -2105,6 +2158,9 @@ function WeekPicker({
             <motion.button
               key={d}
               onClick={() => onSelectDay(d)}
+              onPointerDown={() => startPress(d)}
+              onPointerUp={cancelPress}
+              onPointerLeave={cancelPress}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.95 }}
               aria-current={active ? "step" : undefined}
@@ -3313,6 +3369,83 @@ function StatCard({ label, value, icon }: { label: string; value: string | numbe
         <span className="text-[10px] font-bold uppercase tracking-wider">{label}</span>
       </div>
       <div className="mt-1 text-2xl font-display text-primary leading-none">{value}</div>
+    </div>
+  );
+}
+
+function DayPreviewModal({ 
+  day, 
+  onClose, 
+  onSelect 
+}: { 
+  day: number; 
+  onClose: () => void; 
+  onSelect: () => void;
+}) {
+  const meta = getProtocolDay(day);
+  const phase = getProtocolPhase(day);
+  
+  return (
+    <div className="fixed inset-0 z-[60] flex items-center justify-center bg-background/80 p-6 backdrop-blur-md">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-border bg-card shadow-2xl"
+      >
+        <button
+          onClick={onClose}
+          className="absolute right-4 top-4 rounded-full bg-secondary/50 p-2 text-foreground/60 transition-colors hover:bg-secondary"
+        >
+          <X size={20} />
+        </button>
+
+        <div className="p-8">
+          <div className="flex items-center gap-2">
+             <span className="text-[10px] font-bold uppercase tracking-widest text-accent">{phase.range}</span>
+             <div className="h-1 flex-1 bg-border/40 rounded-full" />
+          </div>
+          
+          <h2 className="mt-4 font-display text-3xl tracking-tight text-primary">
+            Dia <span className="text-4xl text-accent">{day}</span>
+          </h2>
+          <h3 className="mt-1 text-xl font-bold text-primary/80">{meta.title}</h3>
+          
+          <div className="mt-6 space-y-4">
+            <div className="rounded-2xl bg-primary/5 p-4 border border-primary/10">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-primary/60">Objetivo</div>
+              <p className="mt-1 text-sm leading-relaxed text-foreground/80">{meta.objective}</p>
+            </div>
+            
+            <div>
+              <div className="text-[10px] font-bold uppercase tracking-widest text-primary/60">Tarefa Principal</div>
+              <p className="mt-1 text-sm leading-relaxed text-foreground/90 font-medium">{meta.mainAction}</p>
+            </div>
+
+            {meta.tip && (
+              <div className="flex gap-3 rounded-2xl bg-accent/5 p-4 border border-accent/10">
+                <Sparkles size={18} className="shrink-0 text-accent" />
+                <p className="text-xs italic text-accent/80">{meta.tip}</p>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-8 flex flex-col gap-3">
+            <button
+              onClick={onSelect}
+              className="w-full rounded-2xl bg-primary py-4 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:brightness-110 active:scale-[0.98]"
+            >
+              Começar este dia agora
+            </button>
+            <button
+              onClick={onClose}
+              className="w-full rounded-2xl border border-border py-4 text-sm font-bold text-muted-foreground transition-all hover:bg-muted"
+            >
+              Voltar
+            </button>
+          </div>
+        </div>
+      </motion.div>
     </div>
   );
 }
