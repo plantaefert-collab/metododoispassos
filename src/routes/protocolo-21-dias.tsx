@@ -913,6 +913,7 @@ function SignupScreen({ actorId, onNext }: { actorId: string; onNext: () => void
         >
           Salvar e fazer diagnóstico
         </button>
+        </div>
       </div>
     </div>
   );
