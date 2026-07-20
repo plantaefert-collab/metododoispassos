@@ -35,7 +35,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { useProtocolStore, isDiagnosisCurrent, defaultState } from "@/lib/protocol-store";
+import { useProtocolStore, isDiagnosisCurrent, defaultState, getState } from "@/lib/protocol-store";
 import { compressImage, PHOTO_ERROR_MESSAGE } from "@/lib/image-compress";
 import {
   getProtocolDay,
@@ -115,6 +115,16 @@ function ProtocoloPage() {
   const store = useProtocolStore();
   const { status, user, error: authError, setStatus } = useAuthBootstrap();
   const [tab, setTab] = useState<Tab>("inicio");
+
+  // Retomar automaticamente para a aba correta quando o status mudar para ready
+  useEffect(() => {
+    if (status === "ready") {
+      const state = getState();
+      if (state.onboarded) {
+        setTab("plano");
+      }
+    }
+  }, [status]);
   const [guestMode, setGuestMode] = useState(false);
   const [showReset, setShowReset] = useState(false);
   const [showLegacyDialog, setShowLegacyDialog] = useState(false);
@@ -354,7 +364,37 @@ function ProtocoloPage() {
   );
 }
 
+function PhaseProgressBar({ currentDay }: { currentDay: number }) {
+  const phaseInfo = useMemo(() => {
+    if (currentDay <= 7) return { label: "Fase 1: Dias 1–7", progress: (currentDay / 7) * 100, color: "bg-primary" };
+    if (currentDay <= 14) return { label: "Fase 2: Dias 8–14", progress: ((currentDay - 7) / 7) * 100, color: "bg-lilac-500" };
+    return { label: "Fase 3: Dias 15–21", progress: ((currentDay - 14) / 7) * 100, color: "bg-accent" };
+  }, [currentDay]);
+
+  return (
+    <div className="border-t border-border bg-card px-4 py-2">
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+          Progresso da {phaseInfo.label}
+        </span>
+        <span className="text-[10px] font-bold text-muted-foreground">
+          Dia {currentDay} de 21
+        </span>
+      </div>
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${Math.min(100, Math.max(0, phaseInfo.progress))}%` }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className={`h-full ${phaseInfo.color}`}
+        />
+      </div>
+    </div>
+  );
+}
+
 /* ---------------- Shell ---------------- */
+
 
 function AppShell({
   tab,
@@ -450,6 +490,7 @@ function AppShell({
           </div>
         </main>
 
+        <PhaseProgressBar currentDay={state.currentDay} />
         <nav className="sticky bottom-0 z-20 border-t border-border bg-card/80 backdrop-blur-md sm:rounded-b-2xl">
           <div className="grid grid-cols-5">
             <TabBtn
@@ -799,7 +840,10 @@ function SignupScreen({
           <Field label="Nome da planta *">
             <input
               value={plant.name}
-              onChange={(e) => updatePlant({ name: e.target.value }, actorId)}
+              onChange={(e) => {
+                const name = e.target.value;
+                updatePlant({ name }, actorId);
+              }}
               placeholder="Ex.: Minha Phalaenopsis"
               className="w-full rounded-lg border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-1 focus:ring-primary"
             />
@@ -808,7 +852,10 @@ function SignupScreen({
           <Field label="Espécie (opcional)">
             <input
               value={plant.species}
-              onChange={(e) => updatePlant({ species: e.target.value, unknownSpecies: false }, actorId)}
+              onChange={(e) => {
+                const species = e.target.value;
+                updatePlant({ species, unknownSpecies: false }, actorId);
+              }}
               disabled={plant.unknownSpecies}
               placeholder="Ex.: Phalaenopsis, Cattleya…"
               className="w-full rounded-lg border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
@@ -817,13 +864,13 @@ function SignupScreen({
               <input
                 type="checkbox"
                 checked={plant.unknownSpecies}
-                onChange={(e) =>
+                onChange={(e) => {
+                  const unknownSpecies = e.target.checked;
                   updatePlant({
-                    unknownSpecies: e.target.checked,
-                    species: e.target.checked ? "" : plant.species,
-                  }, actorId)
-
-                }
+                    unknownSpecies,
+                    species: unknownSpecies ? "" : plant.species,
+                  }, actorId);
+                }}
                 className="h-4 w-4 rounded border-input accent-primary"
               />
               Não sei a espécie
