@@ -10,6 +10,19 @@ import {
 } from "./protocol-cache";
 import { ProtocolState } from "./protocol-store";
 
+// Mock localStorage
+const localStorageMock = (() => {
+  let store: Record<string, string> = {};
+  return {
+    getItem: (key: string) => store[key] || null,
+    setItem: (key: string, value: string) => { store[key] = value.toString(); },
+    removeItem: (key: string) => { delete store[key]; },
+    clear: () => { store = {}; },
+  };
+})();
+
+Object.defineProperty(global, 'localStorage', { value: localStorageMock });
+
 const mockState: ProtocolState = {
   schemaVersion: 2,
   currentDay: 1,
