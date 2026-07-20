@@ -1808,10 +1808,11 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
 type PlanoTabProps = {
   actorId: string;
   setTab: (tab: Tab) => void;
+  onPreviewDay: (day: number) => void;
 };
 
 
-function PlanoTab({ actorId, setTab }: PlanoTabProps) {
+function PlanoTab({ actorId, setTab, onPreviewDay }: PlanoTabProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   
