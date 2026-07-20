@@ -185,7 +185,30 @@ function ProtocoloPage() {
 
   return (
     <div className="font-sans text-foreground antialiased selection:bg-accent/20">
-      <Toaster position="top-center" richColors />
+      <Toaster 
+        position="top-center" 
+        richColors 
+        toastOptions={{
+          className: "font-sans",
+          style: {
+            borderRadius: '1rem',
+            padding: '12px 16px',
+          },
+          classNames: {
+            toast: "border shadow-lg",
+            success: "bg-[#F8F5EE] border-[#173D32]/20 text-[#173D32]",
+            info: "bg-[#FDF2F8] border-[#D946EF]/20 text-[#D946EF]",
+            error: "bg-destructive/5 border-destructive/20 text-destructive",
+            warning: "bg-yellow-50 border-yellow-200 text-yellow-800",
+          }
+        }}
+        icons={{
+          success: <Sprout size={18} className="text-[#173D32]" />,
+          info: <Sparkles size={18} className="text-[#D946EF]" />,
+          error: <AlertCircle size={18} className="text-destructive" />,
+          warning: <AlertTriangle size={18} className="text-yellow-600" />,
+        }}
+      />
       <AnimatePresence mode="wait">
         {status === "signed_out" && !guestMode && (
           <motion.div
