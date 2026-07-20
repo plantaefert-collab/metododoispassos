@@ -301,11 +301,13 @@ function AppShell({
   tab,
   setTab,
   onReset,
+  userEmail,
   children,
 }: {
   tab: Tab;
   setTab: (t: Tab) => void;
   onReset: () => void;
+  userEmail?: string;
   children: ReactNode;
 }) {
   const { state, clearSaveError } = useProtocolStore();
