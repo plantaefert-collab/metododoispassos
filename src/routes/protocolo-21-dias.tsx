@@ -2931,15 +2931,20 @@ function AprenderTab() {
   const current = LIBRARY.find((l) => l.id === open);
 
   return (
-    <div className="space-y-4">
-      <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-6">
-        <div className="absolute -right-4 -top-4 opacity-[0.08] text-primary rotate-12">
-          <BookOpen size={120} />
+    <div className="space-y-6">
+      <div className="relative overflow-hidden rounded-[2rem] border border-primary/10 bg-gradient-to-br from-primary/[0.03] to-transparent p-8">
+        <div className="absolute -right-8 -top-8 opacity-[0.05] text-primary rotate-12">
+          <BookOpen size={160} />
         </div>
         <div className="relative z-10">
-          <div className="text-xs font-bold uppercase tracking-wider text-accent">Aprender</div>
-          <h1 className="text-2xl font-display tracking-tight text-primary">Biblioteca de Cuidado</h1>
-          <p className="mt-1 text-sm text-muted-foreground">
+          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary">
+            <BookOpen size={12} /> Biblioteca de Cuidado
+          </div>
+          <h1 className="mt-4 font-display text-3xl leading-tight tracking-tight text-primary">
+            Dicas & Guia <br />
+            <span className="text-accent">Botânico</span>
+          </h1>
+          <p className="mt-3 max-w-[240px] text-sm leading-relaxed text-muted-foreground">
             Fundamentos e orientações práticas para sua orquídea florescer.
           </p>
         </div>
