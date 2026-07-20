@@ -1,5 +1,7 @@
 /**
+ * Chat, antes a gente tinha uma outra página inicial, né? Tinha uma imagem, falava sobre os dois passos, o me-- certo?
  * Qual que é a página inicial do meu aplicativo?
+
  * Chat, outro ponto é que assim, a pessoa que já fez o login, já fez o diagnóstico, após ela fazer o login novamente, ela tem que ser dire-e-redirecionada para a página de início e não pra fazer o diagnóstico novamente. 
 
  * 
