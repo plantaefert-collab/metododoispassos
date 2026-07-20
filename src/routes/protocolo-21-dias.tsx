@@ -1602,9 +1602,10 @@ function PlanoTab({ actorId, setTab }: PlanoTabProps) {
         )}
       </div>
 
-      {day === 21 && <FinalEvaluation />}
+      {day === 21 && <FinalEvaluation actorId={actorId} />}
 
-      {showMethod && <MethodDrawer day={day} onClose={() => setShowMethod(false)} />}
+      {showMethod && <MethodDrawer actorId={actorId} day={day} onClose={() => setShowMethod(false)} />}
+
     </div>
   );
 }
