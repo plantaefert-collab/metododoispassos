@@ -86,6 +86,8 @@ export function isDiagnosisCurrent(state: ProtocolState): boolean {
   );
 }
 
+export { totalObservations };
+
 const DEFAULT_CURRENT_DAY = 1;
 
 const emptyPlant: PlantInfo = {
@@ -192,6 +194,13 @@ export function useProtocolStore() {
     currentState = next;
     notifyListeners();
     saveToCache(actorId, next);
+    
+    // Se logado, tenta salvar na nuvem em background
+    if (actorId !== "guest") {
+      import("./protocol-cloud").then(({ saveProgressRemote }) => {
+        saveProgressRemote(actorId, next);
+      });
+    }
   }, []);
 
   const updatePlant = useCallback((patch: Partial<PlantInfo>, actorId: string | "guest") => {

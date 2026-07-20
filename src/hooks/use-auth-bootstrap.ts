@@ -4,7 +4,7 @@ import { hydrateStore, clearStore, defaultState, normalizeRemoteProgress, Protoc
 import { AuthBootstrapStatus, UserProfile } from "@/lib/auth/types";
 import { loadFromCache, saveToCache, getCacheTimestamp } from "@/lib/protocol-cache";
 import { fetchUserProfile, fetchUserProgress, saveProgressRemote } from "@/lib/protocol-cloud";
-import { isDiagnosisCurrent } from "@/lib/protocol-store";
+import { isDiagnosisCurrent, totalObservations } from "@/lib/protocol-store";
 
 export function useAuthBootstrap() {
   const [status, setStatus] = useState<AuthBootstrapStatus>("booting");
@@ -90,11 +90,14 @@ export function useAuthBootstrap() {
       // Determinar destino
       const hasPlant = profileRes.data?.plant_registered_at !== null;
       const diagnosisReady = isDiagnosisCurrent(finalState);
+      const hasObservations = totalObservations(finalState.diagnosis) > 0;
 
       if (!hasPlant) {
         setStatus("needs_plant_registration");
-      } else if (!diagnosisReady) {
+      } else if (!diagnosisReady && !hasObservations) {
         setStatus("needs_diagnosis");
+      } else if (!diagnosisReady && hasObservations) {
+        setStatus("reviewing_diagnosis_result");
       } else {
         setStatus("ready");
       }
