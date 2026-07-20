@@ -1372,12 +1372,14 @@ function ResultSection({
   );
 }
 
-function ProgressBar({ value, className = "" }: { value: number; className?: string }) {
+function ProgressBar({ value, className = "", color = "bg-primary" }: { value: number; className?: string; color?: string }) {
   return (
     <div className={`h-2 w-full overflow-hidden rounded-full bg-muted ${className}`}>
-      <div
-        className="h-full rounded-full bg-primary transition-all"
-        style={{ width: `${Math.max(0, Math.min(100, value))}%` }}
+      <motion.div
+        initial={{ width: 0 }}
+        animate={{ width: `${Math.max(0, Math.min(100, value))}%` }}
+        transition={{ duration: 0.8, ease: "circOut" }}
+        className={`h-full rounded-full ${color}`}
       />
     </div>
   );
