@@ -1446,7 +1446,11 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             <div className="text-sm font-medium">Progresso do plano</div>
             <div className="text-sm font-bold">Dia {day} de 21</div>
           </div>
-          <ProgressBar className="mt-2" value={(day / 21) * 100} />
+          <ProgressBar 
+            className="mt-2" 
+            value={(day / 21) * 100} 
+            color={day <= 7 ? "bg-primary" : day <= 14 ? "bg-[#D946EF]" : "bg-accent"} 
+          />
         </div>
       </div>
 
