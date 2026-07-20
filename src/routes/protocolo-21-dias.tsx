@@ -1,7 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState, type ReactNode, type ChangeEvent, useEffect, useRef, useLayoutEffect } from "react";
 import { toast, Toaster } from "sonner";
+import confetti from "canvas-confetti";
 import { motion, AnimatePresence } from "framer-motion";
+import { playSuccessSound, playPopSound } from "@/lib/audio-feedback";
 import { supabase } from "@/integrations/supabase/client";
 import {
   Sprout,
