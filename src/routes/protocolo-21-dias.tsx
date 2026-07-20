@@ -1359,6 +1359,25 @@ function PlanoTab({ setTab }: PlanoTabProps) {
         >
           {entry.completed ? "Tarefa concluída ✓ · Desmarcar" : "Concluir tarefa"}
         </button>
+
+        {entry.completed && (
+          <div className="mt-3 grid grid-cols-2 gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
+            <button
+              onClick={() => setTab("inicio")}
+              className="flex items-center justify-center gap-1.5 rounded-2xl border border-primary/20 bg-primary/5 py-3 text-[12px] font-bold text-primary transition-colors hover:bg-primary/10"
+            >
+              <Home size={14} />
+              Início
+            </button>
+            <button
+              onClick={() => setTab("diagnostico")}
+              className="flex items-center justify-center gap-1.5 rounded-2xl border border-accent/20 bg-accent/5 py-3 text-[12px] font-bold text-accent transition-colors hover:bg-accent/10"
+            >
+              <Stethoscope size={14} />
+              Diagnóstico
+            </button>
+          </div>
+        )}
       </div>
 
       {day === 21 && <FinalEvaluation />}
