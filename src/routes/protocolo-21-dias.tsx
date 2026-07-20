@@ -284,7 +284,7 @@ function ProtocoloPage() {
                 onConfirm={() => {
                   store.reset();
                   setShowReset(false);
-                  setScreen("welcome");
+                  setStatus("signed_out");
                 }}
               />
             </motion.div>
