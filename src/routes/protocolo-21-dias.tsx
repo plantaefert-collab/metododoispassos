@@ -100,10 +100,22 @@ function ProtocoloPage() {
   >(null);
   const [showReset, setShowReset] = useState(false);
 
-  // Redireciona usuários autenticados para a tela principal (app) caso ainda não estejam lá
-  // Isso resolve o problema de ficar preso na tela de boas-vindas após o login.
+  // Redireciona usuários autenticados e onboarded para o Plano
+  // Se autenticado mas sem diagnóstico concluído, força o fluxo de diagnóstico.
   const hasUser = !!store.userId;
-  const activeScreen = screen ?? (store.state.onboarded || guestMode || hasUser ? "app" : "welcome");
+  const hasDiagnosis = isDiagnosisCurrent(store.state);
+  
+  let activeScreen: "welcome" | "auth" | "signup" | "diagnosis" | "result" | "app" = "welcome";
+  
+  if (screen) {
+    activeScreen = screen;
+  } else if (store.state.onboarded || guestMode) {
+    activeScreen = "app";
+  } else if (hasUser) {
+    activeScreen = hasDiagnosis ? "app" : "signup";
+  } else {
+    activeScreen = "welcome";
+  }
 
   if (!store.hydrated) {
     return (
