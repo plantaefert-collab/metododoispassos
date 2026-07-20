@@ -1926,7 +1926,7 @@ function PlanoTab({ actorId, setTab, onPreviewDay }: PlanoTabProps) {
             O diagnóstico ajuda a identificar as necessidades específicas da sua orquídea hoje.
           </p>
           <button
-            onClick={() => setTab("diagnostico")}
+            onClick={() => setStatus("needs_diagnosis")}
             className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground shadow-md transition-transform active:scale-95"
           >
             Fazer diagnóstico agora
