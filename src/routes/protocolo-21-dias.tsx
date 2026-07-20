@@ -1604,18 +1604,49 @@ function PlanoTab({ actorId, setTab }: PlanoTabProps) {
         <div className="mt-4 flex flex-col gap-2">
           <div className="flex gap-2">
             <button
+              onClick={() => {
+                if (day > 1) {
+                  setCurrentDay(day - 1, actorId);
+                }
+              }}
+              disabled={day === 1}
+              className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-border bg-muted/30 py-2.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground disabled:opacity-30"
+            >
+              <ChevronLeft size={13} />
+              Dia Anterior
+            </button>
+            <button
+              onClick={() => {
+                const lastCompleted = Object.entries(state.days)
+                  .filter(([_, d]) => d.completed)
+                  .map(([day, _]) => parseInt(day))
+                  .sort((a, b) => b - a)[0];
+                
+                if (lastCompleted) {
+                  setCurrentDay(lastCompleted, actorId);
+                }
+              }}
+              className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-border bg-muted/30 py-2.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
+            >
+              <RefreshCw size={13} />
+              Último Concluído
+            </button>
+          </div>
+
+          <div className="flex gap-2">
+            <button
               onClick={() => setTab("inicio")}
               className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-border bg-muted/30 py-2.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
             >
               <Home size={13} />
-              Ir para Início
+              Início
             </button>
             <button
               onClick={() => setTab("diagnostico")}
               className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-border bg-muted/30 py-2.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
             >
               <Stethoscope size={13} />
-              Ver Diagnóstico
+              Diagnóstico
             </button>
           </div>
           <button
