@@ -769,3 +769,187 @@ export function computeDiagnosisResult(
 export function totalObservations(answers: DiagnosisAnswers): number {
   return (Object.values(answers) as string[][]).reduce((n, arr) => n + arr.length, 0);
 }
+
+// --- Normalização e Migração ---
+
+function isPlainObject(v: unknown): v is Record<string, unknown> {
+  return typeof v === "object" && v !== null && !Array.isArray(v);
+}
+
+function asString(v: unknown, fallback = ""): string {
+  return typeof v === "string" ? v : fallback;
+}
+function asBool(v: unknown, fallback = false): boolean {
+  return typeof v === "boolean" ? v : fallback;
+}
+function asNumber(v: unknown, fallback = 0): number {
+  return typeof v === "number" && Number.isFinite(v) ? v : fallback;
+}
+function asStringArray(v: unknown): string[] {
+  if (!Array.isArray(v)) return [];
+  return v.filter((x): x is string => typeof x === "string");
+}
+
+export function uniqueStrings(values: string[]): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const v of values) {
+    if (typeof v !== "string") continue;
+    if (v.length === 0) continue;
+    if (seen.has(v)) continue;
+    seen.add(v);
+    out.push(v);
+  }
+  return out;
+}
+
+export function normalizeCurrentDay(v: unknown): number {
+  if (typeof v !== "number") return 1;
+  if (!Number.isInteger(v)) return 1;
+  if (v < 1 || v > 21) return 1;
+  return v;
+}
+
+function mapRootAnswer(v: string): string[] {
+  switch (v) {
+    case "Firmes": return ["Firmes, verdes ou prateadas"];
+    case "Pontas novas": return ["Pontas novas em crescimento"];
+    case "Poucas raízes": return ["Poucas raízes visíveis"];
+    case "Secas ou ocas": return ["Raízes secas ou ocas"];
+    case "Escuras ou moles": return ["Raízes escuras", "Raízes moles"];
+    case "Mau cheiro": return ["Mau cheiro próximo às raízes ou ao substrato"];
+    default: return [v];
+  }
+}
+
+function mapLeafAnswer(v: string): string[] {
+  switch (v) {
+    case "Firmes": return ["Firmes e sem alterações aparentes"];
+    case "Enrugadas": return ["Folhas enrugadas"];
+    case "Amareladas": return ["Folhas amareladas"];
+    case "Manchas": return ["Manchas escuras"];
+    case "Folha nova": return ["Folha nova surgindo"];
+    case "Brotação": return ["Brotação nova visível"];
+    default: return [v];
+  }
+}
+
+export function migrateLegacyDiagnosis(saved: unknown): DiagnosisAnswers {
+  const acc: DiagnosisAnswers = {
+    roots: [],
+    leaves: [],
+    environment: [],
+    potAndSubstrate: [],
+    wateringAndRoutine: [],
+  };
+  if (!isPlainObject(saved)) return acc;
+
+  const push = (cat: DiagnosisCategory, values: string[]) => {
+    for (const v of values) if (typeof v === "string" && v.length > 0) acc[cat].push(v);
+  };
+
+  for (const v of asStringArray(saved.roots)) push("roots", mapRootAnswer(v));
+  for (const v of asStringArray(saved.leaves)) push("leaves", mapLeafAnswer(v));
+  
+  // Mapeamento simples para environment e routine do legado
+  if (Array.isArray(saved.environment)) {
+    for (const v of saved.environment) if (typeof v === "string") acc.environment.push(v);
+  }
+  if (Array.isArray(saved.routine)) {
+    for (const v of saved.routine) if (typeof v === "string") acc.wateringAndRoutine.push(v);
+  }
+  if (Array.isArray(saved.wateringAndRoutine)) {
+    for (const v of saved.wateringAndRoutine) if (typeof v === "string") acc.wateringAndRoutine.push(v);
+  }
+  if (Array.isArray(saved.potAndSubstrate)) {
+    for (const v of saved.potAndSubstrate) if (typeof v === "string") acc.potAndSubstrate.push(v);
+  }
+
+  return {
+    roots: uniqueStrings(acc.roots),
+    leaves: uniqueStrings(acc.leaves),
+    environment: uniqueStrings(acc.environment),
+    potAndSubstrate: uniqueStrings(acc.potAndSubstrate),
+    wateringAndRoutine: uniqueStrings(acc.wateringAndRoutine),
+  };
+}
+
+export function normalizeDays(v: unknown): Record<number, any> {
+  if (!isPlainObject(v)) return {};
+  const out: Record<number, any> = {};
+  for (const [k, val] of Object.entries(v)) {
+    const n = Number(k);
+    if (!Number.isInteger(n) || n < 1 || n > 21) continue;
+    out[n] = val;
+  }
+  return out;
+}
+
+export function normalizeApplications(v: unknown, days: Record<number, any>): any[] {
+  if (!Array.isArray(v)) return [];
+  return v.filter(isPlainObject);
+}
+
+export function normalizeFinalEval(v: unknown): any {
+  if (!isPlainObject(v)) return { improved: "", same: "", attention: "", keep: "", path: "" };
+  return v;
+}
+
+export function normalizeDiagnosisStatus(v: unknown): "none" | "fresh" | "outdated" {
+  return v === "fresh" || v === "outdated" || v === "none" ? v : "none";
+}
+
+export function normalizeAnswersVersion(value: unknown): number {
+  if (typeof value !== "number") return 0;
+  if (!Number.isFinite(value)) return 0;
+  return Math.max(0, Math.floor(value));
+}
+
+const VALID_CATEGORIES: DiagnosisCategory[] = [
+  "roots",
+  "leaves",
+  "environment",
+  "potAndSubstrate",
+  "wateringAndRoutine",
+];
+const VALID_CLASSIFICATIONS = ["favorable", "adjustment", "priority", "insufficient"] as const;
+
+export function normalizeDiagnosisGuidance(value: unknown): DiagnosisGuidance | null {
+  if (!isPlainObject(value)) return null;
+  const { id, category, classification } = value;
+  if (typeof id !== "string" || id.length === 0) return null;
+  if (typeof category !== "string" || !VALID_CATEGORIES.includes(category as DiagnosisCategory)) return null;
+  if (typeof classification !== "string" || !(VALID_CLASSIFICATIONS as readonly string[]).includes(classification)) return null;
+  return value as DiagnosisGuidance;
+}
+
+function normalizeGuidanceList(v: unknown): DiagnosisGuidance[] | null {
+  if (!Array.isArray(v)) return null;
+  const out: DiagnosisGuidance[] = [];
+  for (const item of v) {
+    const g = normalizeDiagnosisGuidance(item);
+    if (g) out.push(g);
+  }
+  return out;
+}
+
+export function normalizeDiagnosisResult(v: unknown): DiagnosisResult | null {
+  if (!isPlainObject(v)) return null;
+  const favorable = normalizeGuidanceList(v.favorable);
+  const adjustments = normalizeGuidanceList(v.adjustments);
+  const priorities = normalizeGuidanceList(v.priorities);
+  const insufficientInformation = normalizeGuidanceList(v.insufficientInformation);
+  if (!favorable || !adjustments || !priorities || !insufficientInformation) return null;
+  return v as DiagnosisResult;
+}
+
+export function reconcileDiagnosisResultState(
+  diagnosisResult: DiagnosisResult | null,
+  diagnosisStatus: "none" | "fresh" | "outdated",
+  answersVersion: number,
+): { diagnosisResult: DiagnosisResult | null; diagnosisStatus: "none" | "fresh" | "outdated" } {
+  if (diagnosisResult === null) return { diagnosisResult: null, diagnosisStatus: "none" };
+  if (diagnosisResult.answersVersion !== answersVersion) return { diagnosisResult, diagnosisStatus: "outdated" };
+  return { diagnosisResult, diagnosisStatus: diagnosisStatus === "none" ? "fresh" : diagnosisStatus };
+}
+
