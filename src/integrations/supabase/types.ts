@@ -20,7 +20,14 @@ export type Database = {
           full_name: string | null
           id: string
           onboarded: boolean | null
+          plant_difficulty: string | null
+          plant_location: string | null
           plant_name: string | null
+          plant_pot: string | null
+          plant_registered_at: string | null
+          plant_species: string | null
+          plant_substrate: string | null
+          plant_unknown_species: boolean
           updated_at: string
         }
         Insert: {
@@ -28,7 +35,14 @@ export type Database = {
           full_name?: string | null
           id: string
           onboarded?: boolean | null
+          plant_difficulty?: string | null
+          plant_location?: string | null
           plant_name?: string | null
+          plant_pot?: string | null
+          plant_registered_at?: string | null
+          plant_species?: string | null
+          plant_substrate?: string | null
+          plant_unknown_species?: boolean
           updated_at?: string
         }
         Update: {
@@ -36,7 +50,14 @@ export type Database = {
           full_name?: string | null
           id?: string
           onboarded?: boolean | null
+          plant_difficulty?: string | null
+          plant_location?: string | null
           plant_name?: string | null
+          plant_pot?: string | null
+          plant_registered_at?: string | null
+          plant_species?: string | null
+          plant_substrate?: string | null
+          plant_unknown_species?: boolean
           updated_at?: string
         }
         Relationships: []
