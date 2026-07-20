@@ -28,6 +28,8 @@ import {
   Sparkles,
   AlertCircle,
   Loader2,
+  FileText,
+  Download,
 } from "lucide-react";
 import {
   Accordion,
