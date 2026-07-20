@@ -38,6 +38,7 @@ export type ProtocolDay = {
   title: string;
   objective: string;
   mainAction: string;
+  observeTitle?: string;
   stages?: DayStage[];
   howTo?: string[];
   observe?: string[];
