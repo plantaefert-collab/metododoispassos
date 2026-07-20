@@ -1478,10 +1478,10 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
 
       <div 
         onClick={handleRedirectToPlan}
-        className="cursor-pointer rounded-2xl border border-border bg-plantae-cream/40 p-5 transition-colors hover:border-primary/30 active:scale-[0.99]"
+        className="group relative cursor-pointer overflow-hidden rounded-2xl border border-border bg-plantae-cream/40 p-5 transition-all hover:border-primary/30 active:scale-[0.99]"
       >
         <div className="flex items-center gap-3">
-          <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-card">
+          <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-card transition-transform group-hover:scale-105">
             {state.plant.photo ? (
               <img
                 src={state.plant.photo}
@@ -1499,6 +1499,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             <div className="text-xs text-muted-foreground">{phase.label}</div>
           </div>
         </div>
+        
         <div className="mt-4">
           <div className="flex items-baseline justify-between text-primary">
             <div className="text-sm font-medium">Progresso do plano</div>
@@ -1509,6 +1510,18 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             value={(day / 21) * 100} 
             color={day <= 7 ? "bg-primary" : day <= 14 ? "bg-[#D946EF]" : "bg-accent"} 
           />
+        </div>
+
+        <div className="mt-4 border-t border-border/50 pt-4">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleRedirectToPlan();
+            }}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary/10 py-2.5 text-xs font-bold text-primary transition-colors hover:bg-primary/20"
+          >
+            Ir para o Plano <ChevronRight size={14} />
+          </button>
         </div>
       </div>
       {!isApplicationDay && (
