@@ -1263,6 +1263,26 @@ function PlanoTab({ setTab }: PlanoTabProps) {
         <h1 className="text-2xl font-black tracking-tight text-primary">Plano de 21 dias</h1>
       </div>
 
+      {!diagnosisFresh && state.diagnosisResult && (
+        <div className="mb-2 rounded-2xl border border-primary/20 bg-primary/5 p-4">
+          <div className="flex items-start gap-3">
+            <Info className="mt-0.5 shrink-0 text-primary" size={18} />
+            <div className="flex-1">
+              <p className="text-[14px] font-medium leading-relaxed text-primary/90">
+                Seu diagnóstico precisa ser atualizado para mostrar orientações personalizadas.
+              </p>
+              <button
+                onClick={() => setTab("diagnostico")}
+                className="mt-3 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-[13px] font-semibold text-primary-foreground shadow-sm transition-transform active:scale-95"
+              >
+                Atualizar diagnóstico
+                <ChevronRight size={14} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <WeekPicker
         currentWeek={week}
         onSelect={(w) => {
