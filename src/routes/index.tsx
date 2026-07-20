@@ -1,5 +1,7 @@
 /**
+ * Qual que é a página inicial do meu aplicativo?
  * Chat, outro ponto é que assim, a pessoa que já fez o login, já fez o diagnóstico, após ela fazer o login novamente, ela tem que ser dire-e-redirecionada para a página de início e não pra fazer o diagnóstico novamente. 
+
  * 
  * Podemos colocar um, uma sessão no início pra que ela faça o diagnóstico novamente. O que você acha? 
  * 
