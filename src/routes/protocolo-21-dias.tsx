@@ -325,6 +325,19 @@ function ProtocoloPage() {
           </motion.div>
         )}
 
+        <AnimatePresence>
+          {previewDay !== null && (
+            <DayPreviewModal
+              day={previewDay}
+              onClose={() => setPreviewDay(null)}
+              onSelect={() => {
+                store.setCurrentDay(previewDay, actorId);
+                setPreviewDay(null);
+              }}
+            />
+          )}
+        </AnimatePresence>
+
         {(status === "ready" || guestMode) && (
           <motion.div
             key="app"
