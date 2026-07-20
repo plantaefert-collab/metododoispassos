@@ -354,7 +354,37 @@ function ProtocoloPage() {
   );
 }
 
+function PhaseProgressBar({ currentDay }: { currentDay: number }) {
+  const phaseInfo = useMemo(() => {
+    if (currentDay <= 7) return { label: "Fase 1: Dias 1–7", progress: (currentDay / 7) * 100, color: "bg-primary" };
+    if (currentDay <= 14) return { label: "Fase 2: Dias 8–14", progress: ((currentDay - 7) / 7) * 100, color: "bg-lilac-500" };
+    return { label: "Fase 3: Dias 15–21", progress: ((currentDay - 14) / 7) * 100, color: "bg-accent" };
+  }, [currentDay]);
+
+  return (
+    <div className="border-t border-border bg-card px-4 py-2">
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+          Progresso da {phaseInfo.label}
+        </span>
+        <span className="text-[10px] font-bold text-muted-foreground">
+          Dia {currentDay} de 21
+        </span>
+      </div>
+      <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${Math.min(100, Math.max(0, phaseInfo.progress))}%` }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className={`h-full ${phaseInfo.color}`}
+        />
+      </div>
+    </div>
+  );
+}
+
 /* ---------------- Shell ---------------- */
+
 
 function AppShell({
   tab,
