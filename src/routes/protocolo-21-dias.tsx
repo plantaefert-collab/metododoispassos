@@ -360,7 +360,7 @@ function ProtocoloPage() {
                   style={{ perspective: "1000px" }}
                 >
                   {tab === "inicio" && <InicioTab actorId={actorId} setTab={setTab} setStatus={setStatus} />}
-                  {tab === "plano" && <PlanoTab actorId={actorId} setTab={setTab} onPreviewDay={setPreviewDay} />}
+                  {tab === "plano" && <PlanoTab actorId={actorId} setTab={setTab} onPreviewDay={setPreviewDay} setStatus={setStatus} />}
                   {tab === "diagnostico" && (
                     <DiagnosticoTab actorId={actorId} onRedo={() => setStatus("needs_diagnosis")} setTab={setTab} />
                   )}
@@ -1834,10 +1834,10 @@ type PlanoTabProps = {
   actorId: string;
   setTab: (tab: Tab) => void;
   onPreviewDay: (day: number) => void;
+  setStatus: (status: AuthBootstrapStatus) => void;
 };
 
-
-function PlanoTab({ actorId, setTab, onPreviewDay }: PlanoTabProps) {
+function PlanoTab({ actorId, setTab, onPreviewDay, setStatus }: PlanoTabProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   
@@ -1926,7 +1926,7 @@ function PlanoTab({ actorId, setTab, onPreviewDay }: PlanoTabProps) {
             O diagnóstico ajuda a identificar as necessidades específicas da sua orquídea hoje.
           </p>
           <button
-            onClick={() => setTab("diagnostico")}
+            onClick={() => setStatus("needs_diagnosis")}
             className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground shadow-md transition-transform active:scale-95"
           >
             Fazer diagnóstico agora
