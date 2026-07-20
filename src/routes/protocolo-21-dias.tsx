@@ -2319,10 +2319,12 @@ function StagesList({
   day,
   meta,
   onOpenMethod,
+  setStatus,
 }: {
   day: number;
   meta: ProtocolDay;
   onOpenMethod: () => void;
+  setStatus?: (status: AuthBootstrapStatus) => void;
 }) {
   const stages = meta.stages ?? [];
   return (
