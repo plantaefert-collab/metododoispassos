@@ -40,7 +40,9 @@ export function useAuthBootstrap() {
         return;
       }
 
-      if (profileRes.error) throw new Error("Erro ao carregar perfil");
+      if (profileRes.error && profileRes.error.code !== "PGRST116") {
+        throw new Error("Erro ao carregar perfil: " + profileRes.error.message);
+      }
       
       const remoteProgress = progressRes.data;
       const remoteTimestamp = remoteProgress?.updated_at || null;
