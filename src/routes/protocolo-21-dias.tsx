@@ -221,7 +221,7 @@ function ProtocoloPage() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 bg-background"
+            className="fixed inset-0 z-50 overflow-y-auto bg-background"
           >
             <SignupScreen
               actorId={actorId}
@@ -237,7 +237,7 @@ function ProtocoloPage() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 bg-background"
+            className="fixed inset-0 z-50 overflow-y-auto bg-background"
           >
             <DiagnosisScreen
               actorId={actorId}
@@ -257,6 +257,7 @@ function ProtocoloPage() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-50 overflow-y-auto bg-background"
           >
             <DiagnosisResultScreen
               actorId={actorId}
