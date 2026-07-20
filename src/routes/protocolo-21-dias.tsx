@@ -1157,9 +1157,16 @@ function DiagnosisResultScreen({ onBack, onFinish }: { onBack: () => void; onFin
 
         {current && result ? (
           <ResultBlocks result={result} />
+        ) : result ? (
+          <div className="space-y-4">
+            <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
+              As respostas foram alteradas. Este resultado pode estar desatualizado, mas você ainda pode visualizá-lo abaixo.
+            </InfoCard>
+            <ResultBlocks result={result} />
+          </div>
         ) : (
           <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
-            Este resultado não está atualizado. Revise as respostas e gere o diagnóstico novamente.
+            Nenhum diagnóstico encontrado. Por favor, realize o exame para ver as orientações.
           </InfoCard>
         )}
 
@@ -1170,7 +1177,7 @@ function DiagnosisResultScreen({ onBack, onFinish }: { onBack: () => void; onFin
           >
             <ChevronLeft size={16} /> Revisar respostas
           </button>
-          {current && (
+          {result && (
             <button
               onClick={onFinish}
               className="ml-auto flex items-center gap-1 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -2211,7 +2218,7 @@ function DiagnosticoTab({
         </div>
       ))}
 
-      {current && result && <ResultBlocks result={result} />}
+      {result && <ResultBlocks result={result} />}
 
       <div className="space-y-3">
         <button
