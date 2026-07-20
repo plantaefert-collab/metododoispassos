@@ -2104,14 +2104,9 @@ function MethodDrawer({ actorId, day, onClose }: { actorId: string; day: number;
 
 /* ---------------- Diagnóstico Tab ---------------- */
 
-function DiagnosticoTab({
-  onRedo,
-  setTab,
-}: {
-  onRedo: () => void;
-  setTab: (tab: Tab) => void;
-}) {
+function DiagnosticoTab({ actorId, onRedo, setTab }: { actorId: string; onRedo: () => void; setTab: (tab: Tab) => void }) {
   const { state } = useProtocolStore();
+
   const items: Array<{ key: DiagnosisCategory; label: string; values: string[] }> = (
     Object.keys(CATEGORY_LABEL) as DiagnosisCategory[]
   ).map((k) => ({ key: k, label: CATEGORY_LABEL[k], values: state.diagnosis[k] }));
