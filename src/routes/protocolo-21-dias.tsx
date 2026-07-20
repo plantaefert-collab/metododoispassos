@@ -38,7 +38,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { useProtocolStore, isDiagnosisCurrent } from "@/lib/protocol-store";
+import { useProtocolStore, isDiagnosisCurrent, defaultState } from "@/lib/protocol-store";
 import { compressImage, PHOTO_ERROR_MESSAGE } from "@/lib/image-compress";
 import {
   getProtocolDay,
@@ -63,8 +63,19 @@ import { useAuthBootstrap } from "@/hooks/use-auth-bootstrap";
 import { AuthScreen } from "@/components/auth/AuthScreen";
 import { AccountMenu } from "@/components/auth/AccountMenu";
 import { LegacyProgressDialog } from "@/components/auth/LegacyProgressDialog";
-import { hasLegacyData, getLegacyData, clearLegacyData } from "@/lib/protocol-cache";
+import { 
+  hasLegacyData, 
+  getLegacyData, 
+  clearLegacyData, 
+  isGuestActive, 
+  setGuestActive, 
+  getMigrationRecord, 
+  saveMigrationRecord, 
+  saveToCache 
+} from "@/lib/protocol-cache";
+import { saveProgressRemote } from "@/lib/protocol-cloud";
 import welcomeOrchid from "@/assets/welcome-orchid.jpg";
+
 
 
 export const Route = createFileRoute("/protocolo-21-dias")({
