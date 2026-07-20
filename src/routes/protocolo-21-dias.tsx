@@ -218,7 +218,7 @@ function AppShell({
             <button
               onClick={onReset}
               className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
-              aria-label="Reiniciar demonstração"
+              aria-label="Reiniciar meu plano"
             >
               <RefreshCw size={16} />
             </button>
