@@ -1,8 +1,10 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import type { Json } from "@/integrations/supabase/types";
 
 import {
   computeDiagnosisResult,
+  totalObservations,
   type DiagnosisAnswers,
   type DiagnosisCategory,
   type DiagnosisGuidance,
@@ -457,6 +459,71 @@ export function reconcileDiagnosisResultState(
   return { diagnosisResult, diagnosisStatus: "fresh" };
 }
 
+export type RemoteProtocolProgress = {
+  current_day?: unknown;
+  completed_tasks?: unknown;
+  applications?: unknown;
+  diagnosis_result?: unknown;
+  diagnosis_answers?: unknown;
+  diagnosis_status?: unknown;
+  answers_version?: unknown;
+};
+
+/**
+ * Mescla o progresso salvo no banco com o estado local sem apagar um
+ * diagnóstico recém-gerado quando a linha remota ainda está vazia ou atrasada.
+ */
+export function mergeRemoteProgressState(
+  local: ProtocolState,
+  progress: RemoteProtocolProgress,
+): ProtocolState {
+  const next: ProtocolState = {
+    ...local,
+    currentDay: normalizeCurrentDay(progress.current_day),
+  };
+
+  const remoteDays = normalizeDays(progress.completed_tasks);
+  if (Object.keys(remoteDays).length > 0 || Object.keys(local.days).length === 0) {
+    next.days = remoteDays;
+  }
+
+  const remoteApplications = normalizeApplications(progress.applications, next.days);
+  if (remoteApplications.length > 0 || local.applications.length === 0) {
+    next.applications = remoteApplications;
+  }
+
+  const remoteDiagnosis = migrateLegacyDiagnosis(progress.diagnosis_answers);
+  const remoteDiagnosisCount = totalObservations(remoteDiagnosis);
+  const remoteResult = normalizeDiagnosisResult(progress.diagnosis_result);
+  const remoteStatus = normalizeDiagnosisStatus(progress.diagnosis_status);
+  const storedAnswersVersion = normalizeAnswersVersion(progress.answers_version);
+  const remoteAnswersVersion = remoteResult
+    ? Math.max(storedAnswersVersion, remoteResult.answersVersion)
+    : storedAnswersVersion;
+  const hasRemoteDiagnosisState =
+    remoteResult !== null ||
+    remoteDiagnosisCount > 0 ||
+    remoteAnswersVersion > 0 ||
+    remoteStatus !== "none";
+
+  if (!hasRemoteDiagnosisState) {
+    return next;
+  }
+
+  if (remoteResult === null && local.diagnosisResult !== null) {
+    return next;
+  }
+
+  const reconciled = reconcileDiagnosisResultState(remoteResult, remoteStatus, remoteAnswersVersion);
+  return {
+    ...next,
+    diagnosis: remoteDiagnosisCount > 0 ? remoteDiagnosis : next.diagnosis,
+    answersVersion: remoteAnswersVersion,
+    diagnosisResult: reconciled.diagnosisResult,
+    diagnosisStatus: reconciled.diagnosisStatus,
+  };
+}
+
 const VALID_CATEGORIES: DiagnosisCategory[] = [
   "roots",
   "leaves",
@@ -778,10 +845,7 @@ export function useProtocolStore() {
             next.onboarded = profile.onboarded ?? next.onboarded;
           }
           if (progress) {
-            next.currentDay = progress.current_day;
-            next.days = progress.completed_tasks as any;
-            next.applications = progress.applications as any;
-            next.diagnosisResult = progress.diagnosis_result as any;
+            return mergeRemoteProgressState(next, progress);
           }
           return next;
         });
@@ -804,9 +868,12 @@ export function useProtocolStore() {
     await supabase.from("protocol_progress").upsert({
       user_id: uid,
       current_day: s.currentDay,
-      completed_tasks: s.days as any,
-      applications: s.applications as any,
-      diagnosis_result: s.diagnosisResult as any,
+      completed_tasks: s.days as unknown as Json,
+      applications: s.applications as unknown as Json,
+      diagnosis_answers: s.diagnosis as unknown as Json,
+      diagnosis_result: s.diagnosisResult as unknown as Json,
+      diagnosis_status: s.diagnosisStatus,
+      answers_version: s.answersVersion,
       updated_at: new Date().toISOString(),
     });
   }, []);
