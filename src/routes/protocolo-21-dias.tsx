@@ -1422,6 +1422,35 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
 
   return (
     <div className="space-y-4">
+      {isApplicationDay && (
+        <div className="rounded-2xl border border-accent/20 bg-accent/5 p-5">
+          <div className="flex items-center gap-2 text-accent">
+            <Sparkles size={16} />
+            <span className="text-xs font-bold uppercase tracking-wider">Dia de aplicação</span>
+          </div>
+          <h2 className="mt-2 text-xl font-display text-primary">
+            Hoje é dia de aplicar o Método de 2 Passos
+          </h2>
+          <p className="mt-1 text-sm text-primary/80">
+            Enraizar primeiro, depois nutrir. Prefira horário fresco e evite sol forte.
+          </p>
+          <div className="mt-4 grid grid-cols-2 gap-2">
+            <button
+              onClick={() => setTab("plano")}
+              className="rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
+            >
+              Ver tarefa
+            </button>
+            <button
+              onClick={() => setTab("plano")}
+              className="rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground"
+            >
+              Registrar aplicação
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="rounded-2xl border border-border bg-plantae-cream/40 p-5">
         <div className="flex items-center gap-3">
           <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-card">
@@ -1454,13 +1483,6 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           />
         </div>
       </div>
-
-      {isApplicationDay ? (
-        <div className="rounded-2xl border border-accent/20 bg-accent/5 p-5">
-          <div className="flex items-center gap-2 text-accent">
-            <Sparkles size={16} />
-            <span className="text-xs font-bold uppercase tracking-wider">Dia de aplicação</span>
-          </div>
           <h2 className="mt-2 text-xl font-display text-primary">
             Hoje é dia de aplicar o Método de 2 Passos
           </h2>
