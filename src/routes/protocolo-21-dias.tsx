@@ -672,7 +672,8 @@ function AuthScreen({ onBack, onSuccess }: { onBack: () => void; onSuccess: () =
       await lovable.auth.signInWithOAuth("google", {
         redirect_uri: window.location.origin + "/protocolo-21-dias",
         options: {
-          queryParams: { prompt: "select_account" }
+          queryParams: { prompt: "select_account" },
+          skip_browser_redirect: true
         }
       } as any);
     } catch (err) {
