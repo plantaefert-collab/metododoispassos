@@ -196,7 +196,7 @@ function AppShell({
       <div className="mx-auto flex min-h-screen max-w-[440px] flex-col shadow-[0_30px_90px_-20px_rgba(23,61,50,0.2)] sm:my-4 sm:min-h-[calc(100vh-2rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card">
         <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-border bg-card px-4 py-4 sm:rounded-t-2xl">
           <div className="flex items-center gap-2">
-            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
+            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground shadow-md shadow-primary/20">
               <Leaf size={18} strokeWidth={2.2} />
             </div>
             <div className="min-w-0">
@@ -541,7 +541,7 @@ function SignupScreen({ onNext }: { onNext: () => void }) {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto min-h-screen max-w-[440px] px-5 py-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-3xl sm:border sm:border-border sm:bg-card sm:shadow-[0_10px_60px_-30px_rgba(0,80,40,0.35)]">
+      <div className="mx-auto min-h-screen max-w-[440px] px-5 py-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card sm:shadow-[0_15px_50px_-30px_rgba(23,61,50,0.25)]">
         <StepHeader
           step={1}
           total={3}
@@ -753,7 +753,7 @@ function DiagnosisScreen({ onFinish, onBack }: { onFinish: () => void; onBack: (
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto min-h-screen max-w-[440px] px-5 py-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-3xl sm:border sm:border-border sm:bg-card sm:shadow-[0_10px_60px_-30px_rgba(0,80,40,0.35)]">
+      <div className="mx-auto min-h-screen max-w-[440px] px-5 py-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card sm:shadow-[0_15px_50px_-30px_rgba(23,61,50,0.25)]">
         <StepHeader
           step={2}
           total={3}
@@ -872,7 +872,7 @@ function DiagnosisResultScreen({ onBack, onFinish }: { onBack: () => void; onFin
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto min-h-screen max-w-[440px] px-5 py-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-3xl sm:border sm:border-border sm:bg-card sm:shadow-[0_10px_60px_-30px_rgba(0,80,40,0.35)]">
+      <div className="mx-auto min-h-screen max-w-[440px] px-5 py-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card sm:shadow-[0_15px_50px_-30px_rgba(23,61,50,0.25)]">
         <StepHeader
           step={3}
           total={3}
@@ -990,7 +990,7 @@ function ResultSection({
           : "border-border bg-card";
   return (
     <section className={`rounded-2xl border p-4 ${toneCls}`}>
-      <h3 className="text-sm font-bold text-primary">{title}</h3>
+      <h3 className="text-sm font-semibold text-primary">{title}</h3>
       <ul className="mt-3 space-y-3">
         {items.map((g) => (
           <li key={g.id} className="rounded-xl bg-card/70 p-3 border border-border/60">
@@ -1147,7 +1147,7 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
           <div className="text-xs font-bold uppercase tracking-wider text-primary">
             Tarefa do dia
           </div>
-          <h2 className="mt-1 text-lg font-bold text-foreground">{getProtocolDay(day).title}</h2>
+          <h2 className="mt-1 text-lg font-display text-foreground">{getProtocolDay(day).title}</h2>
           <p className="mt-1 text-sm text-muted-foreground">{getProtocolDay(day).objective}</p>
           <button
             onClick={() => setTab("plano")}
@@ -1181,7 +1181,7 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
               <div className="text-[10px] font-semibold uppercase tracking-wider text-accent">
                 {d === 7 ? "1ª avaliação" : d === 14 ? "Intermediária" : "Final"}
               </div>
-              <div className="mt-1 text-base font-bold text-primary">Dia {d}</div>
+              <div className="mt-1 text-base font-display text-primary">Dia {d}</div>
             </button>
           ))}
         </div>
