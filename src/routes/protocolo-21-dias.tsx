@@ -1311,7 +1311,7 @@ function PlanoTab({ setTab }: PlanoTabProps) {
         <StagesList day={day} meta={meta} onOpenMethod={() => setShowMethod(true)} />
       )}
 
-      {isApplication && (
+      {isApplication && day !== 1 && (
         <button
           onClick={() => setShowMethod(true)}
           className="w-full rounded-full bg-accent px-4 py-3 text-sm font-semibold text-accent-foreground active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
