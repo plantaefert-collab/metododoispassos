@@ -557,6 +557,7 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     day: 13,
     phase: 2,
     title: "Corrigir apenas o necessário",
+    observeTitle: "Possíveis ajustes",
     objective: "Evitar excesso de intervenções.",
     mainAction:
       "Escolher no máximo um ajuste simples, quando houver necessidade clara.",
