@@ -32,10 +32,7 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useProtocolStore, isDiagnosisCurrent } from "@/lib/protocol-store";
-import {
-  compressImage,
-  PHOTO_ERROR_MESSAGE,
-} from "@/lib/image-compress";
+import { compressImage, PHOTO_ERROR_MESSAGE } from "@/lib/image-compress";
 import {
   getProtocolDay,
   getProtocolPhase,
@@ -78,8 +75,6 @@ export const Route = createFileRoute("/protocolo-21-dias")({
 
 type Tab = "inicio" | "plano" | "diagnostico" | "diario" | "aprender";
 
-
-
 function phaseOf(day: number) {
   const phase = getProtocolPhase(day);
   const tones = {
@@ -105,8 +100,7 @@ function ProtocoloPage() {
 
   // Resolve which screen we're on:
   // If not onboarded, show welcome -> signup -> diagnosis flow gated by explicit screen state.
-  const activeScreen =
-    screen ?? (store.state.onboarded || guestMode ? "app" : "welcome");
+  const activeScreen = screen ?? (store.state.onboarded || guestMode ? "app" : "welcome");
 
   if (!store.hydrated) {
     return (
@@ -246,11 +240,36 @@ function AppShell({
 
         <nav className="sticky bottom-0 z-20 border-t border-border bg-background/95 backdrop-blur sm:rounded-b-3xl">
           <div className="grid grid-cols-5">
-            <TabBtn active={tab === "inicio"} onClick={() => setTab("inicio")} icon={<Home size={18} />} label="Início" />
-            <TabBtn active={tab === "plano"} onClick={() => setTab("plano")} icon={<CalendarCheck size={18} />} label="Meu plano" />
-            <TabBtn active={tab === "diagnostico"} onClick={() => setTab("diagnostico")} icon={<Stethoscope size={18} />} label="Diagnóstico" />
-            <TabBtn active={tab === "diario"} onClick={() => setTab("diario")} icon={<Images size={18} />} label="Diário" />
-            <TabBtn active={tab === "aprender"} onClick={() => setTab("aprender")} icon={<BookOpen size={18} />} label="Aprender" />
+            <TabBtn
+              active={tab === "inicio"}
+              onClick={() => setTab("inicio")}
+              icon={<Home size={18} />}
+              label="Início"
+            />
+            <TabBtn
+              active={tab === "plano"}
+              onClick={() => setTab("plano")}
+              icon={<CalendarCheck size={18} />}
+              label="Meu plano"
+            />
+            <TabBtn
+              active={tab === "diagnostico"}
+              onClick={() => setTab("diagnostico")}
+              icon={<Stethoscope size={18} />}
+              label="Diagnóstico"
+            />
+            <TabBtn
+              active={tab === "diario"}
+              onClick={() => setTab("diario")}
+              icon={<Images size={18} />}
+              label="Diário"
+            />
+            <TabBtn
+              active={tab === "aprender"}
+              onClick={() => setTab("aprender")}
+              icon={<BookOpen size={18} />}
+              label="Aprender"
+            />
           </div>
         </nav>
       </div>
@@ -258,7 +277,17 @@ function AppShell({
   );
 }
 
-function TabBtn({ active, onClick, icon, label }: { active: boolean; onClick: () => void; icon: ReactNode; label: string }) {
+function TabBtn({
+  active,
+  onClick,
+  icon,
+  label,
+}: {
+  active: boolean;
+  onClick: () => void;
+  icon: ReactNode;
+  label: string;
+}) {
   return (
     <button
       onClick={onClick}
@@ -310,7 +339,10 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
         </header>
 
         {/* Photo */}
-        <figure className="relative mt-5 overflow-hidden rounded-[22px]" style={{ backgroundColor: "#EEE8F2" }}>
+        <figure
+          className="relative mt-5 overflow-hidden rounded-[22px]"
+          style={{ backgroundColor: "#EEE8F2" }}
+        >
           <img
             src={welcomeOrchid}
             alt="Orquídea Phalaenopsis saudável em vaso, com folhas verdes e raízes aéreas visíveis em ambiente doméstico claro."
@@ -336,7 +368,9 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
           </span>
           <span className="mt-1 block text-[36px] leading-[1.05] font-normal min-[390px]:text-[40px] sm:text-[44px] [word-spacing:0.02em]">
             <span className="whitespace-nowrap">Orquídeas</span>{" "}
-            <em className="not-italic whitespace-nowrap" style={{ color: "#B72D72" }}>Floridas</em>
+            <em className="not-italic whitespace-nowrap" style={{ color: "#B72D72" }}>
+              Floridas
+            </em>
           </span>
         </h1>
 
@@ -345,7 +379,8 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
           Seu plano guiado de 21 dias
         </p>
         <p className="mt-1.5 text-[14px] leading-relaxed" style={{ color: "#66736C" }}>
-          Observe sua orquídea, fortaleça a base e acompanhe os sinais da planta com uma rotina simples.
+          Observe sua orquídea, fortaleça a base e acompanhe os sinais da planta com uma rotina
+          simples.
         </p>
 
         {/* Two-step method */}
@@ -361,7 +396,10 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
             badgeInk="#F8F5EE"
             icon={<Sprout size={18} strokeWidth={2} />}
           />
-          <div className="flex items-center gap-2 pl-6 text-[10px] uppercase tracking-[0.2em]" style={{ color: "#66736C" }}>
+          <div
+            className="flex items-center gap-2 pl-6 text-[10px] uppercase tracking-[0.2em]"
+            style={{ color: "#66736C" }}
+          >
             <span className="h-px w-6" style={{ backgroundColor: "#66736C" }} />
             depois
           </div>
@@ -381,13 +419,20 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
         {/* Benefit */}
         <div
           className="mt-5 rounded-2xl px-4 py-3"
-          style={{ backgroundColor: "rgba(255,255,255,0.6)", color: "#26352E", border: "1px solid rgba(23,61,50,0.08)" }}
+          style={{
+            backgroundColor: "rgba(255,255,255,0.6)",
+            color: "#26352E",
+            border: "1px solid rgba(23,61,50,0.08)",
+          }}
         >
           <div className="flex items-center gap-2">
             <Stethoscope size={13} style={{ color: "#173D32" }} />
             <CalendarCheck size={13} style={{ color: "#173D32" }} />
             <Camera size={13} style={{ color: "#173D32" }} />
-            <span className="ml-1 text-[12px] font-semibold uppercase tracking-[0.09em]" style={{ color: "#173D32" }}>
+            <span
+              className="ml-1 text-[12px] font-semibold uppercase tracking-[0.09em]"
+              style={{ color: "#173D32" }}
+            >
               Diagnóstico · Tarefas · Fotos
             </span>
           </div>
@@ -455,10 +500,16 @@ function StepCard({
               {label}
             </h3>
           </div>
-          <p className="mt-1 text-[12.5px] font-semibold uppercase tracking-[0.1em]" style={{ color: ink, opacity: 0.7 }}>
+          <p
+            className="mt-1 text-[12.5px] font-semibold uppercase tracking-[0.1em]"
+            style={{ color: ink, opacity: 0.7 }}
+          >
             {support}
           </p>
-          <p className="mt-1.5 text-[14.5px] leading-[1.55]" style={{ color: "#26352E", opacity: 0.85 }}>
+          <p
+            className="mt-1.5 text-[14.5px] leading-[1.55]"
+            style={{ color: "#26352E", opacity: 0.85 }}
+          >
             {text}
           </p>
         </div>
@@ -489,7 +540,12 @@ function SignupScreen({ onNext }: { onNext: () => void }) {
   return (
     <div className="min-h-screen bg-background">
       <div className="mx-auto min-h-screen max-w-[440px] px-5 py-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-3xl sm:border sm:border-border sm:bg-card sm:shadow-[0_10px_60px_-30px_rgba(0,80,40,0.35)]">
-        <StepHeader step={1} total={3} title="Cadastro da orquídea" subtitle="Conte um pouco sobre sua planta." />
+        <StepHeader
+          step={1}
+          total={3}
+          title="Cadastro da orquídea"
+          subtitle="Conte um pouco sobre sua planta."
+        />
 
         <div className="mt-6 space-y-5">
           <Field label="Nome da planta *">
@@ -513,7 +569,12 @@ function SignupScreen({ onNext }: { onNext: () => void }) {
               <input
                 type="checkbox"
                 checked={plant.unknownSpecies}
-                onChange={(e) => updatePlant({ unknownSpecies: e.target.checked, species: e.target.checked ? "" : plant.species })}
+                onChange={(e) =>
+                  updatePlant({
+                    unknownSpecies: e.target.checked,
+                    species: e.target.checked ? "" : plant.species,
+                  })
+                }
                 className="h-4 w-4 rounded border-input accent-primary"
               />
               Não sei a espécie
@@ -531,14 +592,28 @@ function SignupScreen({ onNext }: { onNext: () => void }) {
             label="Tipo de vaso"
             value={plant.pot}
             onChange={(v) => updatePlant({ pot: v })}
-            options={["Vaso plástico transparente", "Vaso plástico comum", "Vaso de barro", "Vaso de madeira", "Cachepot", "Outro"]}
+            options={[
+              "Vaso plástico transparente",
+              "Vaso plástico comum",
+              "Vaso de barro",
+              "Vaso de madeira",
+              "Cachepot",
+              "Outro",
+            ]}
           />
 
           <SelectField
             label="Tipo de substrato"
             value={plant.substrate}
             onChange={(v) => updatePlant({ substrate: v })}
-            options={["Casca de pinus", "Fibra de coco", "Musgo (sphagnum)", "Mistura", "Não sei", "Outro"]}
+            options={[
+              "Casca de pinus",
+              "Fibra de coco",
+              "Musgo (sphagnum)",
+              "Mistura",
+              "Não sei",
+              "Outro",
+            ]}
           />
 
           <SelectField
@@ -558,7 +633,11 @@ function SignupScreen({ onNext }: { onNext: () => void }) {
           <Field label="Foto atual da planta">
             <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/40 px-4 py-6 text-center transition-colors hover:border-primary/40">
               {plant.photo ? (
-                <img src={plant.photo} alt="Sua orquídea" className="max-h-48 rounded-lg object-cover" />
+                <img
+                  src={plant.photo}
+                  alt="Sua orquídea"
+                  className="max-h-48 rounded-lg object-cover"
+                />
               ) : (
                 <>
                   <Camera size={22} className="text-muted-foreground" />
@@ -569,7 +648,10 @@ function SignupScreen({ onNext }: { onNext: () => void }) {
               <input type="file" accept="image/*" className="sr-only" onChange={handlePhoto} />
             </label>
             {plant.photo && (
-              <button onClick={() => updatePlant({ photo: null })} className="mt-2 text-xs text-muted-foreground underline">
+              <button
+                onClick={() => updatePlant({ photo: null })}
+                className="mt-2 text-xs text-muted-foreground underline"
+              >
                 Remover foto
               </button>
             )}
@@ -617,14 +699,26 @@ function SelectField({
       >
         <option value="">Selecione…</option>
         {options.map((o) => (
-          <option key={o} value={o}>{o}</option>
+          <option key={o} value={o}>
+            {o}
+          </option>
         ))}
       </select>
     </Field>
   );
 }
 
-function StepHeader({ step, total, title, subtitle }: { step: number; total: number; title: string; subtitle: string }) {
+function StepHeader({
+  step,
+  total,
+  title,
+  subtitle,
+}: {
+  step: number;
+  total: number;
+  title: string;
+  subtitle: string;
+}) {
   return (
     <div>
       <div className="text-xs font-semibold uppercase tracking-wider text-accent">
@@ -702,13 +796,19 @@ function DiagnosisScreen({ onFinish, onBack }: { onFinish: () => void; onBack: (
 
         <div className="mt-6">
           <div className="flex items-center gap-2 text-primary">
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-secondary">{current.icon}</span>
+            <span className="grid h-8 w-8 place-items-center rounded-full bg-secondary">
+              {current.icon}
+            </span>
             <h2 className="text-xl font-bold">{CATEGORY_LABEL[current.key]}</h2>
           </div>
           <p className="mt-1 text-xs text-muted-foreground">
             Selecione todas as alternativas que descrevem sua observação atual.
           </p>
-          <div className="mt-4 grid gap-2" role="group" aria-label={`Alternativas de ${CATEGORY_LABEL[current.key]}`}>
+          <div
+            className="mt-4 grid gap-2"
+            role="group"
+            aria-label={`Alternativas de ${CATEGORY_LABEL[current.key]}`}
+          >
             {options.map((opt) => {
               const active = selected.includes(opt);
               return (
@@ -736,7 +836,8 @@ function DiagnosisScreen({ onFinish, onBack }: { onFinish: () => void; onBack: (
         </div>
 
         <InfoCard tone="lilac" icon={<Info size={16} />}>
-          Um sinal isolado não fecha um diagnóstico. Estas escolhas orientam a observação nos próximos dias.
+          Um sinal isolado não fecha um diagnóstico. Estas escolhas orientam a observação nos
+          próximos dias.
         </InfoCard>
 
         <div className="mt-6 flex gap-2">
@@ -761,13 +862,7 @@ function DiagnosisScreen({ onFinish, onBack }: { onFinish: () => void; onBack: (
 
 /* ---------------- Diagnosis Result Screen ---------------- */
 
-function DiagnosisResultScreen({
-  onBack,
-  onFinish,
-}: {
-  onBack: () => void;
-  onFinish: () => void;
-}) {
+function DiagnosisResultScreen({ onBack, onFinish }: { onBack: () => void; onFinish: () => void }) {
   const { state } = useProtocolStore();
   const observations = totalObservations(state.diagnosis);
   const current = isDiagnosisCurrent(state);
@@ -787,7 +882,8 @@ function DiagnosisResultScreen({
           }
         />
         <div className="mt-3 text-xs text-muted-foreground">
-          {observations} {observations === 1 ? "sinal observado" : "sinais observados"}. Este resultado orienta o acompanhamento — não é um diagnóstico definitivo.
+          {observations} {observations === 1 ? "sinal observado" : "sinais observados"}. Este
+          resultado orienta o acompanhamento — não é um diagnóstico definitivo.
         </div>
 
         {current && result ? (
@@ -837,36 +933,21 @@ function ResultBlocks({
     <div className="mt-5 space-y-3">
       {!hasAny && (
         <InfoCard tone="lilac" icon={<Info size={16} />}>
-          Nenhuma alternativa foi marcada. Volte e selecione o que você observa para receber orientações personalizadas.
+          Nenhuma alternativa foi marcada. Volte e selecione o que você observa para receber
+          orientações personalizadas.
         </InfoCard>
       )}
       {priorities.length > 0 && (
-        <ResultSection
-          title="Pontos que merecem atenção próxima"
-          tone="warn"
-          items={priorities}
-        />
+        <ResultSection title="Pontos que merecem atenção próxima" tone="warn" items={priorities} />
       )}
       {adjustments.length > 0 && (
-        <ResultSection
-          title="Ajustes recomendados"
-          tone="accent"
-          items={adjustments}
-        />
+        <ResultSection title="Ajustes recomendados" tone="accent" items={adjustments} />
       )}
       {favorable.length > 0 && (
-        <ResultSection
-          title="Sinais favoráveis"
-          tone="green"
-          items={favorable}
-        />
+        <ResultSection title="Sinais favoráveis" tone="green" items={favorable} />
       )}
       {insufficientInformation.length > 0 && (
-        <ResultSection
-          title="Ainda não observado"
-          tone="muted"
-          items={insufficientInformation}
-        />
+        <ResultSection title="Ainda não observado" tone="muted" items={insufficientInformation} />
       )}
       {trackingPoints.length > 0 && (
         <div className="rounded-2xl border border-border bg-secondary/50 p-4">
@@ -881,7 +962,8 @@ function ResultBlocks({
         </div>
       )}
       <InfoCard tone="lilac" icon={<Info size={16} />}>
-        Um sinal isolado não fecha um diagnóstico. Utilize estas orientações como apoio à observação.
+        Um sinal isolado não fecha um diagnóstico. Utilize estas orientações como apoio à
+        observação.
       </InfoCard>
     </div>
   );
@@ -947,18 +1029,29 @@ function ResultSection({
 function ProgressBar({ value, className = "" }: { value: number; className?: string }) {
   return (
     <div className={`h-2 w-full overflow-hidden rounded-full bg-muted ${className}`}>
-      <div className="h-full rounded-full bg-primary transition-all" style={{ width: `${Math.max(0, Math.min(100, value))}%` }} />
+      <div
+        className="h-full rounded-full bg-primary transition-all"
+        style={{ width: `${Math.max(0, Math.min(100, value))}%` }}
+      />
     </div>
   );
 }
 
-function InfoCard({ tone, icon, children }: { tone: "lilac" | "warn" | "green"; icon: ReactNode; children: ReactNode }) {
+function InfoCard({
+  tone,
+  icon,
+  children,
+}: {
+  tone: "lilac" | "warn" | "green";
+  icon: ReactNode;
+  children: ReactNode;
+}) {
   const styles =
     tone === "warn"
       ? "border-accent/40 bg-accent/10 text-accent"
       : tone === "lilac"
-      ? "border-lilac bg-lilac/60 text-lilac-foreground"
-      : "border-border bg-secondary text-secondary-foreground";
+        ? "border-lilac bg-lilac/60 text-lilac-foreground"
+        : "border-border bg-secondary text-secondary-foreground";
   return (
     <div className={`flex gap-2 rounded-2xl border p-3.5 text-sm leading-relaxed ${styles}`}>
       <span className="mt-0.5 shrink-0">{icon}</span>
@@ -983,13 +1076,19 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
         <div className="flex items-center gap-3">
           <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-2xl bg-card">
             {state.plant.photo ? (
-              <img src={state.plant.photo} alt={state.plant.name} className="h-full w-full object-cover" />
+              <img
+                src={state.plant.photo}
+                alt={state.plant.name}
+                className="h-full w-full object-cover"
+              />
             ) : (
               <Flower2 size={22} className="text-muted-foreground" />
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="truncate text-lg font-bold text-primary">{state.plant.name || "Sua orquídea"}</div>
+            <div className="truncate text-lg font-bold text-primary">
+              {state.plant.name || "Sua orquídea"}
+            </div>
             <div className="text-xs text-muted-foreground">{phase.label}</div>
           </div>
         </div>
@@ -1015,26 +1114,43 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
             Enraizar primeiro, depois nutrir. Prefira horário fresco e evite sol forte.
           </p>
           <div className="mt-4 grid grid-cols-2 gap-2">
-            <button onClick={() => setTab("plano")} className="rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground">
+            <button
+              onClick={() => setTab("plano")}
+              className="rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
+            >
               Ver tarefa
             </button>
-            <button onClick={() => setTab("plano")} className="rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground">
+            <button
+              onClick={() => setTab("plano")}
+              className="rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground"
+            >
               Abrir protocolo
             </button>
-            <button onClick={() => setTab("diario")} className="rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground">
+            <button
+              onClick={() => setTab("diario")}
+              className="rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground"
+            >
               Adicionar foto
             </button>
-            <button onClick={() => setTab("plano")} className="rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground">
+            <button
+              onClick={() => setTab("plano")}
+              className="rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground"
+            >
               Ver tarefa do dia
             </button>
           </div>
         </div>
       ) : (
         <div className="rounded-3xl border border-border bg-card p-5">
-          <div className="text-xs font-bold uppercase tracking-wider text-primary">Tarefa do dia</div>
+          <div className="text-xs font-bold uppercase tracking-wider text-primary">
+            Tarefa do dia
+          </div>
           <h2 className="mt-1 text-lg font-bold text-foreground">{getProtocolDay(day).title}</h2>
           <p className="mt-1 text-sm text-muted-foreground">{getProtocolDay(day).objective}</p>
-          <button onClick={() => setTab("plano")} className="mt-3 inline-flex items-center gap-1 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground">
+          <button
+            onClick={() => setTab("plano")}
+            className="mt-3 inline-flex items-center gap-1 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
+          >
             Abrir meu plano <ChevronRight size={16} />
           </button>
         </div>
@@ -1043,7 +1159,10 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
       <div className="rounded-3xl border border-border bg-card p-5">
         <div className="mb-3 flex items-center justify-between">
           <div className="text-sm font-bold text-primary">Próximos marcos</div>
-          <button onClick={() => setTab("plano")} className="text-xs font-medium text-accent hover:underline">
+          <button
+            onClick={() => setTab("plano")}
+            className="text-xs font-medium text-accent hover:underline"
+          >
             Ver todos
           </button>
         </div>
@@ -1051,7 +1170,10 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
           {[7, 14, 21].map((d) => (
             <button
               key={d}
-              onClick={() => { setCurrentDay(d); setTab("plano"); }}
+              onClick={() => {
+                setCurrentDay(d);
+                setTab("plano");
+              }}
               className="rounded-2xl border border-border bg-secondary/40 p-3 text-left transition-colors hover:border-primary/40"
             >
               <div className="text-[10px] font-semibold uppercase tracking-wider text-accent">
@@ -1091,14 +1213,18 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
 
       <div className="rounded-3xl border border-border bg-card p-5">
         <div className="text-sm font-bold text-primary">Explorar dias do plano</div>
-        <p className="mt-1 text-xs text-muted-foreground">Escolha uma semana e um dia para consultar.</p>
+        <p className="mt-1 text-xs text-muted-foreground">
+          Escolha uma semana e um dia para consultar.
+        </p>
         <div className="mt-3 flex flex-wrap gap-1.5">
           {[1, 7, 14, 21].map((d) => (
             <button
               key={d}
               onClick={() => setCurrentDay(d)}
               className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
-                day === d ? "bg-primary text-primary-foreground" : "border border-border bg-card text-foreground"
+                day === d
+                  ? "bg-primary text-primary-foreground"
+                  : "border border-border bg-card text-foreground"
               }`}
             >
               Dia {d}
@@ -1112,38 +1238,57 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
 
 /* ---------------- Plano ---------------- */
 
-function PlanoTab({ setTab }: { setTab: (t: Tab) => void }) {
-  const {
-    state,
-    setCurrentDay,
-    updateDay,
-    toggleChecklist,
-    toggleDayCompleted,
-  } = useProtocolStore();
+type PlanoTabProps = {
+  setTab: (tab: Tab) => void;
+};
+
+function PlanoTab({ setTab }: PlanoTabProps) {
+  const { state, setCurrentDay, updateDay, toggleChecklist, toggleDayCompleted } =
+    useProtocolStore();
   const day = state.currentDay;
-  const [week, setWeek] = useState<1 | 2 | 3>(() => getWeekForDay(day));
   const [showMethod, setShowMethod] = useState(false);
   const meta = getProtocolDay(day);
   const entry = state.days[day] ?? { checklist: {}, note: "", completed: false };
   const isApplication = APPLICATION_DAYS.includes(day);
   const trackingPoints = state.diagnosisResult?.trackingPoints ?? [];
   const diagnosisFresh = isDiagnosisCurrent(state);
+
+  const week = useMemo(() => getWeekForDay(day), [day]);
   const activeWeek = WEEKS.find((w) => w.id === week) ?? WEEKS[0];
 
   return (
     <div className="space-y-4">
       <div>
-        <div className="text-xs font-bold uppercase tracking-wider text-accent">
-          Meu plano
-        </div>
-        <h1 className="text-2xl font-black tracking-tight text-primary">
-          Plano de 21 dias
-        </h1>
+        <div className="text-xs font-bold uppercase tracking-wider text-accent">Meu plano</div>
+        <h1 className="text-2xl font-black tracking-tight text-primary">Plano de 21 dias</h1>
       </div>
+
+      {!diagnosisFresh && state.diagnosisResult && (
+        <div className="mb-2 rounded-2xl border border-primary/20 bg-primary/5 p-4">
+          <div className="flex items-start gap-3">
+            <Info className="mt-0.5 shrink-0 text-primary" size={18} />
+            <div className="flex-1">
+              <p className="text-[14px] font-medium leading-relaxed text-primary/90">
+                Seu diagnóstico precisa ser atualizado para mostrar orientações personalizadas.
+              </p>
+              <button
+                onClick={() => setTab("diagnostico")}
+                className="mt-3 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-[13px] font-semibold text-primary-foreground shadow-sm transition-transform active:scale-95"
+              >
+                Atualizar diagnóstico
+                <ChevronRight size={14} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <WeekPicker
         currentWeek={week}
-        onSelect={setWeek}
+        onSelect={(w) => {
+          const firstDay = w === 1 ? 1 : w === 2 ? 8 : 15;
+          setCurrentDay(firstDay);
+        }}
         currentDay={day}
         onSelectDay={setCurrentDay}
         weekDays={activeWeek.days}
@@ -1166,7 +1311,7 @@ function PlanoTab({ setTab }: { setTab: (t: Tab) => void }) {
         <StagesList day={day} meta={meta} onOpenMethod={() => setShowMethod(true)} />
       )}
 
-      {isApplication && (
+      {isApplication && day !== 1 && (
         <button
           onClick={() => setShowMethod(true)}
           className="w-full rounded-full bg-accent px-4 py-3 text-sm font-semibold text-accent-foreground active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -1201,11 +1346,7 @@ function PlanoTab({ setTab }: { setTab: (t: Tab) => void }) {
           })}
         </div>
 
-        <RegisterField
-          meta={meta}
-          entry={entry}
-          onChange={(note) => updateDay(day, { note })}
-        />
+        <RegisterField meta={meta} entry={entry} onChange={(note) => updateDay(day, { note })} />
 
         <button
           onClick={() => toggleDayCompleted(day)}
@@ -1279,9 +1420,7 @@ function WeekPicker({
               key={d}
               onClick={() => onSelectDay(d)}
               aria-current={active ? "step" : undefined}
-              aria-label={
-                isApp ? `Dia ${d}, dia de aplicação` : `Dia ${d}`
-              }
+              aria-label={isApp ? `Dia ${d}, dia de aplicação` : `Dia ${d}`}
               className={`relative min-h-[44px] rounded-2xl border px-2 py-2 text-[13px] font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
                 active
                   ? "border-primary bg-primary text-primary-foreground"
@@ -1367,6 +1506,7 @@ function DayContentCard({
         registerText={meta.registerText}
         attention={meta.attention}
         personalizedTracking={meta.personalizedContext ? tracking : []}
+        customObserveTitle={meta.observeTitle}
       />
     </div>
   );
@@ -1389,8 +1529,7 @@ function StagesList({
       className="space-y-2"
     >
       {stages.map((stage, idx) => {
-        const isApplicationStage =
-          APPLICATION_DAYS.includes(day) && idx === stages.length - 1;
+        const isApplicationStage = APPLICATION_DAYS.includes(day) && idx === stages.length - 1;
         return (
           <AccordionItem
             key={stage.id}
@@ -1413,18 +1552,10 @@ function StagesList({
   );
 }
 
-function StageBody({
-  stage,
-  onOpenMethod,
-}: {
-  stage: DayStage;
-  onOpenMethod?: () => void;
-}) {
+function StageBody({ stage, onOpenMethod }: { stage: DayStage; onOpenMethod?: () => void }) {
   return (
     <div className="space-y-3 text-sm text-foreground/85">
-      {stage.objective && (
-        <p className="text-sm text-muted-foreground">{stage.objective}</p>
-      )}
+      {stage.objective && <p className="text-sm text-muted-foreground">{stage.objective}</p>}
       {stage.mainAction && (
         <p className="text-sm text-foreground/85">
           <span className="font-semibold text-primary">O que fazer: </span>
@@ -1444,6 +1575,7 @@ function StageBody({
         registerText={stage.registerText}
         attention={stage.attention}
         personalizedTracking={[]}
+        customObserveTitle={(stage as any).observeTitle as string | undefined}
       />
       {onOpenMethod && (
         <button
@@ -1464,6 +1596,7 @@ function DetailAccordions({
   registerText,
   attention,
   personalizedTracking,
+  customObserveTitle,
 }: {
   howTo?: string[];
   observe?: string[];
@@ -1471,6 +1604,7 @@ function DetailAccordions({
   registerText?: string;
   attention?: string[];
   personalizedTracking: string[];
+  customObserveTitle?: string;
 }) {
   const sections: Array<{ id: string; title: string; content: ReactNode }> = [];
 
@@ -1484,7 +1618,7 @@ function DetailAccordions({
   if (observe && observe.length > 0) {
     sections.push({
       id: "observe",
-      title: "Observe",
+      title: customObserveTitle || "Observe",
       content: <BulletList items={observe} />,
     });
   }
@@ -1565,18 +1699,11 @@ function RegisterField({
 
   return (
     <div className="mt-4 space-y-2">
-      <label
-        htmlFor={inputId}
-        className="block text-[13px] font-semibold text-primary"
-      >
+      <label htmlFor={inputId} className="block text-[13px] font-semibold text-primary">
         {label}
       </label>
       {options && options.length > 0 && (
-        <div
-          role="radiogroup"
-          aria-label={label}
-          className="flex flex-wrap gap-1.5"
-        >
+        <div role="radiogroup" aria-label={label} className="flex flex-wrap gap-1.5">
           {options.map((opt) => {
             const active = entry.note.startsWith(opt.label);
             return (
@@ -1606,9 +1733,7 @@ function RegisterField({
         value={entry.note}
         onChange={(e) => onChange(e.target.value)}
         placeholder={
-          options && options.length > 0
-            ? "Observação complementar (opcional)"
-            : "Sua anotação"
+          options && options.length > 0 ? "Observação complementar (opcional)" : "Sua anotação"
         }
         rows={3}
         className="w-full rounded-xl border border-input bg-card px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
@@ -1628,9 +1753,8 @@ function MethodDrawer({ day, onClose }: { day: number; onClose: () => void }) {
   return (
     <Drawer onClose={onClose} title="Método de 2 Passos">
       <p className="text-sm text-foreground/85">
-        Realize o Método de 2 Passos uma vez por semana, preferencialmente nos
-        horários mais frescos do dia. Os produtos são prontos para uso e não
-        precisam de diluição.
+        Realize o Método de 2 Passos uma vez por semana, preferencialmente nos horários mais frescos
+        do dia. Os produtos são prontos para uso e não precisam de diluição.
       </p>
 
       <div className="mt-4 space-y-3">
@@ -1643,9 +1767,8 @@ function MethodDrawer({ day, onClose }: { day: number; onClose: () => void }) {
             <span className="text-base font-bold">Enraizar</span>
           </div>
           <p className="mt-2 text-sm text-secondary-foreground/90">
-            Aplique primeiro o Enraizador nas raízes e no substrato. Distribua o
-            produto de forma uniforme até umedecer levemente as áreas indicadas,
-            sem escorrer e sem encharcar.
+            Aplique primeiro o Enraizador nas raízes e no substrato. Distribua o produto de forma
+            uniforme até umedecer levemente as áreas indicadas, sem escorrer e sem encharcar.
           </p>
           <div className="mt-2 text-[12px] font-semibold uppercase tracking-wider text-primary/80">
             Enraizador Forte 500 ml Pronto Uso
@@ -1661,9 +1784,9 @@ function MethodDrawer({ day, onClose }: { day: number; onClose: () => void }) {
             <span className="text-base font-bold">Nutrir</span>
           </div>
           <p className="mt-2 text-sm text-lilac-foreground/90">
-            Em seguida, aplique o Bokashi nas raízes, folhas e substrato.
-            Distribua o produto de forma uniforme até umedecer levemente, sem
-            escorrer e sem encharcar. Evite aplicar diretamente nas flores.
+            Em seguida, aplique o Bokashi nas raízes, folhas e substrato. Distribua o produto de
+            forma uniforme até umedecer levemente, sem escorrer e sem encharcar. Evite aplicar
+            diretamente nas flores.
           </p>
           <div className="mt-2 text-[12px] font-semibold uppercase tracking-wider text-primary/80">
             Bokashi Orquídeas Premium 500 ml Pronto Uso
@@ -1690,9 +1813,7 @@ function MethodDrawer({ day, onClose }: { day: number; onClose: () => void }) {
 
       {applicationsForDay.length > 0 && (
         <div className="mt-4 rounded-xl border border-border bg-secondary/40 p-3 text-xs text-secondary-foreground">
-          <div className="font-semibold text-primary">
-            Histórico de aplicações no Dia {day}
-          </div>
+          <div className="font-semibold text-primary">Histórico de aplicações no Dia {day}</div>
           <ul className="mt-1 space-y-0.5">
             {applicationsForDay.map((a) => (
               <li key={a.id}>
@@ -1743,12 +1864,15 @@ function DiagnosticoTab({ onRedo }: { onRedo: () => void }) {
       <div>
         <div className="text-xs font-bold uppercase tracking-wider text-accent">Diagnóstico</div>
         <h1 className="text-2xl font-black tracking-tight text-primary">Sinais observados</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Este resumo orienta sua observação. Um sinal isolado não fecha um diagnóstico.</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Este resumo orienta sua observação. Um sinal isolado não fecha um diagnóstico.
+        </p>
       </div>
 
       {result && !current && (
         <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
-          Você editou respostas depois de gerar o resultado. Refaça o diagnóstico para atualizar as orientações.
+          Você editou respostas depois de gerar o resultado. Refaça o diagnóstico para atualizar as
+          orientações.
         </InfoCard>
       )}
 
@@ -1760,7 +1884,10 @@ function DiagnosticoTab({ onRedo }: { onRedo: () => void }) {
           ) : (
             <div className="mt-2 flex flex-wrap gap-1.5">
               {it.values.map((v) => (
-                <span key={v} className="rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground">
+                <span
+                  key={v}
+                  className="rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground"
+                >
                   {v}
                 </span>
               ))}
@@ -1771,7 +1898,10 @@ function DiagnosticoTab({ onRedo }: { onRedo: () => void }) {
 
       {current && result && <ResultBlocks result={result} />}
 
-      <button onClick={onRedo} className="w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground">
+      <button
+        onClick={onRedo}
+        className="w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground"
+      >
         Refazer diagnóstico
       </button>
     </div>
@@ -1797,9 +1927,13 @@ function DiarioTab() {
   return (
     <div className="space-y-4">
       <div>
-        <div className="text-xs font-bold uppercase tracking-wider text-accent">Diário fotográfico</div>
+        <div className="text-xs font-bold uppercase tracking-wider text-accent">
+          Diário fotográfico
+        </div>
         <h1 className="text-2xl font-black tracking-tight text-primary">Linha do tempo</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Registre fotos e observações nos Dias 1, 7, 14 e 21.</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Registre fotos e observações nos Dias 1, 7, 14 e 21.
+        </p>
       </div>
 
       <div className="space-y-3">
@@ -1809,19 +1943,29 @@ function DiarioTab() {
             <div key={d} className="rounded-3xl border border-border bg-card p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-[11px] font-bold uppercase tracking-wider text-accent">{phaseOf(d).range}</div>
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-accent">
+                    {phaseOf(d).range}
+                  </div>
                   <div className="text-lg font-bold text-primary">Dia {d}</div>
                 </div>
                 {entry.photo ? (
-                  <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold text-primary">Registrado</span>
+                  <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold text-primary">
+                    Registrado
+                  </span>
                 ) : (
-                  <span className="rounded-full bg-muted px-2.5 py-0.5 text-[11px] font-semibold text-muted-foreground">Aguardando</span>
+                  <span className="rounded-full bg-muted px-2.5 py-0.5 text-[11px] font-semibold text-muted-foreground">
+                    Aguardando
+                  </span>
                 )}
               </div>
 
               <label className="mt-3 block cursor-pointer">
                 {entry.photo ? (
-                  <img src={entry.photo} alt={`Foto do dia ${d}`} className="h-48 w-full rounded-xl object-cover" />
+                  <img
+                    src={entry.photo}
+                    alt={`Foto do dia ${d}`}
+                    className="h-48 w-full rounded-xl object-cover"
+                  />
                 ) : (
                   <div className="grid h-40 place-items-center rounded-xl border-2 border-dashed border-border bg-muted/40 text-center">
                     <div className="flex flex-col items-center gap-1 text-muted-foreground">
@@ -1830,7 +1974,12 @@ function DiarioTab() {
                     </div>
                   </div>
                 )}
-                <input type="file" accept="image/*" className="sr-only" onChange={(e) => handlePhoto(d, e)} />
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="sr-only"
+                  onChange={(e) => handlePhoto(d, e)}
+                />
               </label>
 
               <input
@@ -1841,10 +1990,26 @@ function DiarioTab() {
               />
 
               <div className="mt-3 grid gap-2 sm:grid-cols-2">
-                <FieldSmall label="Raízes" value={entry.roots ?? ""} onChange={(v) => updateDay(d, { roots: v })} />
-                <FieldSmall label="Folhas" value={entry.leavesObs ?? ""} onChange={(v) => updateDay(d, { leavesObs: v })} />
-                <FieldSmall label="Brotos/hastes" value={entry.shoots ?? ""} onChange={(v) => updateDay(d, { shoots: v })} />
-                <FieldSmall label="Observações" value={entry.observations ?? ""} onChange={(v) => updateDay(d, { observations: v })} />
+                <FieldSmall
+                  label="Raízes"
+                  value={entry.roots ?? ""}
+                  onChange={(v) => updateDay(d, { roots: v })}
+                />
+                <FieldSmall
+                  label="Folhas"
+                  value={entry.leavesObs ?? ""}
+                  onChange={(v) => updateDay(d, { leavesObs: v })}
+                />
+                <FieldSmall
+                  label="Brotos/hastes"
+                  value={entry.shoots ?? ""}
+                  onChange={(v) => updateDay(d, { shoots: v })}
+                />
+                <FieldSmall
+                  label="Observações"
+                  value={entry.observations ?? ""}
+                  onChange={(v) => updateDay(d, { observations: v })}
+                />
               </div>
             </div>
           );
@@ -1854,10 +2019,20 @@ function DiarioTab() {
   );
 }
 
-function FieldSmall({ label, value, onChange }: { label: string; value: string; onChange: (v: string) => void }) {
+function FieldSmall({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
   return (
     <label className="block">
-      <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
+      <span className="mb-1 block text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </span>
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -1873,11 +2048,36 @@ function FinalEvaluation() {
   const { state, updateFinalEval } = useProtocolStore();
   const fe = state.finalEval;
 
-  const paths: Array<{ id: typeof fe.path; label: string; desc: string; tone: "green" | "lilac" | "accent" | "warn" }> = [
-    { id: "evolved", label: "Apresentou evolução", desc: "Sinais claros de melhora nas raízes, folhas ou brotos.", tone: "green" },
-    { id: "stable", label: "Está estável", desc: "Sem mudança clara. Continue observando e mantendo o cuidado.", tone: "lilac" },
-    { id: "worsening", label: "Está piorando", desc: "Procure orientação especializada com um profissional.", tone: "warn" },
-    { id: "healthy-no-bloom", label: "Saudável, mas não floresceu", desc: "Vigor bom, sem floração. Ajuste luz e ciclo natural.", tone: "accent" },
+  const paths: Array<{
+    id: typeof fe.path;
+    label: string;
+    desc: string;
+    tone: "green" | "lilac" | "accent" | "warn";
+  }> = [
+    {
+      id: "evolved",
+      label: "Apresentou evolução",
+      desc: "Sinais claros de melhora nas raízes, folhas ou brotos.",
+      tone: "green",
+    },
+    {
+      id: "stable",
+      label: "Está estável",
+      desc: "Sem mudança clara. Continue observando e mantendo o cuidado.",
+      tone: "lilac",
+    },
+    {
+      id: "worsening",
+      label: "Está piorando",
+      desc: "Procure orientação especializada com um profissional.",
+      tone: "warn",
+    },
+    {
+      id: "healthy-no-bloom",
+      label: "Saudável, mas não floresceu",
+      desc: "Vigor bom, sem floração. Ajuste luz e ciclo natural.",
+      tone: "accent",
+    },
   ];
 
   return (
@@ -1889,11 +2089,16 @@ function FinalEvaluation() {
         {PHOTO_DAYS.map((d: number) => {
           const p = state.days[d]?.photo;
           return (
-            <div key={d} className="aspect-square overflow-hidden rounded-lg border border-border bg-muted/40">
+            <div
+              key={d}
+              className="aspect-square overflow-hidden rounded-lg border border-border bg-muted/40"
+            >
               {p ? (
                 <img src={p} alt={`Dia ${d}`} className="h-full w-full object-cover" />
               ) : (
-                <div className="grid h-full place-items-center text-[10px] font-semibold text-muted-foreground">Dia {d}</div>
+                <div className="grid h-full place-items-center text-[10px] font-semibold text-muted-foreground">
+                  Dia {d}
+                </div>
               )}
             </div>
           );
@@ -1908,7 +2113,9 @@ function FinalEvaluation() {
           { key: "keep", label: "Qual cuidado será mantido?" },
         ].map((q) => (
           <label key={q.key} className="block">
-            <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">{q.label}</span>
+            <span className="mb-1 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              {q.label}
+            </span>
             <textarea
               value={fe[q.key as keyof typeof fe] as string}
               onChange={(e) => updateFinalEval({ [q.key]: e.target.value } as Partial<typeof fe>)}
@@ -1920,7 +2127,9 @@ function FinalEvaluation() {
       </div>
 
       <div className="mt-4">
-        <div className="mb-2 text-sm font-semibold text-primary">Como sua planta chegou ao Dia 21?</div>
+        <div className="mb-2 text-sm font-semibold text-primary">
+          Como sua planta chegou ao Dia 21?
+        </div>
         <div className="grid gap-2">
           {paths.map((p) => {
             const active = fe.path === p.id;
@@ -1947,7 +2156,8 @@ function FinalEvaluation() {
       {fe.path === "worsening" && (
         <div className="mt-3">
           <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
-            Recomendamos buscar ajuda de um profissional em orquídeas. Sinais persistentes de deterioração pedem avaliação presencial.
+            Recomendamos buscar ajuda de um profissional em orquídeas. Sinais persistentes de
+            deterioração pedem avaliação presencial.
           </InfoCard>
         </div>
       )}
@@ -1962,64 +2172,55 @@ const LIBRARY: Array<{ id: string; title: string; icon: ReactNode; body: string 
     id: "raizes",
     title: "Raízes",
     icon: <Sprout size={18} />,
-    body:
-      "Raízes saudáveis são firmes e esverdeadas quando úmidas. Pontas claras indicam crescimento. Raízes muito moles, escuras ou com mau cheiro pedem atenção imediata: revise rega, drenagem e substrato.",
+    body: "Raízes saudáveis são firmes e esverdeadas quando úmidas. Pontas claras indicam crescimento. Raízes muito moles, escuras ou com mau cheiro pedem atenção imediata: revise rega, drenagem e substrato.",
   },
   {
     id: "rega",
     title: "Rega",
     icon: <Droplets size={18} />,
-    body:
-      "Prefira verificar a umidade antes de regar. Substrato encharcado sufoca raízes. Rega por calendário fixo costuma encharcar em dias frios e faltar em dias quentes.",
+    body: "Prefira verificar a umidade antes de regar. Substrato encharcado sufoca raízes. Rega por calendário fixo costuma encharcar em dias frios e faltar em dias quentes.",
   },
   {
     id: "luz",
     title: "Luz",
     icon: <Sun size={18} />,
-    body:
-      "Orquídeas gostam de luz clara e indireta. Sol forte direto queima folhas. Falta de luz reduz vigor e dificulta floração.",
+    body: "Orquídeas gostam de luz clara e indireta. Sol forte direto queima folhas. Falta de luz reduz vigor e dificulta floração.",
   },
   {
     id: "ventilacao",
     title: "Ventilação",
     icon: <Wind size={18} />,
-    body:
-      "Ar parado favorece fungos e apodrecimento. Um ambiente com ventilação suave contribui para raízes saudáveis e folhas firmes.",
+    body: "Ar parado favorece fungos e apodrecimento. Um ambiente com ventilação suave contribui para raízes saudáveis e folhas firmes.",
   },
   {
     id: "vaso",
     title: "Vaso e drenagem",
     icon: <FlowerIcon size={18} />,
-    body:
-      "O vaso deve permitir passagem de ar e drenagem eficiente. Água acumulada é uma das principais causas de perda de raízes.",
+    body: "O vaso deve permitir passagem de ar e drenagem eficiente. Água acumulada é uma das principais causas de perda de raízes.",
   },
   {
     id: "substrato",
     title: "Substrato",
     icon: <Leaf size={18} />,
-    body:
-      "Substrato bom se mantém aerado, drena rápido e não vira uma massa compactada. Quando compacta, é hora de repor.",
+    body: "Substrato bom se mantém aerado, drena rápido e não vira uma massa compactada. Quando compacta, é hora de repor.",
   },
   {
     id: "erros",
     title: "Erros comuns",
     icon: <AlertTriangle size={18} />,
-    body:
-      "Regar por calendário fixo, misturar vários produtos, mudar de local com frequência e usar sol direto forte são erros que enfraquecem a planta.",
+    body: "Regar por calendário fixo, misturar vários produtos, mudar de local com frequência e usar sol direto forte são erros que enfraquecem a planta.",
   },
   {
     id: "evolucao",
     title: "Sinais de evolução",
     icon: <Sparkles size={18} />,
-    body:
-      "Pontas verdes ou avermelhadas nas raízes, folhas mais firmes, brotos novos e hastes florais em desenvolvimento são bons indícios.",
+    body: "Pontas verdes ou avermelhadas nas raízes, folhas mais firmes, brotos novos e hastes florais em desenvolvimento são bons indícios.",
   },
   {
     id: "faq",
     title: "Perguntas frequentes",
     icon: <Info size={18} />,
-    body:
-      "‘Vai florescer em 21 dias?’ — Não prometemos floração garantida. O plano cria condições favoráveis. ‘Posso usar em qualquer orquídea?’ — Foco em espécies comuns cultivadas em casa. Em dúvida, procure um profissional.",
+    body: "‘Vai florescer em 21 dias?’ — Não prometemos floração garantida. O plano cria condições favoráveis. ‘Posso usar em qualquer orquídea?’ — Foco em espécies comuns cultivadas em casa. Em dúvida, procure um profissional.",
   },
 ];
 
@@ -2032,7 +2233,9 @@ function AprenderTab() {
       <div>
         <div className="text-xs font-bold uppercase tracking-wider text-accent">Aprender</div>
         <h1 className="text-2xl font-black tracking-tight text-primary">Biblioteca educativa</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Conteúdo curto e prático para consultar quando precisar.</p>
+        <p className="mt-1 text-sm text-muted-foreground">
+          Conteúdo curto e prático para consultar quando precisar.
+        </p>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -2042,7 +2245,9 @@ function AprenderTab() {
             onClick={() => setOpen(l.id)}
             className="flex h-full flex-col items-start gap-2 rounded-2xl border border-border bg-card p-4 text-left transition-colors hover:border-primary/40"
           >
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-secondary text-primary">{l.icon}</span>
+            <span className="grid h-9 w-9 place-items-center rounded-full bg-secondary text-primary">
+              {l.icon}
+            </span>
             <div className="text-sm font-bold text-primary">{l.title}</div>
             <div className="mt-auto flex items-center gap-1 text-[11px] font-semibold text-accent">
               Ler <ChevronRight size={12} />
@@ -2062,16 +2267,30 @@ function AprenderTab() {
 
 /* ---------------- Drawer & Modal ---------------- */
 
-function Drawer({ title, onClose, children }: { title: string; onClose: () => void; children: ReactNode }) {
+function Drawer({
+  title,
+  onClose,
+  children,
+}: {
+  title: string;
+  onClose: () => void;
+  children: ReactNode;
+}) {
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-primary/30 backdrop-blur-sm sm:items-center" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-end justify-center bg-primary/30 backdrop-blur-sm sm:items-center"
+      onClick={onClose}
+    >
       <div
         className="max-h-[90vh] w-full max-w-[440px] overflow-y-auto rounded-t-3xl border border-border bg-card p-5 shadow-2xl sm:rounded-3xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-4 flex items-center justify-between">
           <div className="text-lg font-bold text-primary">{title}</div>
-          <button onClick={onClose} className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted">
+          <button
+            onClick={onClose}
+            className="grid h-8 w-8 place-items-center rounded-full text-muted-foreground hover:bg-muted"
+          >
             <X size={16} />
           </button>
         </div>
@@ -2100,10 +2319,16 @@ function ConfirmModal({
         <div className="text-lg font-bold text-primary">{title}</div>
         <p className="mt-1 text-sm text-muted-foreground">{description}</p>
         <div className="mt-4 flex gap-2">
-          <button onClick={onCancel} className="flex-1 rounded-full border border-border px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted">
+          <button
+            onClick={onCancel}
+            className="flex-1 rounded-full border border-border px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+          >
             Cancelar
           </button>
-          <button onClick={onConfirm} className="flex-1 rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground">
+          <button
+            onClick={onConfirm}
+            className="flex-1 rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground"
+          >
             {confirmLabel}
           </button>
         </div>

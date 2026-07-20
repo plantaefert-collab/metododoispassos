@@ -5,9 +5,11 @@ Etapa editorial e de UI. Sem novas validações, sem alterar tela de boas-vindas
 ## Arquivos
 
 **Substituir integralmente**
+
 - `src/lib/editorial-plan.ts` — nova estrutura tipada com `stages`, `howTo`, `observe`, `avoid`, `registerText`, `registerOptions`, `tip`, `attention`, `personalizedContext`. Transcrição fiel do arquivo anexado (sem resumir listas, sem substituir orientações).
 
 **Atualizar**
+
 - `src/lib/protocol-plan.ts` — expandir `ProtocolDay` com os campos novos + tipos `EditorialSection`, `RegisterOption`, `DayStage`. `APPLICATION_DAYS = [1, 7, 14, 21]`, `PHOTO_DAYS = [1, 7, 14, 21]` (já corretos).
 - `src/routes/protocolo-21-dias.tsx`:
   - Remover navegação horizontal contínua dos 21 dias.
@@ -20,6 +22,7 @@ Etapa editorial e de UI. Sem novas validações, sem alterar tela de boas-vindas
   - Bloco "No seu caso": acordeão exibindo até 3 `trackingPoints` quando diagnóstico atual; aviso curto + CTA quando `outdated`.
 
 **Não alterar**
+
 - `WelcomeScreen`, imagem, textos, cards, CTAs da boas-vindas.
 - `protocol-store.ts` além do mínimo indispensável (armazenar `registerValue` estruturado do dia, se necessário — reaproveitar o `note` existente).
 - Testes existentes; nenhum novo teste editorial.

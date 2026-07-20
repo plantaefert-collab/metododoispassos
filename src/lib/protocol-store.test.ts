@@ -94,17 +94,10 @@ describe("migrateLegacyDiagnosis — TESTE 1: mapeamento completo de raízes", (
 describe("migrateLegacyDiagnosis — TESTE 2: separação de categorias", () => {
   it("move água/substrato para potAndSubstrate e mudança de lugar para environment", () => {
     const out = migrateLegacyDiagnosis({
-      environment: [
-        "Boa claridade",
-        "Água acumulada no vaso",
-        "Substrato compactado",
-      ],
+      environment: ["Boa claridade", "Água acumulada no vaso", "Substrato compactado"],
       routine: ["Rego por calendário", "Mudei a planta recentemente"],
     });
-    expect(out.environment).toEqual([
-      "Boa luminosidade indireta",
-      "Mudada de lugar recentemente",
-    ]);
+    expect(out.environment).toEqual(["Boa luminosidade indireta", "Mudada de lugar recentemente"]);
     expect(out.potAndSubstrate).toEqual([
       "Água acumulada no pratinho ou cachepot",
       "Substrato compactado",
@@ -116,12 +109,7 @@ describe("migrateLegacyDiagnosis — TESTE 2: separação de categorias", () => 
 describe("migrateLegacyDiagnosis — TESTE 3: deduplicação", () => {
   it("não repete a mesma resposta atual", () => {
     const out = migrateLegacyDiagnosis({
-      roots: [
-        "Firmes",
-        "Firmes, verdes ou prateadas",
-        "Escuras ou moles",
-        "Raízes escuras",
-      ],
+      roots: ["Firmes", "Firmes, verdes ou prateadas", "Escuras ou moles", "Raízes escuras"],
     });
     // Nenhum duplicado
     expect(new Set(out.roots).size).toBe(out.roots.length);
@@ -153,9 +141,7 @@ describe("migrateProtocolState — TESTE 5: mesclagem de aplicações", () => {
   it("preserva registros reais e adiciona legacy-3 sem duplicar dia 7", () => {
     const s = migrateProtocolState({
       schemaVersion: 2,
-      applications: [
-        { id: "real-1", day: 7, timestamp: "2026-07-01T10:00:00.000Z" },
-      ],
+      applications: [{ id: "real-1", day: 7, timestamp: "2026-07-01T10:00:00.000Z" }],
       days: {
         3: { applicationDone: true },
         7: { applicationDone: true },
@@ -258,10 +244,7 @@ describe("Migração atômica — TESTE 9", () => {
   });
 
   it("remove a chave antiga apenas após gravação bem-sucedida", () => {
-    mockLS.store.set(
-      "plantaefert-protocolo-21d-v1",
-      JSON.stringify({ plant: { name: "Roxa" } }),
-    );
+    mockLS.store.set("plantaefert-protocolo-21d-v1", JSON.stringify({ plant: { name: "Roxa" } }));
     __resetStoreForTests();
 
     const s = getState();
@@ -436,15 +419,11 @@ describe("normalizeDiagnosisResult — validação profunda", () => {
   });
 
   it("11. id vazio retorna null", () => {
-    expect(
-      withResult(baseResult({ priorities: [{ ...validGuidance, id: "" }] })),
-    ).toBeNull();
+    expect(withResult(baseResult({ priorities: [{ ...validGuidance, id: "" }] }))).toBeNull();
   });
 
   it("12. avoid/warning com tipo inválido retorna null", () => {
-    expect(
-      withResult(baseResult({ priorities: [{ ...validGuidance, avoid: 5 }] })),
-    ).toBeNull();
+    expect(withResult(baseResult({ priorities: [{ ...validGuidance, avoid: 5 }] }))).toBeNull();
     expect(
       withResult(baseResult({ priorities: [{ ...validGuidance, warning: true }] })),
     ).toBeNull();
@@ -579,12 +558,24 @@ describe("Fluxo de alteração e nova conclusão", () => {
     // Semear estado válido com versão 2 e resultado compatível.
     __resetStoreForTests();
     const seeded = computeDiagnosisResult(
-      { roots: ["Firmes, verdes ou prateadas"], leaves: [], environment: [], potAndSubstrate: [], wateringAndRoutine: [] },
+      {
+        roots: ["Firmes, verdes ou prateadas"],
+        leaves: [],
+        environment: [],
+        potAndSubstrate: [],
+        wateringAndRoutine: [],
+      },
       2,
     );
     setState((s) => ({
       ...s,
-      diagnosis: { roots: ["Firmes, verdes ou prateadas"], leaves: [], environment: [], potAndSubstrate: [], wateringAndRoutine: [] },
+      diagnosis: {
+        roots: ["Firmes, verdes ou prateadas"],
+        leaves: [],
+        environment: [],
+        potAndSubstrate: [],
+        wateringAndRoutine: [],
+      },
       diagnosisResult: seeded,
       diagnosisStatus: "fresh",
       answersVersion: 2,
@@ -615,7 +606,13 @@ describe("Fluxo de alteração e nova conclusão", () => {
     __resetStoreForTests();
     setState((s) => ({
       ...s,
-      diagnosis: { roots: ["Firmes, verdes ou prateadas"], leaves: [], environment: [], potAndSubstrate: [], wateringAndRoutine: [] },
+      diagnosis: {
+        roots: ["Firmes, verdes ou prateadas"],
+        leaves: [],
+        environment: [],
+        potAndSubstrate: [],
+        wateringAndRoutine: [],
+      },
       diagnosisResult: buildResult(2),
       diagnosisStatus: "outdated",
       answersVersion: 5,
@@ -764,10 +761,12 @@ describe("saveDiagnosisResult", () => {
   });
 });
 
-
 describe("Inicialização única do Store", () => {
   it("TESTE 1 — Primeira inicialização: lê localStorage", () => {
-    mockLS.setItem("plantaefert-protocolo-21d", JSON.stringify({ schemaVersion: 2, currentDay: 10 }));
+    mockLS.setItem(
+      "plantaefert-protocolo-21d",
+      JSON.stringify({ schemaVersion: 2, currentDay: 10 }),
+    );
     const state = ensureStoreInitialized();
     expect(state.currentDay).toBe(10);
   });
@@ -817,7 +816,10 @@ describe("Inicialização única do Store", () => {
   });
 
   it("TESTE 6 — Reset preservado: dados antigos não retornam", () => {
-    mockLS.setItem("plantaefert-protocolo-21d", JSON.stringify({ schemaVersion: 2, currentDay: 15 }));
+    mockLS.setItem(
+      "plantaefert-protocolo-21d",
+      JSON.stringify({ schemaVersion: 2, currentDay: 15 }),
+    );
     ensureStoreInitialized();
     expect(getState().currentDay).toBe(15);
 
@@ -825,8 +827,23 @@ describe("Inicialização única do Store", () => {
     setState((s) => ({
       schemaVersion: 2,
       currentDay: 1,
-      plant: { name: "", species: "", unknownSpecies: false, location: "", pot: "", substrate: "", difficulty: "", photo: null },
-      diagnosis: { roots: [], leaves: [], environment: [], potAndSubstrate: [], wateringAndRoutine: [] },
+      plant: {
+        name: "",
+        species: "",
+        unknownSpecies: false,
+        location: "",
+        pot: "",
+        substrate: "",
+        difficulty: "",
+        photo: null,
+      },
+      diagnosis: {
+        roots: [],
+        leaves: [],
+        environment: [],
+        potAndSubstrate: [],
+        wateringAndRoutine: [],
+      },
       diagnosisResult: null,
       diagnosisStatus: "none",
       answersVersion: 0,
@@ -835,7 +852,7 @@ describe("Inicialização única do Store", () => {
       finalEval: { improved: "", same: "", attention: "", keep: "", path: "" },
       onboarded: false,
     }));
-    
+
     expect(getState().currentDay).toBe(1);
     const stateAgain = ensureStoreInitialized();
     expect(stateAgain.currentDay).toBe(1);
@@ -883,4 +900,3 @@ describe("Protocol Plan — Regras de aplicação e marcos", () => {
     expect(s.days[21].note).toBe("Dia 21");
   });
 });
-

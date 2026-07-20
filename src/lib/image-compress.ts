@@ -9,10 +9,7 @@ export type CompressOptions = {
   mimeType?: "image/jpeg" | "image/webp";
 };
 
-export async function compressImage(
-  file: File,
-  opts: CompressOptions = {},
-): Promise<string> {
+export async function compressImage(file: File, opts: CompressOptions = {}): Promise<string> {
   const maxSide = opts.maxSide ?? 1280;
   const quality = opts.quality ?? 0.78;
   const mimeType = opts.mimeType ?? "image/jpeg";

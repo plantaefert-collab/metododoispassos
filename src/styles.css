@@ -7,15 +7,15 @@
 @theme {
   --font-display: "DM Serif Display", "Fraunces", ui-serif, Georgia, serif;
   --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --color-plantae-cream: #F8F5EE;
-  --color-plantae-deep: #173D32;
-  --color-plantae-green: #58705D;
-  --color-plantae-soft: #DCEBDD;
-  --color-plantae-magenta: #B72D72;
-  --color-plantae-rose: #F3DCE7;
-  --color-plantae-lilac: #EEE8F2;
-  --color-plantae-ink: #26352E;
-  --color-plantae-mute: #66736C;
+  --color-plantae-cream: #f8f5ee;
+  --color-plantae-deep: #173d32;
+  --color-plantae-green: #58705d;
+  --color-plantae-soft: #dcebdd;
+  --color-plantae-magenta: #b72d72;
+  --color-plantae-rose: #f3dce7;
+  --color-plantae-lilac: #eee8f2;
+  --color-plantae-ink: #26352e;
+  --color-plantae-mute: #66736c;
 }
 
 /*

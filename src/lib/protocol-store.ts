@@ -324,9 +324,7 @@ function normalizePlant(v: unknown): PlantInfo {
 function normalizeDayEntry(v: unknown): DayEntry {
   const o = isPlainObject(v) ? v : {};
   const checklist = isPlainObject(o.checklist)
-    ? Object.fromEntries(
-        Object.entries(o.checklist).map(([k, val]) => [k, Boolean(val)]),
-      )
+    ? Object.fromEntries(Object.entries(o.checklist).map(([k, val]) => [k, Boolean(val)]))
     : {};
   return {
     checklist,
@@ -399,7 +397,13 @@ function normalizeApplications(v: unknown, days: Record<number, DayEntry>): Appl
 function normalizeFinalEval(v: unknown): FinalEvaluation {
   const o = isPlainObject(v) ? v : {};
   const path = o.path;
-  const allowed: FinalEvaluation["path"][] = ["", "evolved", "stable", "worsening", "healthy-no-bloom"];
+  const allowed: FinalEvaluation["path"][] = [
+    "",
+    "evolved",
+    "stable",
+    "worsening",
+    "healthy-no-bloom",
+  ];
   return {
     improved: asString(o.improved),
     same: asString(o.same),

@@ -10,11 +10,7 @@ export type DiagnosisCategory =
   | "potAndSubstrate"
   | "wateringAndRoutine";
 
-export type Classification =
-  | "favorable"
-  | "adjustment"
-  | "priority"
-  | "insufficient";
+export type Classification = "favorable" | "adjustment" | "priority" | "insufficient";
 
 export type DiagnosisGuidance = {
   id: string;
@@ -148,8 +144,7 @@ const ROOTS = build("roots", [
     answer: "Pontas novas em crescimento",
     title: "Sinal favorável de atividade radicular",
     classification: "favorable",
-    explanation:
-      "Pontas claras ou avermelhadas em crescimento indicam que a planta está ativa.",
+    explanation: "Pontas claras ou avermelhadas em crescimento indicam que a planta está ativa.",
     action: "Continue observando e evite mudanças bruscas de local ou rotina.",
     tracking: ["Aparecimento de novas pontas"],
   },
@@ -159,8 +154,7 @@ const ROOTS = build("roots", [
     classification: "adjustment",
     explanation:
       "Poucas raízes visíveis podem estar relacionadas a substrato antigo, rega inadequada ou histórico de perda.",
-    action:
-      "Reforce a observação da umidade e evite encharcamento até novas raízes surgirem.",
+    action: "Reforce a observação da umidade e evite encharcamento até novas raízes surgirem.",
     tracking: ["Surgimento de novas raízes", "Firmeza das raízes existentes"],
     avoid: "Evite adubações ou mudanças múltiplas ao mesmo tempo.",
   },
@@ -189,23 +183,19 @@ const ROOTS = build("roots", [
     classification: "priority",
     explanation:
       "Raízes moles merecem acompanhamento próximo. Podem estar relacionadas a excesso de umidade prolongado.",
-    action:
-      "Suspenda regas até o substrato secar, verifique a drenagem e remova água acumulada.",
+    action: "Suspenda regas até o substrato secar, verifique a drenagem e remova água acumulada.",
     tracking: ["Firmeza das raízes", "Tempo de secagem do substrato"],
-    warning:
-      "Se houver deterioração rápida, procure orientação especializada.",
+    warning: "Se houver deterioração rápida, procure orientação especializada.",
   },
   {
     answer: "Mau cheiro próximo às raízes ou ao substrato",
     title: "Odor no substrato",
     classification: "priority",
-    explanation:
-      "Mau cheiro pode estar relacionado a substrato encharcado ou em decomposição.",
+    explanation: "Mau cheiro pode estar relacionado a substrato encharcado ou em decomposição.",
     action:
       "Reavalie substrato, drenagem e ventilação; retire água acumulada e evite regar até secar.",
     tracking: ["Presença ou ausência de odor", "Secagem do substrato"],
-    warning:
-      "Sinal que merece atenção. Procure orientação especializada se persistir.",
+    warning: "Sinal que merece atenção. Procure orientação especializada se persistir.",
   },
   {
     answer: "Não consigo visualizar ou avaliar as raízes",
@@ -213,8 +203,7 @@ const ROOTS = build("roots", [
     classification: "insufficient",
     explanation:
       "Avaliar raízes ajuda a entender rega e substrato. Observe com calma quando possível.",
-    action:
-      "Nos próximos dias, observe cor, firmeza e presença de pontas novas.",
+    action: "Nos próximos dias, observe cor, firmeza e presença de pontas novas.",
     tracking: ["Aparência das raízes"],
   },
 ]);
@@ -250,16 +239,14 @@ const LEAVES = build("leaves", [
     classification: "adjustment",
     explanation:
       "Folhas enrugadas podem estar relacionadas a raízes com dificuldade de absorver água.",
-    action:
-      "Avalie raízes, umidade do substrato e ventilação; ajuste apenas um fator por vez.",
+    action: "Avalie raízes, umidade do substrato e ventilação; ajuste apenas um fator por vez.",
     tracking: ["Turgor das folhas", "Firmeza das raízes"],
   },
   {
     answer: "Folhas murchas ou sem firmeza",
     title: "Folhas sem firmeza",
     classification: "adjustment",
-    explanation:
-      "Pode estar relacionado ao sistema radicular; avalie junto com os outros sinais.",
+    explanation: "Pode estar relacionado ao sistema radicular; avalie junto com os outros sinais.",
     action: "Revise raízes, drenagem e frequência de rega.",
     tracking: ["Firmeza das folhas", "Estado das raízes"],
   },
@@ -296,8 +283,7 @@ const LEAVES = build("leaves", [
     classification: "adjustment",
     explanation:
       "Manchas escuras merecem acompanhamento; podem ter várias origens e não confirmam sozinhas uma condição específica.",
-    action:
-      "Observe se estão estáveis ou aumentando ao longo dos dias e revise ventilação e rega.",
+    action: "Observe se estão estáveis ou aumentando ao longo dos dias e revise ventilação e rega.",
     tracking: ["Tamanho e quantidade das manchas"],
   },
   {
@@ -306,20 +292,16 @@ const LEAVES = build("leaves", [
     classification: "priority",
     explanation:
       "Manchas que aumentam merecem atenção próxima. Podem estar relacionadas a excesso de umidade, ventilação insuficiente ou outras causas.",
-    action:
-      "Melhore ventilação, revise rega e evite molhar folhas ao entardecer.",
+    action: "Melhore ventilação, revise rega e evite molhar folhas ao entardecer.",
     tracking: ["Velocidade de expansão"],
-    warning:
-      "Se progredirem rapidamente, procure orientação especializada.",
+    warning: "Se progredirem rapidamente, procure orientação especializada.",
   },
   {
     answer: "Queda ou deterioração rápida das folhas",
     title: "Deterioração acelerada",
     classification: "priority",
-    explanation:
-      "Deterioração rápida merece avaliação próxima e cuidadosa.",
-    action:
-      "Registre fotos, reduza intervenções simultâneas e avalie substrato e raízes.",
+    explanation: "Deterioração rápida merece avaliação próxima e cuidadosa.",
+    action: "Registre fotos, reduza intervenções simultâneas e avalie substrato e raízes.",
     tracking: ["Ritmo da deterioração"],
     warning: "Procure orientação especializada.",
   },
@@ -363,8 +345,7 @@ const ENVIRONMENT = build("environment", [
     answer: "Boa circulação de ar",
     title: "Ar circulando bem",
     classification: "favorable",
-    explanation:
-      "Boa ventilação ajuda a secagem do substrato e contribui para a saúde das folhas.",
+    explanation: "Boa ventilação ajuda a secagem do substrato e contribui para a saúde das folhas.",
     action: "Mantenha o local e evite fechar completamente o ambiente.",
     tracking: ["Tempo de secagem após a rega"],
   },
@@ -389,8 +370,7 @@ const ENVIRONMENT = build("environment", [
     answer: "Próxima de ar-condicionado ou ventilador",
     title: "Fluxo de ar mecânico direto",
     classification: "adjustment",
-    explanation:
-      "Ar seco direto de aparelhos pode desidratar a planta rapidamente.",
+    explanation: "Ar seco direto de aparelhos pode desidratar a planta rapidamente.",
     action: "Afaste do fluxo direto e mantenha ventilação natural.",
     tracking: ["Turgor das folhas"],
   },
@@ -407,8 +387,7 @@ const ENVIRONMENT = build("environment", [
     answer: "Movimentada de lugar com frequência",
     title: "Muitas mudanças de local",
     classification: "adjustment",
-    explanation:
-      "Mudanças frequentes dificultam a leitura dos sinais e a adaptação da planta.",
+    explanation: "Mudanças frequentes dificultam a leitura dos sinais e a adaptação da planta.",
     action: "Defina um local principal e mantenha por algumas semanas.",
     tracking: ["Estabilidade dos sinais"],
   },
@@ -416,8 +395,7 @@ const ENVIRONMENT = build("environment", [
     answer: "Não consigo avaliar luminosidade ou ventilação",
     title: "Ainda não observado",
     classification: "insufficient",
-    explanation:
-      "Luz e ventilação influenciam bastante a rotina. Observe em diferentes horários.",
+    explanation: "Luz e ventilação influenciam bastante a rotina. Observe em diferentes horários.",
     action: "Verifique quanto tempo o local recebe luz clara ao longo do dia.",
     tracking: ["Luz e ventilação do local"],
   },
@@ -444,8 +422,7 @@ const POT = build("potAndSubstrate", [
     answer: "Substrato solto e arejado",
     title: "Substrato em boa condição",
     classification: "favorable",
-    explanation:
-      "Substrato arejado ajuda a manter raízes saudáveis e a secagem correta.",
+    explanation: "Substrato arejado ajuda a manter raízes saudáveis e a secagem correta.",
     action: "Mantenha e observe a evolução ao longo das semanas.",
     tracking: ["Estrutura do substrato"],
   },
@@ -461,8 +438,7 @@ const POT = build("potAndSubstrate", [
     answer: "Água acumulada no pratinho ou cachepot",
     title: "Acúmulo de água",
     classification: "priority",
-    explanation:
-      "Água acumulada mantém o substrato encharcado e pode prejudicar as raízes.",
+    explanation: "Água acumulada mantém o substrato encharcado e pode prejudicar as raízes.",
     action: "Retire a água após regar e revise a drenagem.",
     tracking: ["Presença de água acumulada"],
   },
@@ -470,10 +446,8 @@ const POT = build("potAndSubstrate", [
     answer: "Vaso permanece molhado por muito tempo",
     title: "Secagem lenta",
     classification: "priority",
-    explanation:
-      "Substrato persistentemente molhado dificulta a respiração das raízes.",
-    action:
-      "Reavalie ventilação, exposição à luz e substrato; considere ajustar a rotina de rega.",
+    explanation: "Substrato persistentemente molhado dificulta a respiração das raízes.",
+    action: "Reavalie ventilação, exposição à luz e substrato; considere ajustar a rotina de rega.",
     tracking: ["Tempo de secagem"],
   },
   {
@@ -489,8 +463,7 @@ const POT = build("potAndSubstrate", [
     answer: "Substrato deteriorado ou se desfazendo",
     title: "Substrato deteriorado",
     classification: "adjustment",
-    explanation:
-      "Substrato deteriorado retém mais água e dificulta o escoamento.",
+    explanation: "Substrato deteriorado retém mais água e dificulta o escoamento.",
     action: "Considere avaliar a troca em momento apropriado.",
     tracking: ["Estrutura do substrato"],
   },
@@ -498,19 +471,16 @@ const POT = build("potAndSubstrate", [
     answer: "Mau cheiro no vaso ou substrato",
     title: "Odor no vaso",
     classification: "priority",
-    explanation:
-      "Odor no substrato pode estar relacionado a decomposição por excesso de umidade.",
+    explanation: "Odor no substrato pode estar relacionado a decomposição por excesso de umidade.",
     action: "Interrompa a rega até secar e avalie ventilação e drenagem.",
     tracking: ["Presença ou ausência de odor"],
-    warning:
-      "Sinal que merece atenção. Procure orientação especializada se persistir.",
+    warning: "Sinal que merece atenção. Procure orientação especializada se persistir.",
   },
   {
     answer: "Planta solta ou balançando",
     title: "Fixação comprometida",
     classification: "adjustment",
-    explanation:
-      "Uma planta solta pode indicar substrato deteriorado ou perda de raízes.",
+    explanation: "Uma planta solta pode indicar substrato deteriorado ou perda de raízes.",
     action: "Reforce apoio quando possível e avalie as raízes.",
     tracking: ["Estabilidade da planta", "Estado das raízes"],
   },
@@ -538,8 +508,7 @@ const ROUTINE = build("wateringAndRoutine", [
     answer: "Verifico a umidade antes de regar",
     title: "Rotina de verificação",
     classification: "favorable",
-    explanation:
-      "Verificar a umidade antes da rega ajuda a evitar encharcamento.",
+    explanation: "Verificar a umidade antes da rega ajuda a evitar encharcamento.",
     action: "Mantenha esse hábito ao longo do plano.",
     tracking: ["Consistência da verificação"],
   },
@@ -547,8 +516,7 @@ const ROUTINE = build("wateringAndRoutine", [
     answer: "Observo raízes e peso do vaso",
     title: "Observação atenta",
     classification: "favorable",
-    explanation:
-      "Raízes e peso do vaso são bons indicadores para decidir sobre a rega.",
+    explanation: "Raízes e peso do vaso são bons indicadores para decidir sobre a rega.",
     action: "Continue observando semanalmente.",
     tracking: ["Frequência da observação"],
   },
@@ -574,8 +542,7 @@ const ROUTINE = build("wateringAndRoutine", [
     classification: "adjustment",
     explanation:
       "Regar apenas por calendário pode encharcar em dias frios e faltar água em dias quentes.",
-    action:
-      "Combine o calendário com a verificação da umidade antes de cada rega.",
+    action: "Combine o calendário com a verificação da umidade antes de cada rega.",
     tracking: ["Ajustes conforme o clima"],
   },
   {
@@ -591,18 +558,15 @@ const ROUTINE = build("wateringAndRoutine", [
     answer: "Tenho dificuldade para saber quando regar",
     title: "Dúvida na frequência",
     classification: "adjustment",
-    explanation:
-      "É comum. Observar peso do vaso, raízes e substrato ajuda a criar critério.",
-    action:
-      "Use a próxima semana para observar o tempo de secagem antes de decidir novas regas.",
+    explanation: "É comum. Observar peso do vaso, raízes e substrato ajuda a criar critério.",
+    action: "Use a próxima semana para observar o tempo de secagem antes de decidir novas regas.",
     tracking: ["Critérios de rega"],
   },
   {
     answer: "A água permanece acumulada depois da rega",
     title: "Acúmulo após rega",
     classification: "priority",
-    explanation:
-      "Acúmulo persistente pode indicar drenagem insuficiente ou substrato deteriorado.",
+    explanation: "Acúmulo persistente pode indicar drenagem insuficiente ou substrato deteriorado.",
     action: "Revise vaso, pratinho e substrato; ajuste a drenagem quando possível.",
     tracking: ["Escoamento e secagem"],
   },
@@ -612,8 +576,7 @@ const ROUTINE = build("wateringAndRoutine", [
     classification: "priority",
     explanation:
       "O uso simultâneo dificulta identificar o que ajuda ou o que pode estar prejudicando.",
-    action:
-      "Simplifique a rotina durante o plano de 21 dias, evitando misturas.",
+    action: "Simplifique a rotina durante o plano de 21 dias, evitando misturas.",
     tracking: ["Efeito das aplicações"],
   },
   {
@@ -629,20 +592,16 @@ const ROUTINE = build("wateringAndRoutine", [
     answer: "Mudo frequentemente a quantidade ou a frequência",
     title: "Rotina instável",
     classification: "adjustment",
-    explanation:
-      "Rotinas muito variáveis dificultam a leitura de sinais e a adaptação da planta.",
-    action:
-      "Escolha uma rotina simples e mantenha ao menos durante o plano de 21 dias.",
+    explanation: "Rotinas muito variáveis dificultam a leitura de sinais e a adaptação da planta.",
+    action: "Escolha uma rotina simples e mantenha ao menos durante o plano de 21 dias.",
     tracking: ["Estabilidade da rotina"],
   },
   {
     answer: "Ainda não possuo uma rotina definida",
     title: "Sem rotina definida",
     classification: "adjustment",
-    explanation:
-      "Uma rotina simples ajuda a observar sinais com mais clareza.",
-    action:
-      "Comece com verificação de umidade antes de regar e registros semanais.",
+    explanation: "Uma rotina simples ajuda a observar sinais com mais clareza.",
+    action: "Comece com verificação de umidade antes de regar e registros semanais.",
     tracking: ["Criação da rotina"],
   },
   {
