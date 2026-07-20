@@ -1090,8 +1090,8 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
       )}
 
       <div className="rounded-3xl border border-border bg-card p-5">
-        <div className="text-sm font-bold text-primary">Simular outro dia</div>
-        <p className="mt-1 text-xs text-muted-foreground">Esta versão é uma demonstração local. Escolha um dia para explorar.</p>
+        <div className="text-sm font-bold text-primary">Explorar dias do plano</div>
+        <p className="mt-1 text-xs text-muted-foreground">Escolha uma semana e um dia para consultar.</p>
         <div className="mt-3 flex flex-wrap gap-1.5">
           {[1, 7, 14, 21].map((d) => (
             <button
