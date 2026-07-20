@@ -1177,7 +1177,7 @@ function DiagnosisResultScreen({ onBack, onFinish }: { onBack: () => void; onFin
           >
             <ChevronLeft size={16} /> Revisar respostas
           </button>
-          {current && (
+          {result && (
             <button
               onClick={onFinish}
               className="ml-auto flex items-center gap-1 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
