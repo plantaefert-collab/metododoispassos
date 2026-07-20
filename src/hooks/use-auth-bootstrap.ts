@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { hydrateStore, clearStore, defaultState, ProtocolState } from "@/lib/protocol-store";
+import { hydrateStore, clearStore, defaultState, normalizeRemoteProgress, ProtocolState } from "@/lib/protocol-store";
 import { AuthBootstrapStatus, UserProfile } from "@/lib/auth/types";
 import { loadFromCache, saveToCache, getCacheTimestamp } from "@/lib/protocol-cache";
 import { fetchUserProfile, fetchUserProgress, saveProgressRemote } from "@/lib/protocol-cloud";
@@ -51,10 +51,10 @@ export function useAuthBootstrap() {
 
       // Reconciliação Determinística
       if (remoteProgress && cachedState) {
+        const remoteNormalized = normalizeRemoteProgress(remoteProgress);
         if (remoteTimestamp && cachedTimestamp && new Date(remoteTimestamp) > new Date(cachedTimestamp)) {
           // Banco vence
-          finalState = { ...defaultState, ...remoteProgress }; // Necessário mapear corretamente se os nomes diferirem
-          // TODO: Implementar normalizeRemoteProgress para mapear campos do banco para o estado
+          finalState = remoteNormalized;
         } else {
           // Cache vence ou são iguais
           finalState = cachedState;
@@ -65,11 +65,24 @@ export function useAuthBootstrap() {
         }
       } else if (remoteProgress) {
         // Apenas banco
-        finalState = { ...defaultState, ...remoteProgress };
+        finalState = normalizeRemoteProgress(remoteProgress);
       } else if (cachedState) {
         // Apenas cache
         finalState = cachedState;
         await saveProgressRemote(userId, cachedState);
+      }
+
+      // Mesclar dados do perfil se não existirem no progresso
+      if (profileRes.data) {
+        finalState.plant.name = profileRes.data.plant_name || finalState.plant.name;
+        finalState.onboarded = profileRes.data.onboarded || finalState.onboarded;
+        // Mapear outros campos de planta do perfil
+        finalState.plant.species = profileRes.data.plant_species || finalState.plant.species;
+        finalState.plant.unknownSpecies = profileRes.data.plant_unknown_species ?? finalState.plant.unknownSpecies;
+        finalState.plant.location = profileRes.data.plant_location || finalState.plant.location;
+        finalState.plant.pot = profileRes.data.plant_pot || finalState.plant.pot;
+        finalState.plant.substrate = profileRes.data.plant_substrate || finalState.plant.substrate;
+        finalState.plant.difficulty = profileRes.data.plant_difficulty || finalState.plant.difficulty;
       }
 
       hydrateStore(finalState);

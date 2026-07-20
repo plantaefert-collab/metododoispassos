@@ -1,8 +1,18 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { saveToCache } from "./protocol-cache";
 
 import {
   computeDiagnosisResult,
+  migrateLegacyDiagnosis,
+  normalizeCurrentDay,
+  normalizeDays,
+  normalizeApplications,
+  normalizeFinalEval,
+  normalizeDiagnosisStatus,
+  normalizeAnswersVersion,
+  normalizeDiagnosisResult,
+  reconcileDiagnosisResultState,
+  totalObservations,
   type DiagnosisAnswers,
   type DiagnosisCategory,
   type DiagnosisResult,
@@ -64,10 +74,6 @@ export type ProtocolState = {
   /** Non-persisted transient flag set when the last localStorage write failed. */
   saveError?: string;
 };
-
-export type PersistResult =
-  | { ok: true }
-  | { ok: false; reason: "quota" | "unavailable" | "unknown" };
 
 export const SAVE_ERROR_MESSAGE =
   "Não foi possível salvar esta alteração no navegador. Libere espaço ou remova alguma fotografia e tente novamente.";
@@ -133,27 +139,43 @@ export function subscribe(listener: () => void): () => void {
   };
 }
 
-export function setGlobalState(updater: (s: ProtocolState) => ProtocolState): void {
-  currentState = updater(currentState);
-  notifyListeners();
-}
-
-/**
- * Hidrata o store com um estado completo (ex: vindo do cache ou banco).
- * Usado pelo bootstrap controller.
- */
 export function hydrateStore(state: ProtocolState): void {
   currentState = { ...state, saveError: undefined };
   notifyListeners();
 }
 
-/**
- * Limpa o store para o estado inicial.
- * Usado na troca de conta.
- */
 export function clearStore(): void {
   currentState = { ...defaultState };
   notifyListeners();
+}
+
+/**
+ * Normaliza o progresso vindo do banco (protocol_progress).
+ */
+export function normalizeRemoteProgress(progress: any): ProtocolState {
+  const next: ProtocolState = {
+    ...defaultState,
+    currentDay: normalizeCurrentDay(progress.current_day),
+  };
+
+  next.days = normalizeDays(progress.completed_tasks);
+  next.applications = normalizeApplications(progress.applications, next.days);
+  
+  const remoteDiagnosis = migrateLegacyDiagnosis(progress.diagnosis_answers);
+  const remoteDiagnosisCount = totalObservations(remoteDiagnosis);
+  const remoteResult = normalizeDiagnosisResult(progress.diagnosis_result);
+  const remoteStatus = normalizeDiagnosisStatus(progress.diagnosis_status);
+  const remoteAnswersVersion = normalizeAnswersVersion(progress.answers_version);
+
+  const reconciled = reconcileDiagnosisResultState(remoteResult, remoteStatus, remoteAnswersVersion);
+  
+  return {
+    ...next,
+    diagnosis: remoteDiagnosisCount > 0 ? remoteDiagnosis : next.diagnosis,
+    answersVersion: remoteAnswersVersion,
+    diagnosisResult: reconciled.diagnosisResult,
+    diagnosisStatus: reconciled.diagnosisStatus,
+  };
 }
 
 export function useProtocolStore() {
@@ -260,5 +282,11 @@ export function useProtocolStore() {
     setCurrentDay,
     setOnboarded,
     updateFinalEval,
+    hydrateStore, // Adicionado para facilitar uso em componentes quando necessário
+    clearStore,   // Adicionado
+    clearSaveError: () => {
+      currentState = { ...currentState, saveError: undefined };
+      notifyListeners();
+    }
   };
 }
