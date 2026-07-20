@@ -883,7 +883,26 @@ function SignupScreen({ actorId, onNext }: { actorId: string; onNext: () => void
         </div>
 
         <button
-          onClick={onNext}
+          onClick={async () => {
+            if (actorId !== "guest") {
+              const { registerPlantRemote } = await import("@/lib/protocol-cloud");
+              const { error } = await registerPlantRemote(actorId, {
+                plant_name: plant.name,
+                plant_species: plant.species,
+                plant_unknown_species: plant.unknownSpecies,
+                plant_location: plant.location,
+                plant_pot: plant.pot,
+                plant_substrate: plant.substrate,
+                plant_difficulty: plant.difficulty,
+              });
+              if (error) {
+                console.error("Erro ao registrar planta:", error);
+                alert("Erro ao salvar dados da orquídea. Tente novamente.");
+                return;
+              }
+            }
+            onNext();
+          }}
           disabled={!canSave}
           className="mt-8 w-full rounded-full bg-primary px-6 py-3.5 text-base font-semibold text-primary-foreground shadow-sm transition-transform active:scale-[0.98] disabled:opacity-40"
         >
