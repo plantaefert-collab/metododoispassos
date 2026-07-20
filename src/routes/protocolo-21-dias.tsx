@@ -1091,7 +1091,7 @@ function DiagnosisScreen({ actorId, onFinish, onBack }: { actorId: string; onFin
           próximos dias.
         </InfoCard>
 
-        <div className="mt-auto pt-8 flex gap-2">
+        <div className="mt-auto pt-8 flex gap-2 pb-4">
           <button
             onClick={() => (stepIdx === 0 ? onBack() : setStepIdx((i) => i - 1))}
             className="flex items-center gap-1 rounded-full border border-border px-4 py-3 text-sm font-medium text-foreground hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
