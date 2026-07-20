@@ -1076,7 +1076,7 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
     <div className="space-y-4">
       <div className="rounded-2xl border border-border bg-plantae-cream/40 p-5">
         <div className="flex items-center gap-3">
-          <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-2xl bg-card">
+          <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-card">
             {state.plant.photo ? (
               <img
                 src={state.plant.photo}
