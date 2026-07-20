@@ -2363,7 +2363,7 @@ function StagesList({
   );
 }
 
-function StageBody({ stage, onOpenMethod }: { stage: DayStage; onOpenMethod?: () => void }) {
+function StageBody({ stage, onOpenMethod, setStatus }: { stage: DayStage; onOpenMethod?: () => void; setStatus?: (status: AuthBootstrapStatus) => void }) {
   return (
     <div className="space-y-3 text-sm text-foreground/85">
       {stage.objective && <p className="text-sm text-muted-foreground">{stage.objective}</p>}
