@@ -2655,7 +2655,7 @@ function DiarioTab({ actorId }: { actorId: string }) {
           <div className="text-xs font-bold uppercase tracking-wider text-accent">
             Diário fotográfico
           </div>
-          <h1 className="text-2xl font-display tracking-tight text-primary">Linha do tempo</h1>
+          <h1 className="text-2xl font-display tracking-tight text-primary">Linha do tempo <span className="text-3xl text-accent">21</span></h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Registre fotos e observações nos Dias 1, 7, 14 e 21.
           </p>
@@ -2676,7 +2676,7 @@ function DiarioTab({ actorId }: { actorId: string }) {
                   <div className="text-[11px] font-bold uppercase tracking-wider text-accent">
                     {phaseOf(d).range}
                   </div>
-                  <div className="text-lg font-bold text-primary">Dia {d}</div>
+                  <div className="text-lg font-bold text-primary">Dia <span className="font-display text-2xl text-accent">{d}</span></div>
                 </div>
                 {entry.photo ? (
                   <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold text-primary">
