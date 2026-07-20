@@ -2440,7 +2440,23 @@ function DetailAccordions({
     sections.push({
       id: "registre",
       title: "Registre",
-      content: <p className="text-sm text-foreground/85">{registerText}</p>,
+      content: (
+        <div className="space-y-3">
+          <p className="text-sm text-foreground/85">{registerText}</p>
+          {setStatus && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setStatus("needs_diagnosis");
+              }}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary/10 px-4 py-2.5 text-[12px] font-bold text-primary transition-all hover:bg-primary/20 active:scale-[0.98]"
+            >
+              <Sprout size={14} />
+              Cadastre sua Orquídea
+            </button>
+          )}
+        </div>
+      ),
     });
   }
   if (attention && attention.length > 0) {
