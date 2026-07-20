@@ -112,7 +112,7 @@ function ProtocoloPage() {
   } else if (store.state.onboarded || guestMode) {
     activeScreen = "app";
   } else if (hasUser) {
-    activeScreen = hasDiagnosis ? "app" : "signup";
+    activeScreen = hasDiagnosis ? "app" : "diagnosis";
   } else {
     activeScreen = "welcome";
   }
