@@ -192,9 +192,9 @@ function AppShell({
 }) {
   const { state, clearSaveError } = useProtocolStore();
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto flex min-h-screen max-w-[440px] flex-col shadow-[0_20px_60px_-20px_rgba(62,100,255,0.2)] sm:my-4 sm:min-h-[calc(100vh-2rem)] sm:rounded-3xl sm:border sm:border-border/60 sm:bg-card/90 sm:backdrop-blur-xl">
-        <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-border bg-background/95 px-4 py-3 backdrop-blur sm:rounded-t-3xl">
+    <div className="min-h-screen bg-background font-sans">
+      <div className="mx-auto flex min-h-screen max-w-[440px] flex-col shadow-[0_30px_90px_-20px_rgba(23,61,50,0.2)] sm:my-4 sm:min-h-[calc(100vh-2rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card">
+        <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-border bg-card px-4 py-4 sm:rounded-t-2xl">
           <div className="flex items-center gap-2">
             <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
               <Leaf size={18} strokeWidth={2.2} />
@@ -240,7 +240,7 @@ function AppShell({
 
         <main className="flex-1 overflow-y-auto px-4 pb-28 pt-4">{children}</main>
 
-        <nav className="sticky bottom-0 z-20 border-t border-border bg-background/95 backdrop-blur sm:rounded-b-3xl">
+        <nav className="sticky bottom-0 z-20 border-t border-border bg-card sm:rounded-b-2xl">
           <div className="grid grid-cols-5">
             <TabBtn
               active={tab === "inicio"}
@@ -299,8 +299,8 @@ function TabBtn({
       aria-current={active ? "page" : undefined}
     >
       <span
-        className={`grid h-8 w-8 place-items-center rounded-xl transition-all ${
-          active ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-110" : ""
+        className={`grid h-8 w-8 place-items-center rounded-lg transition-all ${
+          active ? "bg-primary text-primary-foreground shadow-sm scale-105" : ""
         }`}
       >
         {icon}
@@ -555,7 +555,7 @@ function SignupScreen({ onNext }: { onNext: () => void }) {
               value={plant.name}
               onChange={(e) => updatePlant({ name: e.target.value })}
               placeholder="Ex.: Minha Phalaenopsis"
-              className="w-full rounded-xl border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-2 focus:ring-ring"
+              className="w-full rounded-lg border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </Field>
 
@@ -565,7 +565,7 @@ function SignupScreen({ onNext }: { onNext: () => void }) {
               onChange={(e) => updatePlant({ species: e.target.value, unknownSpecies: false })}
               disabled={plant.unknownSpecies}
               placeholder="Ex.: Phalaenopsis, Cattleya…"
-              className="w-full rounded-xl border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-2 focus:ring-ring disabled:opacity-50"
+              className="w-full rounded-lg border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
             />
             <label className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
               <input
@@ -697,7 +697,7 @@ function SelectField({
       <select
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-xl border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-2 focus:ring-ring"
+        className="w-full rounded-lg border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-1 focus:ring-primary"
       >
         <option value="">Selecione…</option>
         {options.map((o) => (
@@ -726,7 +726,7 @@ function StepHeader({
       <div className="text-xs font-semibold uppercase tracking-wider text-accent">
         Passo {step} de {total}
       </div>
-      <h1 className="mt-1 text-2xl font-black tracking-tight text-primary">{title}</h1>
+      <h1 className="mt-1 text-2xl font-display tracking-tight text-primary">{title}</h1>
       <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
     </div>
   );
@@ -819,7 +819,7 @@ function DiagnosisScreen({ onFinish, onBack }: { onFinish: () => void; onBack: (
                   type="button"
                   onClick={() => toggleDiagnosis(current.key, opt)}
                   aria-pressed={active}
-                  className={`flex items-center justify-between rounded-2xl border px-4 py-3.5 text-left text-[15px] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                  className={`flex items-center justify-between rounded-xl border px-4 py-3.5 text-left text-[15px] transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
                     active
                       ? "border-primary bg-primary/5 text-primary"
                       : "border-border bg-card text-foreground hover:border-primary/40"
