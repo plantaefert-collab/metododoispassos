@@ -1977,7 +1977,21 @@ function PlanoTab({ actorId, setTab, onPreviewDay }: PlanoTabProps) {
         <RegisterField meta={meta} entry={entry} onChange={(note) => updateDay(day, { note }, actorId)} />
 
         <button
-          onClick={() => toggleDayCompleted(day, actorId)}
+          onClick={() => {
+            toggleDayCompleted(day, actorId);
+            if (!entry.completed) {
+              playSuccessSound();
+              if ([7, 14, 21].includes(day)) {
+                confetti({
+                  particleCount: 150,
+                  spread: 70,
+                  origin: { y: 0.6 },
+                  colors: ['#D946EF', '#173D32', '#F8F5EE', '#FDF2F8']
+                });
+                toast.success(day === 7 ? "Fase 1 Concluída!" : day === 14 ? "Fase 2 Concluída!" : "Protocolo Concluído!");
+              }
+            }
+          }}
           aria-pressed={entry.completed}
           className={`mt-4 w-full rounded-full px-4 py-3 text-sm font-semibold active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
             entry.completed
