@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Json } from "@/integrations/supabase/types";
+import { saveToCache } from "./protocol-cache";
 
 import {
   computeDiagnosisResult,
@@ -841,16 +842,13 @@ export function useProtocolStore() {
             next.plant = {
               ...next.plant,
               name: profile.plant_name ?? next.plant.name,
-              full_name: profile.full_name ?? "",
-            } as any;
-            // Só sobrescreve onboarded se o remoto for verdadeiro
+            };
             if (profile.onboarded) {
               next.onboarded = true;
             }
           }
           
           if (progress) {
-            // Se o progresso remoto tiver diagnóstico, mas o local não, ou o remoto for mais novo
             return mergeRemoteProgressState(next, progress);
           }
           
@@ -888,9 +886,15 @@ export function useProtocolStore() {
   const state = hydrated ? getState() : defaultState;
 
   const wrapSetState = useCallback((updater: (s: ProtocolState) => ProtocolState) => {
+    const prev = getState();
+    const next = updater(prev);
     const result = setState(updater);
-    if (result.ok && userId) {
-      syncToCloud(userId, getState());
+    if (result.ok) {
+      const uid = userId || "guest";
+      saveToCache(uid, next);
+      if (userId) {
+        syncToCloud(userId, next);
+      }
     }
     return result;
   }, [userId, syncToCloud]);
@@ -998,6 +1002,11 @@ export function useProtocolStore() {
     updateFinalEval,
     reset,
     clearSaveError: clearSaveErrorCb,
+    setState: wrapSetState,
+    mergeRemoteProgressState: (progress: any) => {
+      wrapSetState((s) => mergeRemoteProgressState(s, progress));
+    },
   };
 }
+
 
