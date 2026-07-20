@@ -1506,6 +1506,7 @@ function DayContentCard({
         registerText={meta.registerText}
         attention={meta.attention}
         personalizedTracking={meta.personalizedContext ? tracking : []}
+        customObserveTitle={meta.observeTitle}
       />
     </div>
   );
@@ -1574,6 +1575,7 @@ function StageBody({ stage, onOpenMethod }: { stage: DayStage; onOpenMethod?: ()
         registerText={stage.registerText}
         attention={stage.attention}
         personalizedTracking={[]}
+        customObserveTitle={(stage as any).observeTitle}
       />
       {onOpenMethod && (
         <button
@@ -1594,6 +1596,7 @@ function DetailAccordions({
   registerText,
   attention,
   personalizedTracking,
+  customObserveTitle,
 }: {
   howTo?: string[];
   observe?: string[];
@@ -1601,9 +1604,9 @@ function DetailAccordions({
   registerText?: string;
   attention?: string[];
   personalizedTracking: string[];
+  customObserveTitle?: string;
 }) {
   const sections: Array<{ id: string; title: string; content: ReactNode }> = [];
-  const observeTitle = (typeof window !== "undefined" && meta && "observeTitle" in (meta as any)) ? (meta as any).observeTitle : undefined;
 
   if (howTo && howTo.length > 0) {
     sections.push({
@@ -1615,7 +1618,7 @@ function DetailAccordions({
   if (observe && observe.length > 0) {
     sections.push({
       id: "observe",
-      title: "Observe",
+      title: customObserveTitle || "Observe",
       content: <BulletList items={observe} />,
     });
   }
@@ -1659,9 +1662,7 @@ function DetailAccordions({
           className="overflow-hidden rounded-2xl border border-border bg-background/40"
         >
           <AccordionTrigger className="px-4 py-3 text-[14px] font-semibold text-primary hover:no-underline">
-            {s.id === "observe" && observe.length > 0 && sections.find(sec => sec.id === "observe")?.title !== "Observe" 
-              ? sections.find(sec => sec.id === "observe")?.title 
-              : s.title}
+            {s.title}
           </AccordionTrigger>
           <AccordionContent className="px-4 pb-4 pt-0">{s.content}</AccordionContent>
         </AccordionItem>
