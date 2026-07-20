@@ -1453,8 +1453,10 @@ function InicioTab({ actorId, setTab }: { actorId: string; setTab: (t: Tab) => v
 /* ---------------- Plano ---------------- */
 
 type PlanoTabProps = {
+  actorId: string;
   setTab: (tab: Tab) => void;
 };
+
 
 function PlanoTab({ setTab }: PlanoTabProps) {
   const { state, setCurrentDay, updateDay, toggleChecklist, toggleDayCompleted } =
