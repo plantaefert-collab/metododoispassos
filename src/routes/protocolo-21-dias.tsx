@@ -671,6 +671,7 @@ function AuthScreen({ onBack, onSuccess }: { onBack: () => void; onSuccess: () =
       const { lovable } = await import("@/integrations/lovable/index");
       await lovable.auth.signInWithOAuth("google", {
         redirect_uri: window.location.origin + "/protocolo-21-dias",
+        queryParams: { prompt: "select_account" }
       });
     } catch (err) {
       setError("Erro ao iniciar login com Google");
