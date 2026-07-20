@@ -1422,12 +1422,15 @@ function InfoCard({
 /* ---------------- Início ---------------- */
 
 function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t: Tab) => void; setStatus: (s: AuthBootstrapStatus) => void }) {
+  const planTitleRef = useRef<HTMLDivElement>(null);
+
   const handleRedirectToPlan = () => {
     setTab("plano");
     toast.success("Abrindo seu plano de 21 dias", {
       description: "Confira as tarefas para hoje.",
       duration: 3000,
     });
+    // O foco e scroll serão tratados pelo useEffect na PlanoTab
   };
 
   const { state, setCurrentDay } = useProtocolStore();
