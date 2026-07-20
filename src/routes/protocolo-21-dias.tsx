@@ -100,10 +100,10 @@ function ProtocoloPage() {
   >(null);
   const [showReset, setShowReset] = useState(false);
 
-
-  // Resolve which screen we're on:
-  // If not onboarded, show welcome -> signup -> diagnosis flow gated by explicit screen state.
-  const activeScreen = screen ?? (store.state.onboarded || guestMode ? "app" : "welcome");
+  // Redireciona usuários autenticados para a tela principal (app) caso ainda não estejam lá
+  // Isso resolve o problema de ficar preso na tela de boas-vindas após o login.
+  const hasUser = !!store.userId;
+  const activeScreen = screen ?? (store.state.onboarded || guestMode || hasUser ? "app" : "welcome");
 
   if (!store.hydrated) {
     return (
