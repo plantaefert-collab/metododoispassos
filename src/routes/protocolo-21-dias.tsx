@@ -2190,8 +2190,9 @@ function DiagnosticoTab({ actorId, onRedo, setTab }: { actorId: string; onRedo: 
 
 /* ---------------- Diário ---------------- */
 
-function DiarioTab() {
+function DiarioTab({ actorId }: { actorId: string }) {
   const { state, updateDay } = useProtocolStore();
+
 
   const handlePhoto = async (day: number, e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
