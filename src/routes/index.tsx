@@ -1,5 +1,10 @@
 /**
+ * Chat, é, confirme isso pra mim, pois eu estou sendo direcionado diretamente para o diagnóstico, 
+ * 
+ * A página inicial tem que ser o método-- aquela página do método onde tem uma imagem de uma raiz e depois fala do, do método dois passos
+ * 
  * Chat, antes a gente tinha uma outra página inicial, né? Tinha uma imagem, falava sobre os dois passos, o me-- certo?
+
  * 
  * Chat, eu quero mudar esse fluxo. Eu quero que esta página de boas-vindas, que fala sobre o método dois passos, seja a página inicial, a pess-- depois vem login, página de login e lá dentro do início, a pessoa-- o primeiro passo tem que ser fazer-- a gente tem que ter uma seção, um card lá dentro do início pra ela fazer o diagnóstico e depois ter acesso ao plano. Como que a gente pode fazer isso?
  * 
