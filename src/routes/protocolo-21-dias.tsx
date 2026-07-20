@@ -1600,6 +1600,23 @@ function PlanoTab({ actorId, setTab }: PlanoTabProps) {
             </button>
           </div>
         )}
+
+        <div className="mt-4 flex gap-2">
+          <button
+            onClick={() => setTab("inicio")}
+            className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-border bg-muted/30 py-2.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
+          >
+            <Home size={13} />
+            Ir para Início
+          </button>
+          <button
+            onClick={() => setTab("diagnostico")}
+            className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-border bg-muted/30 py-2.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
+          >
+            <Stethoscope size={13} />
+            Ver Diagnóstico
+          </button>
+        </div>
       </div>
 
       {day === 21 && <FinalEvaluation actorId={actorId} />}
