@@ -2391,6 +2391,15 @@ function StageBody({ stage, onOpenMethod, setStatus, day }: { stage: DayStage; o
         customObserveTitle={(stage as any).observeTitle as string | undefined}
         setStatus={day === 1 && stage.id === "etapa-1-registrar" ? setStatus : undefined}
       />
+      {day === 1 && stage.id === "etapa-1-registrar" && setStatus && (
+        <button
+          onClick={() => setStatus("needs_diagnosis")}
+          className="mt-2 flex w-full items-center justify-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-3 text-sm font-semibold text-primary transition-all hover:bg-primary/10 active:scale-[0.98]"
+        >
+          <Sprout size={16} />
+          Cadastre sua Orquídea
+        </button>
+      )}
       {onOpenMethod && (
         <button
           onClick={onOpenMethod}
