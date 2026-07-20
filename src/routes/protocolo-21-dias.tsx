@@ -111,70 +111,130 @@ function ProtocoloPage() {
     );
   }
 
-  if (activeScreen === "welcome") {
-    return (
-      <WelcomeScreen
-        onStart={() => setScreen("signup")}
-        onExplore={() => {
-          setGuestMode(true);
-          setScreen("app");
-          setTab("aprender");
-        }}
-      />
-    );
-  }
-  if (activeScreen === "signup") {
-    return <SignupScreen onNext={() => setScreen("diagnosis")} />;
-  }
-  if (activeScreen === "diagnosis") {
-    return (
-      <DiagnosisScreen
-        onBack={() => setScreen("signup")}
-        onFinish={() => {
-          const persistResult = store.saveDiagnosisResult();
-          if (persistResult.ok) {
-            setScreen("result");
-          }
-        }}
-      />
-    );
-  }
-  if (activeScreen === "result") {
-    return (
-      <DiagnosisResultScreen
-        onBack={() => setScreen("diagnosis")}
-        onFinish={() => {
-          store.setOnboarded(true);
-          setScreen("app");
-          setTab("inicio");
-        }}
-      />
-    );
-  }
-
   return (
-    <AppShell tab={tab} setTab={setTab} onReset={() => setShowReset(true)}>
-      {tab === "inicio" && <InicioTab setTab={setTab} />}
-      {tab === "plano" && <PlanoTab setTab={setTab} />}
-      {tab === "diagnostico" && (
-        <DiagnosticoTab onRedo={() => setScreen("diagnosis")} setTab={setTab} />
-      )}
-      {tab === "diario" && <DiarioTab />}
-      {tab === "aprender" && <AprenderTab />}
-      {showReset && (
-        <ConfirmModal
-          title="Reiniciar meu plano?"
-          description="Isso apagará cadastro, diagnóstico, checklists, fotos e anotações salvas no seu navegador."
-          confirmLabel="Reiniciar meu plano"
-          onCancel={() => setShowReset(false)}
-          onConfirm={() => {
-            store.reset();
-            setShowReset(false);
-            setScreen("welcome");
-          }}
-        />
-      )}
-    </AppShell>
+    <div className="font-sans text-foreground antialiased selection:bg-accent/20">
+      <AnimatePresence mode="wait">
+        {activeScreen === "welcome" && (
+          <motion.div
+            key="welcome"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <WelcomeScreen
+              onStart={() => setScreen("signup")}
+              onExplore={() => {
+                setGuestMode(true);
+                setScreen("app");
+                setTab("aprender");
+              }}
+            />
+          </motion.div>
+        )}
+        {activeScreen === "signup" && (
+          <motion.div
+            key="signup"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <SignupScreen onNext={() => setScreen("diagnosis")} />
+          </motion.div>
+        )}
+        {activeScreen === "diagnosis" && (
+          <motion.div
+            key="diagnosis"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <DiagnosisScreen
+              onBack={() => setScreen("signup")}
+              onFinish={() => {
+                const persistResult = store.saveDiagnosisResult();
+                if (persistResult.ok) {
+                  setScreen("result");
+                }
+              }}
+            />
+          </motion.div>
+        )}
+        {activeScreen === "result" && (
+          <motion.div
+            key="result"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.4 }}
+          >
+            <DiagnosisResultScreen
+              onBack={() => setScreen("diagnosis")}
+              onFinish={() => {
+                store.setOnboarded(true);
+                setScreen("app");
+                setTab("inicio");
+              }}
+            />
+          </motion.div>
+        )}
+        {activeScreen === "app" && (
+          <motion.div
+            key="app"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <AppShell tab={tab} setTab={setTab} onReset={() => setShowReset(true)}>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={tab}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  {tab === "inicio" && <InicioTab setTab={setTab} />}
+                  {tab === "plano" && <PlanoTab setTab={setTab} />}
+                  {tab === "diagnostico" && (
+                    <DiagnosticoTab onRedo={() => setScreen("diagnosis")} setTab={setTab} />
+                  )}
+                  {tab === "diario" && <DiarioTab />}
+                  {tab === "aprender" && <AprenderTab />}
+                </motion.div>
+              </AnimatePresence>
+            </AppShell>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showReset && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-6 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-sm"
+            >
+              <ConfirmModal
+                title="Reiniciar meu plano?"
+                description="Isso apagará cadastro, diagnóstico, checklists, fotos e anotações salvas no seu navegador."
+                confirmLabel="Reiniciar meu plano"
+                onCancel={() => setShowReset(false)}
+                onConfirm={() => {
+                  store.reset();
+                  setShowReset(false);
+                  setScreen("welcome");
+                }}
+              />
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
