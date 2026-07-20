@@ -38,18 +38,19 @@ export function AuthScreen({ onBack, onSuccess }: AuthScreenProps) {
 
   const handleGoogleAuth = async () => {
     try {
-      console.log("Initiating Google Auth...");
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: window.location.origin + "/protocolo-21-dias",
-          queryParams: {
-            prompt: "select_account",
-          },
-        },
+      console.log("Initiating Google Auth with Lovable adapter...");
+      const { lovable } = await import("@/integrations/lovable/index");
+      
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin + "/protocolo-21-dias",
+        extraParams: { prompt: "select_account" }
       });
-      if (error) throw error;
-      console.log("OAuth sign in data:", data);
+
+      if (result?.error) {
+        throw result.error;
+      }
+      
+      console.log("OAuth flow result:", result);
     } catch (err: any) {
       console.error("OAuth error:", err);
       setError("Erro ao iniciar login com Google: " + (err.message || "desconhecido"));
