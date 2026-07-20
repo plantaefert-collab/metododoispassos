@@ -1883,6 +1883,7 @@ function PlanoTab({ actorId, setTab, onPreviewDay }: PlanoTabProps) {
         }}
         currentDay={day}
         onSelectDay={(d) => setCurrentDay(d, actorId)}
+        onPreviewDay={onPreviewDay}
         weekDays={activeWeek.days}
       />
 
