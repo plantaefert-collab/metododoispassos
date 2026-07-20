@@ -330,13 +330,18 @@ function ProtocoloPage() {
             transition={{ duration: 0.5 }}
           >
             <AppShell tab={tab} setTab={setTab} onReset={() => setShowReset(true)} userEmail={user?.email} setStatus={setStatus}>
-              <AnimatePresence mode="wait">
+              <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={tab}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                  initial={{ opacity: 0, x: 10, rotateY: 5 }}
+                  animate={{ opacity: 1, x: 0, rotateY: 0 }}
+                  exit={{ opacity: 0, x: -10, rotateY: -5 }}
+                  transition={{ 
+                    duration: 0.4, 
+                    ease: [0.22, 1, 0.36, 1],
+                    opacity: { duration: 0.3 }
+                  }}
+                  style={{ perspective: "1000px" }}
                 >
                   {tab === "inicio" && <InicioTab actorId={actorId} setTab={setTab} setStatus={setStatus} />}
                   {tab === "plano" && <PlanoTab actorId={actorId} setTab={setTab} />}
@@ -1918,8 +1923,9 @@ function PlanoTab({ actorId, setTab }: PlanoTabProps) {
           {meta.checklist.map((item) => {
             const checked = !!entry.checklist[item];
             return (
-              <button
+              <motion.button
                 key={item}
+                whileTap={{ scale: 0.98 }}
                 onClick={() => toggleChecklist(day, item, actorId)}
                 aria-pressed={checked}
                 className={`flex w-full items-start gap-3 rounded-xl border px-4 py-3 text-left text-sm transition-colors ${
@@ -1928,13 +1934,21 @@ function PlanoTab({ actorId, setTab }: PlanoTabProps) {
                     : "border-border bg-card text-foreground"
                 }`}
               >
-                {checked ? (
-                  <CheckCircle2 size={18} className="mt-0.5 shrink-0" />
-                ) : (
-                  <Circle size={18} className="mt-0.5 shrink-0 text-muted-foreground" />
-                )}
-                <span className="min-w-0 flex-1">{item}</span>
-              </button>
+                <div className="mt-0.5 shrink-0">
+                  {checked ? (
+                    <motion.div
+                      initial={{ scale: 0, rotate: -45 }}
+                      animate={{ scale: 1, rotate: 0 }}
+                      transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    >
+                      <CheckCircle2 size={18} className="text-primary" />
+                    </motion.div>
+                  ) : (
+                    <Circle size={18} className="text-muted-foreground" />
+                  )}
+                </div>
+                <span className={`min-w-0 flex-1 ${checked ? "line-through opacity-60" : ""}`}>{item}</span>
+              </motion.button>
             );
           })}
         </div>
@@ -2088,12 +2102,14 @@ function WeekPicker({
           const isApp = APPLICATION_DAYS.includes(d);
           const isCompleted = state.days[d]?.completed;
           return (
-            <button
+            <motion.button
               key={d}
               onClick={() => onSelectDay(d)}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.95 }}
               aria-current={active ? "step" : undefined}
               aria-label={`${isApp ? `Dia ${d}, dia de aplicação` : `Dia ${d}`}${isCompleted ? ", concluído" : ""}`}
-              className={`relative min-h-[44px] rounded-xl border px-2 py-2 text-[13px] font-semibold transition-all focus:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
+              className={`relative min-h-[54px] rounded-xl border px-2 py-2 text-[13px] font-semibold transition-all focus:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
                 active
                   ? "border-primary bg-primary text-primary-foreground shadow-sm"
                   : isCompleted 
@@ -2101,11 +2117,19 @@ function WeekPicker({
                     : "border-border bg-card text-foreground hover:border-primary/40"
               }`}
             >
-              Dia {d}
+              <div className="flex flex-col items-center gap-0.5">
+                <span className="text-[10px] opacity-60 uppercase font-bold tracking-tighter">Dia</span>
+                <span className="font-display text-lg leading-none">{d}</span>
+              </div>
+              
               {isCompleted && (
-                <div className={`absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-primary text-[8px] text-primary-foreground shadow-sm ${active ? 'ring-1 ring-primary-foreground' : ''}`}>
+                <motion.div 
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className={`absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-primary text-[8px] text-primary-foreground shadow-sm ${active ? 'ring-1 ring-primary-foreground' : ''}`}
+                >
                   ✓
-                </div>
+                </motion.div>
               )}
               {isApp && !isCompleted && (
                 <span
@@ -2115,7 +2139,12 @@ function WeekPicker({
                   }`}
                 />
               )}
-            </button>
+              
+              {/* Tooltip/Preview Simulado via Título ou CSS se necessário, 
+                  mas para mobile o long-press pode ser simulado com title para preview nativo 
+                  ou podemos adicionar um pequeno indicador de tarefa */}
+              <div className="sr-only">Tarefa: {getProtocolDay(d).title}</div>
+            </motion.button>
           );
         })}
       </div>
