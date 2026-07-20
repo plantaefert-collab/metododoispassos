@@ -25,6 +25,12 @@ import {
   Flower2,
   Sparkles,
 } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { useProtocolStore, isDiagnosisCurrent } from "@/lib/protocol-store";
 import {
   compressImage,
