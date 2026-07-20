@@ -214,21 +214,34 @@ function ProtocoloPage() {
 
         {/* O cadastro da planta agora é acessível via aba Início se o usuário desejar */}
 
-        {((guestMode && !isDiagnosisCurrent(store.state) && tab === "diagnostico")) && (
+        {status === "needs_diagnosis" && (
+          <motion.div
+            key="signup"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-50 bg-background"
+          >
+            <SignupScreen
+              actorId={actorId}
+              onNext={() => setStatus("diagnosing")}
+            />
+          </motion.div>
+        )}
+
+        {status === "diagnosing" && (
           <motion.div
             key="diagnosis"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 bg-background sm:relative sm:inset-auto sm:z-0"
+            className="fixed inset-0 z-50 bg-background"
           >
             <DiagnosisScreen
               actorId={actorId}
-              onBack={() => {
-                if (guestMode) setTab("aprender");
-                else setTab("inicio");
-              }}
+              onBack={() => setStatus("needs_diagnosis")}
               onFinish={() => {
                 store.saveDiagnosisResult(actorId);
                 setStatus("reviewing_diagnosis_result");
