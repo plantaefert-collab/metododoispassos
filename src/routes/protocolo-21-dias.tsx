@@ -1,3 +1,6 @@
+/**
+ * Criar um teste ponta a ponta simulando a transição de visitante para usuário autenticado via Google com migração do progresso e abertura correta do plano salvo.
+ */
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState, type ReactNode, type ChangeEvent, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
