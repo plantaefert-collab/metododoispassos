@@ -1466,10 +1466,10 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           <div className="relative z-10">
             <div className="flex items-center gap-2 text-accent">
               <Sparkles size={18} className="animate-pulse" />
-              <div className="font-display text-lg font-bold">Inicie seu Diagnóstico</div>
+              <div className="font-display text-lg font-bold">Diagnóstico Opcional</div>
             </div>
             <p className="mt-2 text-sm leading-relaxed text-primary/80">
-              Para liberar seu <strong>Plano de 21 Dias</strong> personalizado, precisamos entender o estado atual da sua orquídea.
+              Para receber orientações específicas para a sua planta, complete o diagnóstico opcional.
             </p>
             <div className="mt-5 flex flex-col gap-3">
               <button
@@ -1581,13 +1581,13 @@ function PlanoTab({ actorId, setTab }: PlanoTabProps) {
             <Info className="mt-0.5 shrink-0 text-primary" size={18} />
             <div className="flex-1">
               <p className="text-[14px] font-medium leading-relaxed text-primary/90">
-                Seu diagnóstico precisa ser atualizado para mostrar orientações personalizadas.
+                Você pode fazer o diagnóstico para receber orientações personalizadas para sua planta.
               </p>
               <button
                 onClick={() => setTab("diagnostico")}
                 className="mt-3 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-[13px] font-semibold text-primary-foreground shadow-sm transition-transform active:scale-95"
               >
-                Atualizar diagnóstico
+                Fazer diagnóstico
                 <ChevronRight size={14} />
               </button>
             </div>
