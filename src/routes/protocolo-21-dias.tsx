@@ -1463,14 +1463,12 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           <h2 className="mt-1 text-lg font-display text-foreground">{getProtocolDay(day).title}</h2>
           <p className="mt-1 text-sm text-muted-foreground">{getProtocolDay(day).objective}</p>
           <div className="mt-3 flex flex-wrap gap-2">
-            {!diagnosisFresh && (
-              <button
-                onClick={() => setStatus("needs_diagnosis")}
-                className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2.5 text-xs font-bold text-primary transition-colors hover:bg-primary/20"
-              >
-                <Stethoscope size={14} /> Fazer diagnóstico
-              </button>
-            )}
+            <button
+              onClick={() => setStatus("needs_diagnosis")}
+              className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2.5 text-xs font-bold text-primary transition-colors hover:bg-primary/20"
+            >
+              <Stethoscope size={14} /> Fazer diagnóstico
+            </button>
           </div>
         </div>
       )}
