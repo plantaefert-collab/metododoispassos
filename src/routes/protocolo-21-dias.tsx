@@ -1367,7 +1367,7 @@ function DiarioTab() {
       </div>
 
       <div className="space-y-3">
-        {PHOTO_DAYS.map((d) => {
+        {PHOTO_DAYS.map((d: number) => {
           const entry = state.days[d] ?? { checklist: {}, note: "", completed: false };
           return (
             <div key={d} className="rounded-3xl border border-border bg-card p-4">
