@@ -1944,7 +1944,10 @@ function PlanoTab({ actorId, setTab, onPreviewDay }: PlanoTabProps) {
               <motion.button
                 key={item}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => toggleChecklist(day, item, actorId)}
+                onClick={() => {
+                  toggleChecklist(day, item, actorId);
+                  if (!checked) playPopSound();
+                }}
                 aria-pressed={checked}
                 className={`flex w-full items-start gap-3 rounded-xl border px-4 py-3 text-left text-sm transition-colors ${
                   checked
