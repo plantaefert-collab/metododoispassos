@@ -885,9 +885,15 @@ export function useProtocolStore() {
   const state = hydrated ? getState() : defaultState;
 
   const wrapSetState = useCallback((updater: (s: ProtocolState) => ProtocolState) => {
+    const prev = getState();
+    const next = updater(prev);
     const result = setState(updater);
-    if (result.ok && userId) {
-      syncToCloud(userId, getState());
+    if (result.ok) {
+      const uid = userId || "guest";
+      saveToCache(uid, next);
+      if (userId) {
+        syncToCloud(userId, next);
+      }
     }
     return result;
   }, [userId, syncToCloud]);
