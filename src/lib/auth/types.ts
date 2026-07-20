@@ -7,8 +7,10 @@ export type AuthBootstrapStatus =
   | "loading_remote_data" 
   | "needs_plant_registration" 
   | "needs_diagnosis" 
+  | "diagnosing"
   | "reviewing_diagnosis_result"
   | "ready" 
+
   | "auth_error";
 
 export interface UserProfile {
