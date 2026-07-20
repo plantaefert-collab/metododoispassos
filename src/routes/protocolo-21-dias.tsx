@@ -110,11 +110,24 @@ function ProtocoloPage() {
   const [showReset, setShowReset] = useState(false);
   const [showLegacyDialog, setShowLegacyDialog] = useState(false);
 
+  const actorId = user?.id ?? "guest";
+
   useEffect(() => {
-    if (status === "loading_remote_data" && hasLegacyData()) {
-      setShowLegacyDialog(true);
+    // Modo visitante persistente
+    if (status === "signed_out" && isGuestActive()) {
+      setGuestMode(true);
+      setTab("aprender");
     }
   }, [status]);
+
+  useEffect(() => {
+    if (status === "loading_remote_data" && hasLegacyData()) {
+      // Verificação de marcador de migração
+      if (user?.id && !getMigrationRecord(user.id)) {
+        setShowLegacyDialog(true);
+      }
+    }
+  }, [status, user?.id]);
 
   if (status === "booting" || status === "loading_remote_data") {
     return (
@@ -162,6 +175,7 @@ function ProtocoloPage() {
             <WelcomeScreen
               onStart={() => setStatus("signing_in")}
               onExplore={() => {
+                setGuestActive(true);
                 setGuestMode(true);
                 setTab("aprender");
               }}
@@ -180,7 +194,7 @@ function ProtocoloPage() {
             <AuthScreen
               onBack={() => setStatus("signed_out")}
               onSuccess={() => {
-                // O hook useAuthBootstrap cuidará da transição após detectar a nova sessão
+                // O bootstrap cuidará da transição
               }}
             />
           </motion.div>
@@ -194,7 +208,7 @@ function ProtocoloPage() {
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
           >
-            <SignupScreen onNext={() => setStatus("needs_diagnosis")} />
+            <SignupScreen actorId={actorId} onNext={() => setStatus("needs_diagnosis")} />
           </motion.div>
         )}
 
@@ -207,16 +221,33 @@ function ProtocoloPage() {
             transition={{ duration: 0.3 }}
           >
             <DiagnosisScreen
+              actorId={actorId}
               onBack={() => {
                 if (guestMode) setTab("aprender");
                 else setStatus("needs_plant_registration");
               }}
               onFinish={() => {
-                const persistResult = store.saveDiagnosisResult();
-                if (persistResult.ok) {
-                  // A transição para result agora é interna ao store/componente ou via estado ready
-                  // Para manter a UX, vamos forçar a exibição do resultado
-                }
+                store.saveDiagnosisResult(actorId);
+                setStatus("reviewing_diagnosis_result");
+              }}
+            />
+          </motion.div>
+        )}
+
+        {status === "reviewing_diagnosis_result" && (
+          <motion.div
+            key="result"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <DiagnosisResultScreen
+              onBack={() => setStatus("needs_diagnosis")}
+              onFinish={() => {
+                store.setOnboarded(true, actorId);
+                setStatus("ready");
+                setTab("plano");
               }}
             />
           </motion.div>
@@ -238,12 +269,12 @@ function ProtocoloPage() {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  {tab === "inicio" && <InicioTab setTab={setTab} />}
-                  {tab === "plano" && <PlanoTab setTab={setTab} />}
+                  {tab === "inicio" && <InicioTab actorId={actorId} setTab={setTab} />}
+                  {tab === "plano" && <PlanoTab actorId={actorId} setTab={setTab} />}
                   {tab === "diagnostico" && (
-                    <DiagnosticoTab onRedo={() => setStatus("needs_diagnosis")} setTab={setTab} />
+                    <DiagnosticoTab actorId={actorId} onRedo={() => setStatus("needs_diagnosis")} setTab={setTab} />
                   )}
-                  {tab === "diario" && <DiarioTab />}
+                  {tab === "diario" && <DiarioTab actorId={actorId} />}
                   {tab === "aprender" && <AprenderTab />}
                 </motion.div>
               </AnimatePresence>
@@ -252,23 +283,26 @@ function ProtocoloPage() {
         )}
       </AnimatePresence>
 
-      {showLegacyDialog && (
+      {showLegacyDialog && user?.id && (
         <LegacyProgressDialog 
-          onImport={() => {
+          onImport={async () => {
             const legacyData = getLegacyData();
-            if (legacyData) {
-              store.setState(() => legacyData);
+            if (legacyData && user.id) {
+              store.hydrateStore(legacyData);
+              await saveProgressRemote(user.id, legacyData);
+              saveMigrationRecord(user.id, { status: "imported", timestamp: new Date().toISOString() });
               clearLegacyData();
             }
             setShowLegacyDialog(false);
           }}
           onContinue={() => {
-            clearLegacyData();
+            if (user.id) {
+              saveMigrationRecord(user.id, { status: "dismissed", timestamp: new Date().toISOString() });
+            }
             setShowLegacyDialog(false);
           }}
         />
       )}
-
 
       <AnimatePresence>
         {showReset && (
@@ -281,13 +315,16 @@ function ProtocoloPage() {
             >
               <ConfirmModal
                 title="Reiniciar meu plano?"
-                description="Isso apagará cadastro, diagnóstico, checklists, fotos e anotações salvas no seu navegador."
+                description="Isso apagará cadastro, diagnóstico, checklists, fotos e anotações salvas."
                 confirmLabel="Reiniciar meu plano"
                 onCancel={() => setShowReset(false)}
-                onConfirm={() => {
-                  store.reset();
+                onConfirm={async () => {
+                  store.clearStore();
+                  saveToCache(actorId, defaultState);
+                  if (user?.id) {
+                    await saveProgressRemote(user.id, defaultState);
+                  }
                   setShowReset(false);
-                  setStatus("signed_out");
                 }}
               />
             </motion.div>
