@@ -2305,8 +2305,8 @@ function AprenderTab() {
       </div>
 
       {current && (
-        <Drawer onClose={() => setOpen(null)} title={current.title}>
-          <p className="text-sm leading-relaxed text-foreground/90">{current.body}</p>
+        <Drawer onClose={() => setOpen(null)} title={current.title} icon={current.icon}>
+          <p className="text-base leading-relaxed text-foreground/90">{current.body}</p>
         </Drawer>
       )}
     </div>
