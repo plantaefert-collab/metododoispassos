@@ -1601,20 +1601,29 @@ function PlanoTab({ actorId, setTab }: PlanoTabProps) {
           </div>
         )}
 
-        <div className="mt-4 flex gap-2">
+        <div className="mt-4 flex flex-col gap-2">
+          <div className="flex gap-2">
+            <button
+              onClick={() => setTab("inicio")}
+              className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-border bg-muted/30 py-2.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
+            >
+              <Home size={13} />
+              Ir para Início
+            </button>
+            <button
+              onClick={() => setTab("diagnostico")}
+              className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-border bg-muted/30 py-2.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
+            >
+              <Stethoscope size={13} />
+              Ver Diagnóstico
+            </button>
+          </div>
           <button
-            onClick={() => setTab("inicio")}
-            className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-border bg-muted/30 py-2.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
+            onClick={() => setTab("diario")}
+            className="w-full flex items-center justify-center gap-1.5 rounded-xl border border-border bg-muted/30 py-2.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
           >
-            <Home size={13} />
-            Ir para Início
-          </button>
-          <button
-            onClick={() => setTab("diagnostico")}
-            className="flex-1 flex items-center justify-center gap-1.5 rounded-xl border border-border bg-muted/30 py-2.5 text-[11px] font-semibold text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
-          >
-            <Stethoscope size={13} />
-            Ver Diagnóstico
+            <Images size={13} />
+            Ver Diário (Evolução)
           </button>
         </div>
       </div>
