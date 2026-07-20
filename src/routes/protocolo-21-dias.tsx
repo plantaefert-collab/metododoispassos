@@ -110,7 +110,7 @@ function ProtocoloPage() {
     store.state.onboarded || guestMode 
       ? "app" 
       : hasUser 
-        ? (store.state.onboarded ? "app" : "signup")
+        ? "signup" 
         : "welcome"
   );
 
