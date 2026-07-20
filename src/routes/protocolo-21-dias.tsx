@@ -114,7 +114,15 @@ function phaseOf(day: number) {
 function ProtocoloPage() {
   const store = useProtocolStore();
   const { status, user, error: authError, setStatus } = useAuthBootstrap();
-  const [tab, setTab] = useState<Tab>("inicio");
+  const [tab, setTab] = useState<Tab>(() => {
+    // Retomar automaticamente do ponto em que parou
+    const actorId = "guest"; // Placeholder para carregar cache
+    const cached = typeof window !== 'undefined' ? localStorage.getItem(`sb-ppcunhobinvkgvsbapbg-auth-token`) : null; // Check for auth
+    // Note: useAuthBootstrap handles hydrating store, so we can check currentState
+    const state = getState();
+    if (state.onboarded) return "plano";
+    return "inicio";
+  });
   const [guestMode, setGuestMode] = useState(false);
   const [showReset, setShowReset] = useState(false);
   const [showLegacyDialog, setShowLegacyDialog] = useState(false);
