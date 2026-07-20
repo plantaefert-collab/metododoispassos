@@ -193,15 +193,15 @@ function AppShell({
   const { state, clearSaveError } = useProtocolStore();
   return (
     <div className="min-h-screen bg-background">
-      <div className="mx-auto flex min-h-screen max-w-[440px] flex-col shadow-[0_0_60px_-30px_rgba(0,80,40,0.25)] sm:my-4 sm:min-h-[calc(100vh-2rem)] sm:rounded-3xl sm:border sm:border-border sm:bg-card">
+      <div className="mx-auto flex min-h-screen max-w-[440px] flex-col shadow-[0_20px_60px_-20px_rgba(62,100,255,0.2)] sm:my-4 sm:min-h-[calc(100vh-2rem)] sm:rounded-3xl sm:border sm:border-border/60 sm:bg-card/90 sm:backdrop-blur-xl">
         <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-border bg-background/95 px-4 py-3 backdrop-blur sm:rounded-t-3xl">
           <div className="flex items-center gap-2">
-            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary text-primary-foreground">
+            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
               <Leaf size={18} strokeWidth={2.2} />
             </div>
             <div className="min-w-0">
-              <div className="text-sm font-bold tracking-tight text-primary">PlantaeFert</div>
-              <div className="truncate text-[11px] text-muted-foreground">Nutrição Vegetal</div>
+              <div className="text-xs font-bold tracking-tight text-primary uppercase">PlantaeFert</div>
+              <div className="truncate text-[10px] font-medium text-muted-foreground/80">LABS · NUTRIÇÃO</div>
             </div>
           </div>
           <div className="flex items-center gap-1">
@@ -299,8 +299,8 @@ function TabBtn({
       aria-current={active ? "page" : undefined}
     >
       <span
-        className={`grid h-8 w-8 place-items-center rounded-full transition-colors ${
-          active ? "bg-primary/10" : ""
+        className={`grid h-8 w-8 place-items-center rounded-xl transition-all ${
+          active ? "bg-primary text-primary-foreground shadow-md shadow-primary/20 scale-110" : ""
         }`}
       >
         {icon}
@@ -325,7 +325,7 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
         {/* Header */}
         <header className="flex items-center gap-2.5">
           <div
-            className="grid h-9 w-9 place-items-center rounded-full"
+            className="grid h-9 w-9 place-items-center rounded-xl"
             style={{ backgroundColor: "var(--color-plantae-green)", color: "var(--color-plantae-cream)" }}
           >
             <Leaf size={18} strokeWidth={2} />
@@ -342,7 +342,7 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
 
         {/* Photo */}
         <figure
-          className="relative mt-5 overflow-hidden rounded-[22px]"
+          className="relative mt-5 overflow-hidden rounded-[28px] border border-white/20 shadow-xl"
           style={{ backgroundColor: "var(--color-plantae-lilac)" }}
         >
           <img
@@ -353,7 +353,7 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
             className="h-[220px] w-full object-cover sm:h-[240px]"
           />
           <span
-            className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em]"
+            className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] backdrop-blur-md"
             style={{ backgroundColor: "var(--color-plantae-rose)", color: "var(--color-plantae-magenta)" }}
           >
             <Sparkles size={11} /> Método de 2 passos
@@ -487,10 +487,10 @@ function StepCard({
   icon: ReactNode;
 }) {
   return (
-    <div className="rounded-[20px] p-4" style={{ backgroundColor: bg }}>
+    <div className="rounded-[24px] p-5 border border-white/40 shadow-sm" style={{ backgroundColor: bg }}>
       <div className="flex items-start gap-3">
         <span
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-sm font-bold"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-sm font-bold shadow-sm"
           style={{ backgroundColor: badge, color: badgeInk }}
         >
           {number}
