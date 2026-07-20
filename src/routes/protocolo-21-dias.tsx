@@ -2089,6 +2089,8 @@ function DiarioTab() {
                   onChange={(v) => updateDay(d, { observations: v })}
                 />
               </div>
+                </div>
+              </div>
             </div>
           );
         })}
