@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState, type ReactNode, type ChangeEvent } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Sprout,
   Leaf,
@@ -110,70 +111,130 @@ function ProtocoloPage() {
     );
   }
 
-  if (activeScreen === "welcome") {
-    return (
-      <WelcomeScreen
-        onStart={() => setScreen("signup")}
-        onExplore={() => {
-          setGuestMode(true);
-          setScreen("app");
-          setTab("aprender");
-        }}
-      />
-    );
-  }
-  if (activeScreen === "signup") {
-    return <SignupScreen onNext={() => setScreen("diagnosis")} />;
-  }
-  if (activeScreen === "diagnosis") {
-    return (
-      <DiagnosisScreen
-        onBack={() => setScreen("signup")}
-        onFinish={() => {
-          const persistResult = store.saveDiagnosisResult();
-          if (persistResult.ok) {
-            setScreen("result");
-          }
-        }}
-      />
-    );
-  }
-  if (activeScreen === "result") {
-    return (
-      <DiagnosisResultScreen
-        onBack={() => setScreen("diagnosis")}
-        onFinish={() => {
-          store.setOnboarded(true);
-          setScreen("app");
-          setTab("inicio");
-        }}
-      />
-    );
-  }
-
   return (
-    <AppShell tab={tab} setTab={setTab} onReset={() => setShowReset(true)}>
-      {tab === "inicio" && <InicioTab setTab={setTab} />}
-      {tab === "plano" && <PlanoTab setTab={setTab} />}
-      {tab === "diagnostico" && (
-        <DiagnosticoTab onRedo={() => setScreen("diagnosis")} setTab={setTab} />
-      )}
-      {tab === "diario" && <DiarioTab />}
-      {tab === "aprender" && <AprenderTab />}
-      {showReset && (
-        <ConfirmModal
-          title="Reiniciar meu plano?"
-          description="Isso apagará cadastro, diagnóstico, checklists, fotos e anotações salvas no seu navegador."
-          confirmLabel="Reiniciar meu plano"
-          onCancel={() => setShowReset(false)}
-          onConfirm={() => {
-            store.reset();
-            setShowReset(false);
-            setScreen("welcome");
-          }}
-        />
-      )}
-    </AppShell>
+    <div className="font-sans text-foreground antialiased selection:bg-accent/20">
+      <AnimatePresence mode="wait">
+        {activeScreen === "welcome" && (
+          <motion.div
+            key="welcome"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <WelcomeScreen
+              onStart={() => setScreen("signup")}
+              onExplore={() => {
+                setGuestMode(true);
+                setScreen("app");
+                setTab("aprender");
+              }}
+            />
+          </motion.div>
+        )}
+        {activeScreen === "signup" && (
+          <motion.div
+            key="signup"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <SignupScreen onNext={() => setScreen("diagnosis")} />
+          </motion.div>
+        )}
+        {activeScreen === "diagnosis" && (
+          <motion.div
+            key="diagnosis"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <DiagnosisScreen
+              onBack={() => setScreen("signup")}
+              onFinish={() => {
+                const persistResult = store.saveDiagnosisResult();
+                if (persistResult.ok) {
+                  setScreen("result");
+                }
+              }}
+            />
+          </motion.div>
+        )}
+        {activeScreen === "result" && (
+          <motion.div
+            key="result"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.4 }}
+          >
+            <DiagnosisResultScreen
+              onBack={() => setScreen("diagnosis")}
+              onFinish={() => {
+                store.setOnboarded(true);
+                setScreen("app");
+                setTab("inicio");
+              }}
+            />
+          </motion.div>
+        )}
+        {activeScreen === "app" && (
+          <motion.div
+            key="app"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <AppShell tab={tab} setTab={setTab} onReset={() => setShowReset(true)}>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={tab}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  {tab === "inicio" && <InicioTab setTab={setTab} />}
+                  {tab === "plano" && <PlanoTab setTab={setTab} />}
+                  {tab === "diagnostico" && (
+                    <DiagnosticoTab onRedo={() => setScreen("diagnosis")} setTab={setTab} />
+                  )}
+                  {tab === "diario" && <DiarioTab />}
+                  {tab === "aprender" && <AprenderTab />}
+                </motion.div>
+              </AnimatePresence>
+            </AppShell>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showReset && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-6 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="w-full max-w-sm"
+            >
+              <ConfirmModal
+                title="Reiniciar meu plano?"
+                description="Isso apagará cadastro, diagnóstico, checklists, fotos e anotações salvas no seu navegador."
+                confirmLabel="Reiniciar meu plano"
+                onCancel={() => setShowReset(false)}
+                onConfirm={() => {
+                  store.reset();
+                  setShowReset(false);
+                  setScreen("welcome");
+                }}
+              />
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 }
 
@@ -192,9 +253,9 @@ function AppShell({
 }) {
   const { state, clearSaveError } = useProtocolStore();
   return (
-    <div className="min-h-screen bg-background font-sans">
-      <div className="mx-auto flex min-h-screen max-w-[440px] flex-col shadow-[0_30px_90px_-20px_rgba(23,61,50,0.2)] sm:my-4 sm:min-h-[calc(100vh-2rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card">
-        <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-border bg-card px-4 py-4 sm:rounded-t-2xl">
+    <div className="min-h-screen bg-background font-sans selection:bg-primary/10">
+      <div className="mx-auto flex min-h-screen max-w-[440px] flex-col shadow-[0_30px_90px_-20px_rgba(23,61,50,0.1)] sm:my-4 sm:min-h-[calc(100vh-2rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card">
+        <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-border bg-card/80 px-4 py-4 backdrop-blur-md sm:rounded-t-2xl">
           <div className="flex items-center gap-2">
             <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground shadow-md shadow-primary/20">
               <Leaf size={18} strokeWidth={2.2} />
@@ -238,39 +299,43 @@ function AppShell({
           </div>
         )}
 
-        <main className="flex-1 overflow-y-auto px-4 pb-28 pt-4">{children}</main>
+        <main className="flex-1 overflow-y-auto px-4 pb-28 pt-4">
+          <div className="relative">
+            {children}
+          </div>
+        </main>
 
-        <nav className="sticky bottom-0 z-20 border-t border-border bg-card sm:rounded-b-2xl">
+        <nav className="sticky bottom-0 z-20 border-t border-border bg-card/80 backdrop-blur-md sm:rounded-b-2xl">
           <div className="grid grid-cols-5">
             <TabBtn
               active={tab === "inicio"}
               onClick={() => setTab("inicio")}
-              icon={<Home size={18} />}
+              icon={<Home size={20} />}
               label="Início"
             />
             <TabBtn
               active={tab === "plano"}
               onClick={() => setTab("plano")}
-              icon={<CalendarCheck size={18} />}
-              label="Meu plano"
+              icon={<CalendarCheck size={20} />}
+              label="Plano"
             />
             <TabBtn
               active={tab === "diagnostico"}
               onClick={() => setTab("diagnostico")}
-              icon={<Stethoscope size={18} />}
-              label="Diagnóstico"
+              icon={<Stethoscope size={20} />}
+              label="Exame"
             />
             <TabBtn
               active={tab === "diario"}
               onClick={() => setTab("diario")}
-              icon={<Images size={18} />}
+              icon={<Images size={20} />}
               label="Diário"
             />
             <TabBtn
               active={tab === "aprender"}
               onClick={() => setTab("aprender")}
-              icon={<BookOpen size={18} />}
-              label="Aprender"
+              icon={<BookOpen size={20} />}
+              label="Dicas"
             />
           </div>
         </nav>
@@ -293,19 +358,33 @@ function TabBtn({
   return (
     <button
       onClick={onClick}
-      className={`flex flex-col items-center gap-0.5 py-2.5 text-[10.5px] font-medium transition-colors ${
+      className={`relative flex flex-col items-center gap-1 py-3 transition-all duration-300 ${
         active ? "text-primary" : "text-muted-foreground hover:text-foreground"
       }`}
-      aria-current={active ? "page" : undefined}
     >
+      <div className="relative">
+        <span
+          className={`grid h-9 w-9 place-items-center rounded-xl transition-all duration-500 ${
+            active ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-110" : "bg-transparent"
+          }`}
+        >
+          {icon}
+        </span>
+        {active && (
+          <motion.div
+            layoutId="tabGlow"
+            className="absolute -inset-1 z-[-1] rounded-2xl bg-primary/10 blur-md"
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          />
+        )}
+      </div>
       <span
-        className={`grid h-8 w-8 place-items-center rounded-lg transition-all ${
-          active ? "bg-primary text-primary-foreground shadow-sm scale-105" : ""
+        className={`text-[9.5px] font-bold uppercase tracking-widest transition-opacity duration-300 ${
+          active ? "opacity-100" : "opacity-50"
         }`}
       >
-        {icon}
+        {label}
       </span>
-      {label}
     </button>
   );
 }
