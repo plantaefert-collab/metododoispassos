@@ -112,7 +112,7 @@ function ProtocoloPage() {
   } else if (store.state.onboarded || guestMode) {
     activeScreen = "app";
   } else if (hasUser) {
-    activeScreen = hasDiagnosis ? "app" : "signup";
+    activeScreen = hasDiagnosis ? "app" : "diagnosis";
   } else {
     activeScreen = "welcome";
   }
@@ -158,12 +158,12 @@ function ProtocoloPage() {
             <AuthScreen
               onBack={() => setScreen("welcome")}
               onSuccess={() => {
-                const hasDiagnosis = isDiagnosisCurrent(store.state);
-                if (hasDiagnosis) {
+                const current = isDiagnosisCurrent(store.state);
+                if (current) {
                   setScreen("app");
                   setTab("plano");
                 } else {
-                  setScreen("signup");
+                  setScreen("diagnosis"); // Direto para o diagnóstico após login se não tiver um atual
                 }
               }}
             />
@@ -671,7 +671,10 @@ function AuthScreen({ onBack, onSuccess }: { onBack: () => void; onSuccess: () =
       const { lovable } = await import("@/integrations/lovable/index");
       await lovable.auth.signInWithOAuth("google", {
         redirect_uri: window.location.origin + "/protocolo-21-dias",
-      });
+        options: {
+          queryParams: { prompt: "select_account" }
+        }
+      } as any);
     } catch (err) {
       setError("Erro ao iniciar login com Google");
     }
