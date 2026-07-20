@@ -310,32 +310,32 @@ function AppShell({
             <TabBtn
               active={tab === "inicio"}
               onClick={() => setTab("inicio")}
-              icon={<Home size={18} />}
+              icon={<Home size={20} />}
               label="Início"
             />
             <TabBtn
               active={tab === "plano"}
               onClick={() => setTab("plano")}
-              icon={<CalendarCheck size={18} />}
-              label="Meu plano"
+              icon={<CalendarCheck size={20} />}
+              label="Plano"
             />
             <TabBtn
               active={tab === "diagnostico"}
               onClick={() => setTab("diagnostico")}
-              icon={<Stethoscope size={18} />}
-              label="Diagnóstico"
+              icon={<Stethoscope size={20} />}
+              label="Exame"
             />
             <TabBtn
               active={tab === "diario"}
               onClick={() => setTab("diario")}
-              icon={<Images size={18} />}
+              icon={<Images size={20} />}
               label="Diário"
             />
             <TabBtn
               active={tab === "aprender"}
               onClick={() => setTab("aprender")}
-              icon={<BookOpen size={18} />}
-              label="Aprender"
+              icon={<BookOpen size={20} />}
+              label="Dicas"
             />
           </div>
         </nav>
@@ -358,19 +358,33 @@ function TabBtn({
   return (
     <button
       onClick={onClick}
-      className={`flex flex-col items-center gap-0.5 py-2.5 text-[10.5px] font-medium transition-colors ${
+      className={`relative flex flex-col items-center gap-1 py-3 transition-all duration-300 ${
         active ? "text-primary" : "text-muted-foreground hover:text-foreground"
       }`}
-      aria-current={active ? "page" : undefined}
     >
+      <div className="relative">
+        <span
+          className={`grid h-9 w-9 place-items-center rounded-xl transition-all duration-500 ${
+            active ? "bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-110" : "bg-transparent"
+          }`}
+        >
+          {icon}
+        </span>
+        {active && (
+          <motion.div
+            layoutId="tabGlow"
+            className="absolute -inset-1 z-[-1] rounded-2xl bg-primary/10 blur-md"
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+          />
+        )}
+      </div>
       <span
-        className={`grid h-8 w-8 place-items-center rounded-lg transition-all ${
-          active ? "bg-primary text-primary-foreground shadow-sm scale-105" : ""
+        className={`text-[9.5px] font-bold uppercase tracking-widest transition-opacity duration-300 ${
+          active ? "opacity-100" : "opacity-50"
         }`}
       >
-        {icon}
+        {label}
       </span>
-      {label}
     </button>
   );
 }
