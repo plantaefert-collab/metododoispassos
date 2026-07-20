@@ -942,8 +942,9 @@ const DIAG_CATEGORIES: Array<{ key: DiagnosisCategory; icon: ReactNode }> = [
   { key: "wateringAndRoutine", icon: <Droplets size={18} /> },
 ];
 
-function DiagnosisScreen({ onFinish, onBack }: { onFinish: () => void; onBack: () => void }) {
+function DiagnosisScreen({ actorId, onFinish, onBack }: { actorId: string; onFinish: () => void; onBack: () => void }) {
   const { state, toggleDiagnosis, clearSaveError } = useProtocolStore();
+
   const [stepIdx, setStepIdx] = useState(0);
   const total = DIAG_CATEGORIES.length;
   const current = DIAG_CATEGORIES[stepIdx];
