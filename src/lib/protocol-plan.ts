@@ -46,7 +46,11 @@ export const PROTOCOL_PHASES: ProtocolPhase[] = [
 
 export const PROTOCOL_DAYS: ProtocolDay[] = Object.values(EDITORIAL_PLAN);
 
+export const APPLICATION_DAYS = [1, 7, 14, 21];
+export const PHOTO_DAYS = [1, 7, 14, 21];
+
 export function getProtocolDay(day: number): ProtocolDay {
+
   const normalized = Math.max(1, Math.min(21, Math.floor(day)));
   return EDITORIAL_PLAN[normalized] || EDITORIAL_PLAN[1];
 }
