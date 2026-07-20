@@ -2092,15 +2092,33 @@ function WeekPicker({
   onSelect,
   currentDay,
   onSelectDay,
+  onPreviewDay,
   weekDays,
 }: {
   currentWeek: 1 | 2 | 3;
   onSelect: (w: 1 | 2 | 3) => void;
   currentDay: number;
   onSelectDay: (day: number) => void;
+  onPreviewDay: (day: number) => void;
   weekDays: number[];
 }) {
   const { state } = useProtocolStore();
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const startPress = (d: number) => {
+    longPressTimer.current = setTimeout(() => {
+      onPreviewDay(d);
+      longPressTimer.current = null;
+    }, 600);
+  };
+
+  const cancelPress = () => {
+    if (longPressTimer.current) {
+      clearTimeout(longPressTimer.current);
+      longPressTimer.current = null;
+    }
+  };
+
   return (
     <div className="space-y-3">
       <div
