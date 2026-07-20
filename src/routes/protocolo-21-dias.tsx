@@ -245,7 +245,7 @@ function ProtocoloPage() {
               actorId={actorId}
               onBack={() => {
                 if (guestMode) setTab("aprender");
-                else setStatus("needs_plant_registration");
+                else setStatus("ready"); // Volta para o Início agora
               }}
               onFinish={() => {
                 store.saveDiagnosisResult(actorId);
@@ -265,7 +265,6 @@ function ProtocoloPage() {
           >
             <DiagnosisResultScreen
               actorId={actorId}
-
               onBack={() => setStatus("needs_diagnosis")}
               onFinish={() => {
                 store.setOnboarded(true, actorId);
@@ -1434,6 +1433,47 @@ function InicioTab({ actorId, setTab }: { actorId: string; setTab: (t: Tab) => v
             className="mt-3 text-xs font-semibold text-accent hover:underline"
           >
             Ver diagnóstico completo
+          </button>
+        </div>
+      )}
+
+      {!diagnosisFresh && (
+        <div className="rounded-2xl border border-accent/20 bg-accent/5 p-5">
+          <div className="flex items-center gap-2 text-accent">
+            <Stethoscope size={16} />
+            <div className="text-sm font-bold">Diagnóstico Necessário</div>
+          </div>
+          <p className="mt-2 text-sm text-primary/80">
+            Seu diagnóstico está desatualizado ou ainda não foi concluído. Vamos atualizar para que seu plano seja mais preciso?
+          </p>
+          <button
+            onClick={() => setStatus("needs_diagnosis")}
+            className="mt-4 w-full rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground shadow-sm active:scale-[0.98]"
+          >
+            Fazer novo diagnóstico
+          </button>
+        </div>
+      )}
+
+      {diagnosisFresh && (
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <div className="flex items-center justify-between">
+            <div className="text-sm font-bold text-primary">Seu diagnóstico</div>
+            <button
+              onClick={() => setStatus("needs_diagnosis")}
+              className="text-xs font-medium text-muted-foreground hover:text-accent hover:underline"
+            >
+              Refazer
+            </button>
+          </div>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Você já realizou o diagnóstico. Toque no botão abaixo ou na aba "Exame" para ver os detalhes.
+          </p>
+          <button
+            onClick={() => setTab("diagnostico")}
+            className="mt-3 inline-flex items-center gap-1 rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
+          >
+            Ver detalhes <ChevronRight size={14} />
           </button>
         </div>
       )}
