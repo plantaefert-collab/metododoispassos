@@ -256,7 +256,7 @@ function ProtocoloPage() {
             <DiagnosisResultScreen
               onBack={() => setStatus("needs_diagnosis")}
               onFinish={() => {
-                store.setOnboarded(true, actorId);
+                store.setOnboarded(true, actorId, actorId);
                 setStatus("ready");
                 setTab("plano");
               }}
@@ -731,7 +731,7 @@ function SignupScreen({ actorId, onNext }: { actorId: string; onNext: () => void
     if (!file) return;
     try {
       const dataUrl = await compressImage(file);
-      updatePlant({ photo: dataUrl });
+      updatePlant({ photo: dataUrl }, actorId);
     } catch {
       alert(PHOTO_ERROR_MESSAGE);
     }
@@ -753,7 +753,7 @@ function SignupScreen({ actorId, onNext }: { actorId: string; onNext: () => void
           <Field label="Nome da planta *">
             <input
               value={plant.name}
-              onChange={(e) => updatePlant({ name: e.target.value })}
+              onChange={(e) => updatePlant({ name: e.target.value }, actorId)}
               placeholder="Ex.: Minha Phalaenopsis"
               className="w-full rounded-lg border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-1 focus:ring-primary"
             />
@@ -762,7 +762,7 @@ function SignupScreen({ actorId, onNext }: { actorId: string; onNext: () => void
           <Field label="Espécie (opcional)">
             <input
               value={plant.species}
-              onChange={(e) => updatePlant({ species: e.target.value, unknownSpecies: false })}
+              onChange={(e) => updatePlant({ species: e.target.value, unknownSpecies: false }, actorId)}
               disabled={plant.unknownSpecies}
               placeholder="Ex.: Phalaenopsis, Cattleya…"
               className="w-full rounded-lg border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
@@ -786,14 +786,14 @@ function SignupScreen({ actorId, onNext }: { actorId: string; onNext: () => void
           <SelectField
             label="Local de cultivo"
             value={plant.location}
-            onChange={(v) => updatePlant({ location: v })}
+            onChange={(v) => updatePlant({ location: v }, actorId)}
             options={["Varanda", "Janela interna", "Jardim externo", "Estufa", "Outro"]}
           />
 
           <SelectField
             label="Tipo de vaso"
             value={plant.pot}
-            onChange={(v) => updatePlant({ pot: v })}
+            onChange={(v) => updatePlant({ pot: v }, actorId)}
             options={[
               "Vaso plástico transparente",
               "Vaso plástico comum",
@@ -807,7 +807,7 @@ function SignupScreen({ actorId, onNext }: { actorId: string; onNext: () => void
           <SelectField
             label="Tipo de substrato"
             value={plant.substrate}
-            onChange={(v) => updatePlant({ substrate: v })}
+            onChange={(v) => updatePlant({ substrate: v }, actorId)}
             options={[
               "Casca de pinus",
               "Fibra de coco",
@@ -821,7 +821,7 @@ function SignupScreen({ actorId, onNext }: { actorId: string; onNext: () => void
           <SelectField
             label="Principal dificuldade"
             value={plant.difficulty}
-            onChange={(v) => updatePlant({ difficulty: v })}
+            onChange={(v) => updatePlant({ difficulty: v }, actorId)}
             options={[
               "Não floresce",
               "Folhas caídas ou enrugadas",
@@ -851,7 +851,7 @@ function SignupScreen({ actorId, onNext }: { actorId: string; onNext: () => void
             </label>
             {plant.photo && (
               <button
-                onClick={() => updatePlant({ photo: null })}
+                onClick={() => updatePlant({ photo: null }, actorId)}
                 className="mt-2 text-xs text-muted-foreground underline"
               >
                 Remover foto
@@ -1017,7 +1017,7 @@ function DiagnosisScreen({ onFinish, onBack }: { onFinish: () => void; onBack: (
                 <button
                   key={opt}
                   type="button"
-                  onClick={() => toggleDiagnosis(current.key, opt)}
+                  onClick={() => toggleDiagnosis(current.key, opt, actorId)}
                   aria-pressed={active}
                   className={`flex items-center justify-between rounded-xl border px-4 py-3.5 text-left text-[15px] transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
                     active
@@ -1383,7 +1383,7 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
             <button
               key={d}
               onClick={() => {
-                setCurrentDay(d);
+                setCurrentDay(d, actorId);
                 setTab("plano");
               }}
               className="rounded-xl border border-border bg-secondary/40 p-3 text-left transition-colors hover:border-primary/40"
@@ -1432,7 +1432,7 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
           {[1, 7, 14, 21].map((d) => (
             <button
               key={d}
-              onClick={() => setCurrentDay(d)}
+              onClick={() => setCurrentDay(d, actorId)}
               className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
                 day === d
                   ? "bg-primary text-primary-foreground"
@@ -1504,7 +1504,7 @@ function PlanoTab({ setTab }: PlanoTabProps) {
         currentWeek={week}
         onSelect={(w) => {
           const firstDay = w === 1 ? 1 : w === 2 ? 8 : 15;
-          setCurrentDay(firstDay);
+          setCurrentDay(firstDay, actorId);
         }}
         currentDay={day}
         onSelectDay={setCurrentDay}
@@ -1517,8 +1517,8 @@ function PlanoTab({ setTab }: PlanoTabProps) {
         <DayContentCard
           meta={meta}
           entry={entry}
-          onToggleChecklist={(item) => toggleChecklist(day, item)}
-          onUpdate={(patch) => updateDay(day, patch)}
+          onToggleChecklist={(item) => toggleChecklist(day, item, actorId)}
+          onUpdate={(patch) => updateDay(day, patch, actorId)}
           diagnosisFresh={diagnosisFresh}
           trackingPoints={trackingPoints}
         />
@@ -1544,7 +1544,7 @@ function PlanoTab({ setTab }: PlanoTabProps) {
             return (
               <button
                 key={item}
-                onClick={() => toggleChecklist(day, item)}
+                onClick={() => toggleChecklist(day, item, actorId)}
                 aria-pressed={checked}
                 className={`flex w-full items-start gap-3 rounded-xl border px-4 py-3 text-left text-sm transition-colors ${
                   checked
@@ -1563,10 +1563,10 @@ function PlanoTab({ setTab }: PlanoTabProps) {
           })}
         </div>
 
-        <RegisterField meta={meta} entry={entry} onChange={(note) => updateDay(day, { note })} />
+        <RegisterField meta={meta} entry={entry} onChange={(note) => updateDay(day, { note }, actorId)} />
 
         <button
-          onClick={() => toggleDayCompleted(day)}
+          onClick={() => toggleDayCompleted(day, actorId)}
           aria-pressed={entry.completed}
           className={`mt-4 w-full rounded-full px-4 py-3 text-sm font-semibold active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
             entry.completed
@@ -2082,7 +2082,7 @@ function MethodDrawer({ day, onClose }: { day: number; onClose: () => void }) {
         <button
           disabled={!canRegister}
           onClick={() => {
-            registerApplication(day);
+            registerApplication(day, actorId);
             onClose();
           }}
           className="w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -2197,7 +2197,7 @@ function DiarioTab() {
     if (!file) return;
     try {
       const dataUrl = await compressImage(file);
-      updateDay(day, { photo: dataUrl });
+      updateDay(day, { photo: dataUrl }, actorId);
     } catch {
       alert(PHOTO_ERROR_MESSAGE);
     }
@@ -2272,7 +2272,7 @@ function DiarioTab() {
 
               <input
                 value={entry.photoCaption ?? ""}
-                onChange={(e) => updateDay(d, { photoCaption: e.target.value })}
+                onChange={(e) => updateDay(d, { photoCaption: e.target.value }, actorId)}
                 placeholder="Legenda"
                 className="mt-3 w-full rounded-xl border border-input bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               />
@@ -2281,22 +2281,22 @@ function DiarioTab() {
                 <FieldSmall
                   label="Raízes"
                   value={entry.roots ?? ""}
-                  onChange={(v) => updateDay(d, { roots: v })}
+                  onChange={(v) => updateDay(d, { roots: v }, actorId)}
                 />
                 <FieldSmall
                   label="Folhas"
                   value={entry.leavesObs ?? ""}
-                  onChange={(v) => updateDay(d, { leavesObs: v })}
+                  onChange={(v) => updateDay(d, { leavesObs: v }, actorId)}
                 />
                 <FieldSmall
                   label="Brotos/hastes"
                   value={entry.shoots ?? ""}
-                  onChange={(v) => updateDay(d, { shoots: v })}
+                  onChange={(v) => updateDay(d, { shoots: v }, actorId)}
                 />
                 <FieldSmall
                   label="Observações"
                   value={entry.observations ?? ""}
-                  onChange={(v) => updateDay(d, { observations: v })}
+                  onChange={(v) => updateDay(d, { observations: v }, actorId)}
                 />
               </div>
               </div>
@@ -2425,7 +2425,7 @@ function FinalEvaluation() {
             return (
               <button
                 key={p.id}
-                onClick={() => updateFinalEval({ path: p.id })}
+                onClick={() => updateFinalEval({{ path: p.id }, actorId)}
                 className={`rounded-2xl border p-3 text-left text-sm transition-colors ${
                   active
                     ? p.tone === "warn"
