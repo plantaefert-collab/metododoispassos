@@ -475,23 +475,6 @@ function AppShell({
                 }} 
               />
             )}
-            {tab === "inicio" && (
-              <div className="mb-6 flex flex-col gap-4">
-                <button
-                  onClick={() => setStatus?.("signed_out")}
-                  className="flex items-center gap-2 rounded-xl bg-secondary/50 p-4 text-sm font-medium text-primary transition-colors hover:bg-secondary"
-                >
-                  <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10">
-                    <BookOpen size={20} />
-                  </div>
-                  <div className="text-left">
-                    <div className="font-bold">Ver o Método</div>
-                    <div className="text-xs text-muted-foreground">Revisar os 2 passos (Enraizar + Nutrir)</div>
-                  </div>
-                  <ChevronRight size={16} className="ml-auto opacity-50" />
-                </button>
-              </div>
-            )}
             {children}
           </div>
         </main>
@@ -1624,22 +1607,8 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
 
       <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <button
-          onClick={() => setTab("aprender")}
-          className="flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-left transition-all hover:bg-primary/10"
-        >
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/20 text-primary">
-            <BookOpen size={20} />
-          </div>
-          <div className="flex-1">
-            <div className="text-sm font-bold text-primary">Ver Método</div>
-            <div className="text-[10px] text-muted-foreground">Entenda o Enraizar + Nutrir</div>
-          </div>
-          <ChevronRight size={16} className="text-primary/40" />
-        </button>
-
-        <button
           onClick={() => setTab("resumo")}
-          className="flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-left transition-all hover:bg-primary/10"
+          className="flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-left transition-all hover:bg-primary/10 sm:col-span-2"
         >
           <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/20 text-primary">
             <FileText size={20} />
