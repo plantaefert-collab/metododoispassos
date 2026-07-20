@@ -126,7 +126,7 @@ function ProtocoloPage() {
         >
           <Loader2 size={40} strokeWidth={1.5} />
         </motion.div>
-        <div className="font-display text-xl text-[#173D32]">Preparando sua jornada…</div>
+        <div className="font-display text-xl text-[#173D32]">Preparando sua jornada...</div>
         <div className="mt-2 text-sm text-[#173D32]/60 font-medium uppercase tracking-widest">PlantaeFert Nutrição</div>
       </div>
     );

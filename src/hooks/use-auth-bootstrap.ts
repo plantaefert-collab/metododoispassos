@@ -62,12 +62,16 @@ export function useAuthBootstrap() {
 
   useEffect(() => {
     // Escuta mudanças na sessão
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const initSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
       bootstrap(session?.user?.id ?? null);
-    });
+    };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    initSession();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log("Auth event:", event);
       const newUser = session?.user ?? null;
       if (newUser?.id !== user?.id) {
         setUser(newUser);
