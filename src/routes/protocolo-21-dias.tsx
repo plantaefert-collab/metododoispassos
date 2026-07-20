@@ -100,19 +100,10 @@ function ProtocoloPage() {
   >(null);
   const [showReset, setShowReset] = useState(false);
 
-  // Lógica de navegação entre telas:
-  // 1. Se autenticado mas não completou o cadastro -> signup
-  // 2. Se autenticado e completou -> app
-  // 3. Se guestMode (apenas em memória) -> app (aba Aprender)
-  // 4. Caso contrário -> welcome
+  // Redireciona usuários autenticados para a tela principal (app) caso ainda não estejam lá
+  // Isso resolve o problema de ficar preso na tela de boas-vindas após o login.
   const hasUser = !!store.userId;
-  const activeScreen = screen ?? (
-    store.state.onboarded || guestMode 
-      ? "app" 
-      : hasUser 
-        ? "signup" 
-        : "welcome"
-  );
+  const activeScreen = screen ?? (store.state.onboarded || guestMode || hasUser ? "app" : "welcome");
 
   if (!store.hydrated) {
     return (
