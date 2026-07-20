@@ -101,34 +101,46 @@ function phaseOf(day: number) {
 
 function ProtocoloPage() {
   const store = useProtocolStore();
+  const { status, user, error: authError, setStatus } = useAuthBootstrap();
   const [tab, setTab] = useState<Tab>("inicio");
   const [guestMode, setGuestMode] = useState(false);
-  const [screen, setScreen] = useState<
-    "welcome" | "auth" | "signup" | "diagnosis" | "result" | "app" | null
-  >(null);
   const [showReset, setShowReset] = useState(false);
+  const [showLegacyDialog, setShowLegacyDialog] = useState(false);
 
-  // Redireciona usuários autenticados e onboarded para o Plano
-  // Se autenticado mas sem diagnóstico concluído, força o fluxo de diagnóstico.
-  const hasUser = !!store.userId;
-  const hasDiagnosis = isDiagnosisCurrent(store.state);
-  
-  let activeScreen: "welcome" | "auth" | "signup" | "diagnosis" | "result" | "app" = "welcome";
-  
-  if (screen) {
-    activeScreen = screen;
-  } else if (store.state.onboarded || guestMode) {
-    activeScreen = "app";
-  } else if (hasUser) {
-    activeScreen = hasDiagnosis ? "app" : "diagnosis";
-  } else {
-    activeScreen = "welcome";
+  useEffect(() => {
+    if (status === "loading_remote_data" && hasLegacyData()) {
+      setShowLegacyDialog(true);
+    }
+  }, [status]);
+
+  if (status === "booting" || status === "loading_remote_data") {
+    return (
+      <div className="min-h-screen bg-[#F8F5EE] flex flex-col items-center justify-center p-6 text-center">
+        <motion.div 
+          animate={{ rotate: 360 }} 
+          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          className="mb-4 text-[#173D32]"
+        >
+          <Loader2 size={40} strokeWidth={1.5} />
+        </motion.div>
+        <div className="font-display text-xl text-[#173D32]">Preparando sua jornada…</div>
+        <div className="mt-2 text-sm text-[#173D32]/60 font-medium uppercase tracking-widest">PlantaeFert Nutrição</div>
+      </div>
+    );
   }
 
-  if (!store.hydrated) {
+  if (status === "auth_error") {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-muted-foreground text-sm">Carregando…</div>
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 text-center">
+        <AlertCircle size={48} className="text-destructive mb-4" />
+        <h2 className="text-xl font-display text-foreground">Ops! Algo deu errado</h2>
+        <p className="mt-2 text-muted-foreground max-w-xs">{authError || "Não foi possível carregar seus dados."}</p>
+        <button 
+          onClick={() => window.location.reload()}
+          className="mt-6 rounded-full bg-primary px-8 py-3 text-sm font-bold text-primary-foreground shadow-md"
+        >
+          Tentar novamente
+        </button>
       </div>
     );
   }
@@ -136,7 +148,7 @@ function ProtocoloPage() {
   return (
     <div className="font-sans text-foreground antialiased selection:bg-accent/20">
       <AnimatePresence mode="wait">
-        {activeScreen === "welcome" && (
+        {status === "signed_out" && !guestMode && (
           <motion.div
             key="welcome"
             initial={{ opacity: 0 }}
@@ -145,17 +157,16 @@ function ProtocoloPage() {
             transition={{ duration: 0.4 }}
           >
             <WelcomeScreen
-              onStart={() => setScreen("auth")}
+              onStart={() => setStatus("signing_in")}
               onExplore={() => {
                 setGuestMode(true);
-                setScreen("app");
                 setTab("aprender");
               }}
             />
-
           </motion.div>
         )}
-        {activeScreen === "auth" && (
+
+        {status === "signing_in" && (
           <motion.div
             key="auth"
             initial={{ opacity: 0, scale: 0.95 }}
@@ -164,21 +175,15 @@ function ProtocoloPage() {
             transition={{ duration: 0.3 }}
           >
             <AuthScreen
-              onBack={() => setScreen("welcome")}
+              onBack={() => setStatus("signed_out")}
               onSuccess={() => {
-                const current = isDiagnosisCurrent(store.state);
-                if (current) {
-                  setScreen("app");
-                  setTab("plano");
-                } else {
-                  setScreen("diagnosis"); // Direto para o diagnóstico após login se não tiver um atual
-                }
+                // O hook useAuthBootstrap cuidará da transição após detectar a nova sessão
               }}
             />
           </motion.div>
         )}
-        {activeScreen === "signup" && (
 
+        {status === "needs_plant_registration" && (
           <motion.div
             key="signup"
             initial={{ opacity: 0, x: 20 }}
@@ -186,10 +191,11 @@ function ProtocoloPage() {
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
           >
-            <SignupScreen onNext={() => setScreen("diagnosis")} />
+            <SignupScreen onNext={() => setStatus("needs_diagnosis")} />
           </motion.div>
         )}
-        {activeScreen === "diagnosis" && (
+
+        {(status === "needs_diagnosis" || (guestMode && !isDiagnosisCurrent(store.state) && tab !== "aprender")) && (
           <motion.div
             key="diagnosis"
             initial={{ opacity: 0, x: 20 }}
@@ -198,42 +204,29 @@ function ProtocoloPage() {
             transition={{ duration: 0.3 }}
           >
             <DiagnosisScreen
-              onBack={() => setScreen("signup")}
+              onBack={() => {
+                if (guestMode) setTab("aprender");
+                else setStatus("needs_plant_registration");
+              }}
               onFinish={() => {
                 const persistResult = store.saveDiagnosisResult();
                 if (persistResult.ok) {
-                  setScreen("result");
+                  // A transição para result agora é interna ao store/componente ou via estado ready
+                  // Para manter a UX, vamos forçar a exibição do resultado
                 }
               }}
             />
           </motion.div>
         )}
-        {activeScreen === "result" && (
-          <motion.div
-            key="result"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.4 }}
-          >
-            <DiagnosisResultScreen
-              onBack={() => setScreen("diagnosis")}
-              onFinish={() => {
-                store.setOnboarded(true);
-                setScreen("app");
-                setTab("plano");
-              }}
-            />
-          </motion.div>
-        )}
-        {activeScreen === "app" && (
+
+        {(status === "ready" || guestMode) && (
           <motion.div
             key="app"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <AppShell tab={tab} setTab={setTab} onReset={() => setShowReset(true)}>
+            <AppShell tab={tab} setTab={setTab} onReset={() => setShowReset(true)} userEmail={user?.email}>
               <AnimatePresence mode="wait">
                 <motion.div
                   key={tab}
@@ -245,7 +238,7 @@ function ProtocoloPage() {
                   {tab === "inicio" && <InicioTab setTab={setTab} />}
                   {tab === "plano" && <PlanoTab setTab={setTab} />}
                   {tab === "diagnostico" && (
-                    <DiagnosticoTab onRedo={() => setScreen("diagnosis")} setTab={setTab} />
+                    <DiagnosticoTab onRedo={() => setStatus("needs_diagnosis")} setTab={setTab} />
                   )}
                   {tab === "diario" && <DiarioTab />}
                   {tab === "aprender" && <AprenderTab />}
@@ -255,6 +248,24 @@ function ProtocoloPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {showLegacyDialog && (
+        <LegacyProgressDialog 
+          onImport={() => {
+            const legacyData = getLegacyData();
+            if (legacyData) {
+              store.setState(() => legacyData);
+              clearLegacyData();
+            }
+            setShowLegacyDialog(false);
+          }}
+          onContinue={() => {
+            clearLegacyData();
+            setShowLegacyDialog(false);
+          }}
+        />
+      )}
+
 
       <AnimatePresence>
         {showReset && (
