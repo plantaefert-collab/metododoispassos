@@ -775,7 +775,8 @@ function SignupScreen({ actorId, onNext }: { actorId: string; onNext: () => void
                   updatePlant({
                     unknownSpecies: e.target.checked,
                     species: e.target.checked ? "" : plant.species,
-                  })
+                  }, actorId)
+
                 }
                 className="h-4 w-4 rounded border-input accent-primary"
               />
