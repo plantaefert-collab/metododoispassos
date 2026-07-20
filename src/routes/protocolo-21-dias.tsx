@@ -1275,8 +1275,9 @@ function InfoCard({
 
 /* ---------------- Início ---------------- */
 
-function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
+function InicioTab({ actorId, setTab }: { actorId: string; setTab: (t: Tab) => void }) {
   const { state, setCurrentDay } = useProtocolStore();
+
   const day = state.currentDay;
   const phase = phaseOf(day);
   const isApplicationDay = APPLICATION_DAYS.includes(day);
