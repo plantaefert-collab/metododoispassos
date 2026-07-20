@@ -357,6 +357,7 @@ function ProtocoloPage() {
                     await saveProgressRemote(user.id, defaultState);
                   }
                   setShowReset(false);
+                  setStatus("needs_diagnosis");
                 }}
               />
             </motion.div>
