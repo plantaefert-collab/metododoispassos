@@ -1498,7 +1498,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
               <div className="text-sm font-bold text-primary">Diagnóstico Concluído</div>
             </div>
             <button
-              onClick={() => setStatus("needs_diagnosis")}
+              onClick={() => setTab("diagnostico")}
               className="text-xs font-medium text-muted-foreground hover:text-accent hover:underline"
             >
               Refazer
