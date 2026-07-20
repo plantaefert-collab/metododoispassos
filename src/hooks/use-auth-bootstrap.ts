@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useProtocolStore, isDiagnosisCurrent } from "./protocol-store";
-import { AuthBootstrapStatus, UserProfile } from "./auth/types";
-import { loadFromCache, saveToCache } from "./protocol-cache";
-import { fetchUserProfile, fetchUserProgress } from "./protocol-cloud";
+import { useProtocolStore, isDiagnosisCurrent } from "@/lib/protocol-store";
+import { AuthBootstrapStatus } from "@/lib/auth/types";
+import { loadFromCache } from "@/lib/protocol-cache";
+import { fetchUserProfile, fetchUserProgress } from "@/lib/protocol-cloud";
 
 export function useAuthBootstrap() {
   const store = useProtocolStore();
@@ -37,19 +37,14 @@ export function useAuthBootstrap() {
       }
 
       // 2. Reconciliar com cache local
-      const localCached = loadFromCache(userId);
-      let finalState = store.state;
-
+      // const localCached = loadFromCache(userId);
+      
       if (progressRes.data) {
-        // Normalização e merge (usando a função já existente no store)
-        // Precisamos garantir que mergeRemoteProgressState funcione com o objeto do banco
-        // O store.mergeRemoteProgressState já existe em src/lib/protocol-store.ts
+        store.mergeRemoteProgressState(progressRes.data);
       }
 
-      // Por agora, para cumprir o protocolo de máquina de estados:
+      // 3. Determinar próximo estado
       const hasPlant = profileRes.data?.plant_name && profileRes.data.plant_name !== "Minha Orquídea";
-      // No banco profiles, o default é 'Minha Orquídea'. Se mudou, assumimos cadastro feito.
-      
       const diagnosisReady = isDiagnosisCurrent(store.state);
 
       if (!hasPlant && !store.state.plant.name) {
