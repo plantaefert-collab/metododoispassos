@@ -25,6 +25,7 @@
  * Implementar um teste automatizado no Playwright para confirmar que, após salvar a orquídea, eu sempre avanço para a tela Início e recebo status 2xx no PATCH /protocol_progress.
  * Proceder com a criação do script de teste em /tmp/browser/ assim que a sessão estiver disponível.
  * Implementar um teste automatizado no Playwright para confirmar que, após salvar a orquídea, eu sempre avanço para a tela Início e recebo status 2xx no PATCH /protocol_progress.
+ * Implemente um teste automatizado no Playwright para confirmar que, após salvar a orquídea, eu sempre avanço para a tela Início e recebo status 2xx no PATCH /protocol_progress.
  */
 import { createFileRoute, redirect } from "@tanstack/react-router";
 
