@@ -1767,11 +1767,17 @@ type PlanoTabProps = {
 
 function PlanoTab({ actorId, setTab }: PlanoTabProps) {
   const containerRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
   
   useEffect(() => {
     // Ao entrar na aba plano via redirecionamento (ou tab change), foca no topo
     if (containerRef.current) {
       containerRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    
+    // Melhora a acessibilidade movendo o foco para o título da aba
+    if (titleRef.current) {
+      titleRef.current.focus();
     }
   }, []);
 
