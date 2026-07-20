@@ -1603,6 +1603,7 @@ function DetailAccordions({
   personalizedTracking: string[];
 }) {
   const sections: Array<{ id: string; title: string; content: ReactNode }> = [];
+  const observeTitle = (typeof window !== "undefined" && meta && "observeTitle" in (meta as any)) ? (meta as any).observeTitle : undefined;
 
   if (howTo && howTo.length > 0) {
     sections.push({
