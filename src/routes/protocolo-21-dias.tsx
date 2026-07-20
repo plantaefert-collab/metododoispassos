@@ -1112,7 +1112,11 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
 
 /* ---------------- Plano ---------------- */
 
-function PlanoTab({ setTab }: { setTab: (t: Tab) => void }) {
+type PlanoTabProps = {
+  setTab: (tab: Tab) => void;
+};
+
+function PlanoTab({ setTab }: PlanoTabProps) {
   const {
     state,
     setCurrentDay,
