@@ -1945,11 +1945,12 @@ function PlanoTab({ actorId, setTab, onPreviewDay, setStatus }: PlanoTabProps) {
           onUpdate={(patch) => updateDay(day, patch, actorId)}
           diagnosisFresh={diagnosisFresh}
           trackingPoints={trackingPoints}
+          setStatus={setStatus}
         />
       )}
 
       {meta.stages && meta.stages.length > 0 && (
-        <StagesList day={day} meta={meta} onOpenMethod={() => setShowMethod(true)} />
+        <StagesList day={day} meta={meta} onOpenMethod={() => setShowMethod(true)} setStatus={setStatus} />
       )}
 
       {isApplication && day !== 1 && (
@@ -2267,6 +2268,7 @@ function DayContentCard({
   onUpdate: _onUpdate,
   diagnosisFresh,
   trackingPoints,
+  setStatus,
 }: {
   meta: ProtocolDay;
   entry: { checklist: Record<string, boolean>; note: string; completed: boolean };
@@ -2274,6 +2276,7 @@ function DayContentCard({
   onUpdate: (patch: { note?: string }) => void;
   diagnosisFresh: boolean;
   trackingPoints: string[];
+  setStatus?: (status: AuthBootstrapStatus) => void;
 }) {
   void entry;
   const tracking = diagnosisFresh ? trackingPoints.slice(0, 3) : [];
@@ -2306,6 +2309,7 @@ function DayContentCard({
           attention={meta.attention}
           personalizedTracking={meta.personalizedContext ? tracking : []}
           customObserveTitle={meta.observeTitle}
+          setStatus={setStatus}
         />
       </div>
     </div>
@@ -2316,10 +2320,12 @@ function StagesList({
   day,
   meta,
   onOpenMethod,
+  setStatus,
 }: {
   day: number;
   meta: ProtocolDay;
   onOpenMethod: () => void;
+  setStatus?: (status: AuthBootstrapStatus) => void;
 }) {
   const stages = meta.stages ?? [];
   return (
@@ -2348,6 +2354,7 @@ function StagesList({
               <StageBody
                 stage={stage}
                 onOpenMethod={isApplicationStage ? onOpenMethod : undefined}
+                setStatus={setStatus}
               />
             </AccordionContent>
           </AccordionItem>
@@ -2357,7 +2364,7 @@ function StagesList({
   );
 }
 
-function StageBody({ stage, onOpenMethod }: { stage: DayStage; onOpenMethod?: () => void }) {
+function StageBody({ stage, onOpenMethod, setStatus }: { stage: DayStage; onOpenMethod?: () => void; setStatus?: (status: AuthBootstrapStatus) => void }) {
   return (
     <div className="space-y-3 text-sm text-foreground/85">
       {stage.objective && <p className="text-sm text-muted-foreground">{stage.objective}</p>}
@@ -2381,6 +2388,7 @@ function StageBody({ stage, onOpenMethod }: { stage: DayStage; onOpenMethod?: ()
         attention={stage.attention}
         personalizedTracking={[]}
         customObserveTitle={(stage as any).observeTitle as string | undefined}
+        setStatus={setStatus}
       />
       {onOpenMethod && (
         <button
@@ -2402,6 +2410,7 @@ function DetailAccordions({
   attention,
   personalizedTracking,
   customObserveTitle,
+  setStatus,
 }: {
   howTo?: string[];
   observe?: string[];
@@ -2410,6 +2419,7 @@ function DetailAccordions({
   attention?: string[];
   personalizedTracking: string[];
   customObserveTitle?: string;
+  setStatus?: (s: AuthBootstrapStatus) => void;
 }) {
   const sections: Array<{ id: string; title: string; content: ReactNode }> = [];
 
@@ -2438,7 +2448,23 @@ function DetailAccordions({
     sections.push({
       id: "registre",
       title: "Registre",
-      content: <p className="text-sm text-foreground/85">{registerText}</p>,
+      content: (
+        <div className="space-y-3">
+          <p className="text-sm text-foreground/85">{registerText}</p>
+          {setStatus && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setStatus("needs_diagnosis");
+              }}
+              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary/10 px-4 py-2.5 text-[12px] font-bold text-primary transition-all hover:bg-primary/20 active:scale-[0.98]"
+            >
+              <Sprout size={14} />
+              Cadastre sua Orquídea
+            </button>
+          )}
+        </div>
+      ),
     });
   }
   if (attention && attention.length > 0) {
