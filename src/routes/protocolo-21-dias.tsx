@@ -1483,40 +1483,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           />
         </div>
       </div>
-          <h2 className="mt-2 text-xl font-display text-primary">
-            Hoje é dia de aplicar o Método de 2 Passos
-          </h2>
-          <p className="mt-1 text-sm text-primary/80">
-            Enraizar primeiro, depois nutrir. Prefira horário fresco e evite sol forte.
-          </p>
-          <div className="mt-4 grid grid-cols-2 gap-2">
-            <button
-              onClick={() => setTab("plano")}
-              className="rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
-            >
-              Ver tarefa
-            </button>
-            <button
-              onClick={() => setTab("plano")}
-              className="rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground"
-            >
-              Abrir protocolo
-            </button>
-            <button
-              onClick={() => setTab("diario")}
-              className="rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground"
-            >
-              Adicionar foto
-            </button>
-            <button
-              onClick={() => setTab("plano")}
-              className="rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground"
-            >
-              Ver tarefa do dia
-            </button>
-          </div>
-        </div>
-      ) : (
+      {!isApplicationDay && (
         <div className="rounded-2xl border border-border bg-card p-5">
           <div className="text-xs font-bold uppercase tracking-wider text-primary">
             Tarefa do dia
