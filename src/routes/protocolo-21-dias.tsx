@@ -1870,7 +1870,13 @@ function MethodDrawer({ day, onClose }: { day: number; onClose: () => void }) {
 
 /* ---------------- Diagnóstico Tab ---------------- */
 
-function DiagnosticoTab({ onRedo }: { onRedo: () => void }) {
+function DiagnosticoTab({
+  onRedo,
+  setTab,
+}: {
+  onRedo: () => void;
+  setTab: (tab: Tab) => void;
+}) {
   const { state } = useProtocolStore();
   const items: Array<{ key: DiagnosisCategory; label: string; values: string[] }> = (
     Object.keys(CATEGORY_LABEL) as DiagnosisCategory[]
@@ -1917,12 +1923,33 @@ function DiagnosticoTab({ onRedo }: { onRedo: () => void }) {
 
       {current && result && <ResultBlocks result={result} />}
 
-      <button
-        onClick={onRedo}
-        className="w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground"
-      >
-        Refazer diagnóstico
-      </button>
+      <div className="space-y-3">
+        <button
+          onClick={onRedo}
+          className="w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-all active:scale-[0.98]"
+        >
+          Refazer diagnóstico
+        </button>
+
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={() => setTab("plano")}
+            className="flex items-center justify-center gap-1.5 rounded-2xl border border-accent/20 bg-accent/5 py-3 text-[12px] font-bold text-accent transition-colors hover:bg-accent/10"
+          >
+            <CalendarCheck size={14} />
+            Ver meu plano
+          </button>
+          <button
+            onClick={() => {
+              setTab("plano");
+            }}
+            className="flex items-center justify-center gap-1.5 rounded-2xl border border-primary/20 bg-primary/5 py-3 text-[12px] font-bold text-primary transition-colors hover:bg-primary/10"
+          >
+            <Sparkles size={14} />
+            Ver tarefa do dia
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
