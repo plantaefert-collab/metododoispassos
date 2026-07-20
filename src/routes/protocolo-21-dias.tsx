@@ -840,7 +840,10 @@ function SignupScreen({
           <Field label="Nome da planta *">
             <input
               value={plant.name}
-              onChange={(e) => updatePlant({ name: e.target.value }, actorId)}
+              onChange={(e) => {
+                const name = e.target.value;
+                updatePlant({ name }, actorId);
+              }}
               placeholder="Ex.: Minha Phalaenopsis"
               className="w-full rounded-lg border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-1 focus:ring-primary"
             />
@@ -849,7 +852,10 @@ function SignupScreen({
           <Field label="Espécie (opcional)">
             <input
               value={plant.species}
-              onChange={(e) => updatePlant({ species: e.target.value, unknownSpecies: false }, actorId)}
+              onChange={(e) => {
+                const species = e.target.value;
+                updatePlant({ species, unknownSpecies: false }, actorId);
+              }}
               disabled={plant.unknownSpecies}
               placeholder="Ex.: Phalaenopsis, Cattleya…"
               className="w-full rounded-lg border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
@@ -858,13 +864,13 @@ function SignupScreen({
               <input
                 type="checkbox"
                 checked={plant.unknownSpecies}
-                onChange={(e) =>
+                onChange={(e) => {
+                  const unknownSpecies = e.target.checked;
                   updatePlant({
-                    unknownSpecies: e.target.checked,
-                    species: e.target.checked ? "" : plant.species,
-                  }, actorId)
-
-                }
+                    unknownSpecies,
+                    species: unknownSpecies ? "" : plant.species,
+                  }, actorId);
+                }}
                 className="h-4 w-4 rounded border-input accent-primary"
               />
               Não sei a espécie
