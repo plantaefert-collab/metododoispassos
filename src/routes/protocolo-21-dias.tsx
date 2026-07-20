@@ -209,18 +209,8 @@ function ProtocoloPage() {
           </motion.div>
         )}
 
-        {status === "loading_remote_data" && (
-          <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#F8F5EE]/90 backdrop-blur-sm">
-            <motion.div 
-              animate={{ rotate: 360 }} 
-              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-              className="mb-4 text-[#173D32]"
-            >
-              <Loader2 size={40} strokeWidth={1.5} />
-            </motion.div>
-            <div className="font-display text-xl text-[#173D32]">Sincronizando seus dados...</div>
-          </div>
-        )}
+        {/* Overlay "Sincronizando..." é gerenciado pelo estado de carregamento
+            inicial (booting/loading_remote_data) no early return acima. */}
 
         {status === "needs_plant_registration" && (
           <motion.div
