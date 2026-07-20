@@ -50,7 +50,7 @@ export async function saveProgressRemote(userId: string, state: ProtocolState): 
       diagnosis_status: state.diagnosisStatus,
       answers_version: state.answersVersion,
       updated_at: new Date().toISOString(),
-    });
+    }, { onConflict: "user_id" });
 
   return { error };
 }
