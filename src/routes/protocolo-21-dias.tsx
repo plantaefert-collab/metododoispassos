@@ -2218,7 +2218,7 @@ function DiagnosticoTab({
         </div>
       ))}
 
-      {current && result && <ResultBlocks result={result} />}
+      {result && <ResultBlocks result={result} />}
 
       <div className="space-y-3">
         <button
