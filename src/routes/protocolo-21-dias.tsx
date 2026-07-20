@@ -166,9 +166,9 @@ function ProtocoloPage() {
       {tab === "aprender" && <AprenderTab />}
       {showReset && (
         <ConfirmModal
-          title="Reiniciar demonstração?"
+          title="Reiniciar meu plano?"
           description="Isso apagará cadastro, diagnóstico, checklists, fotos e anotações salvas no seu navegador."
-          confirmLabel="Reiniciar"
+          confirmLabel="Reiniciar meu plano"
           onCancel={() => setShowReset(false)}
           onConfirm={() => {
             store.reset();
