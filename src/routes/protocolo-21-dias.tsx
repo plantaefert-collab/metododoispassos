@@ -1758,7 +1758,14 @@ function PlanoTab({ actorId, setTab }: PlanoTabProps) {
         </div>
         <div className="relative z-10">
           <div className="text-xs font-bold uppercase tracking-wider text-accent">Meu plano</div>
-          <h1 className="text-2xl font-display tracking-tight text-primary">Plano de 21 dias</h1>
+          <motion.h1 
+            initial={{ opacity: 0.8 }}
+            animate={{ opacity: 1, scale: [1, 1.02, 1] }}
+            transition={{ duration: 0.5 }}
+            className="text-2xl font-display tracking-tight text-primary"
+          >
+            Plano de 21 dias
+          </motion.h1>
         </div>
       </div>
 
