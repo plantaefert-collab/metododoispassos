@@ -2355,6 +2355,7 @@ function StagesList({
                 stage={stage}
                 onOpenMethod={isApplicationStage ? onOpenMethod : undefined}
                 setStatus={setStatus}
+                day={day}
               />
             </AccordionContent>
           </AccordionItem>
@@ -2364,7 +2365,7 @@ function StagesList({
   );
 }
 
-function StageBody({ stage, onOpenMethod, setStatus }: { stage: DayStage; onOpenMethod?: () => void; setStatus?: (status: AuthBootstrapStatus) => void }) {
+function StageBody({ stage, onOpenMethod, setStatus, day }: { stage: DayStage; onOpenMethod?: () => void; setStatus?: (status: AuthBootstrapStatus) => void; day?: number }) {
   return (
     <div className="space-y-3 text-sm text-foreground/85">
       {stage.objective && <p className="text-sm text-muted-foreground">{stage.objective}</p>}
@@ -2388,7 +2389,7 @@ function StageBody({ stage, onOpenMethod, setStatus }: { stage: DayStage; onOpen
         attention={stage.attention}
         personalizedTracking={[]}
         customObserveTitle={(stage as any).observeTitle as string | undefined}
-        setStatus={setStatus}
+        setStatus={day === 1 && stage.id === "etapa-1-registrar" ? setStatus : undefined}
       />
       {onOpenMethod && (
         <button
@@ -2452,16 +2453,18 @@ function DetailAccordions({
         <div className="space-y-3">
           <p className="text-sm text-foreground/85">{registerText}</p>
           {setStatus && (
-            <button
-              onClick={(e) => {
-                e.stopPropagation();
-                setStatus("needs_diagnosis");
-              }}
-              className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary/10 px-4 py-2.5 text-[12px] font-bold text-primary transition-all hover:bg-primary/20 active:scale-[0.98]"
-            >
-              <Sprout size={14} />
-              Cadastre sua Orquídea
-            </button>
+            <div className="pt-1">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setStatus("needs_diagnosis");
+                }}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary/10 px-4 py-2.5 text-[12px] font-bold text-primary transition-all hover:bg-primary/20 active:scale-[0.98]"
+              >
+                <Sprout size={14} />
+                Cadastre sua Orquídea
+              </button>
+            </div>
           )}
         </div>
       ),
