@@ -2388,6 +2388,7 @@ function StageBody({ stage, onOpenMethod, setStatus }: { stage: DayStage; onOpen
         attention={stage.attention}
         personalizedTracking={[]}
         customObserveTitle={(stage as any).observeTitle as string | undefined}
+        setStatus={setStatus}
       />
       {onOpenMethod && (
         <button
