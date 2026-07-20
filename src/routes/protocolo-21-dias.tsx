@@ -316,25 +316,25 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
   return (
     <div
       className="min-h-screen font-sans"
-      style={{ backgroundColor: "#F8F5EE", color: "#26352E" }}
+      style={{ backgroundColor: "var(--color-plantae-cream)", color: "var(--color-plantae-ink)" }}
     >
       <div
         className="mx-auto flex min-h-screen w-full max-w-[440px] flex-col px-5 pb-8 pt-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-[28px] sm:px-6 sm:shadow-[0_20px_70px_-40px_rgba(23,61,50,0.35)]"
-        style={{ backgroundColor: "#F8F5EE" }}
+        style={{ backgroundColor: "var(--color-plantae-cream)" }}
       >
         {/* Header */}
         <header className="flex items-center gap-2.5">
           <div
             className="grid h-9 w-9 place-items-center rounded-full"
-            style={{ backgroundColor: "#173D32", color: "#F8F5EE" }}
+            style={{ backgroundColor: "var(--color-plantae-green)", color: "var(--color-plantae-cream)" }}
           >
             <Leaf size={18} strokeWidth={2} />
           </div>
           <div className="leading-tight">
-            <div className="text-[13px] font-semibold tracking-tight" style={{ color: "#173D32" }}>
+            <div className="text-[13px] font-semibold tracking-tight" style={{ color: "var(--color-plantae-green)" }}>
               PlantaeFert
             </div>
-            <div className="text-[10px] uppercase tracking-[0.14em]" style={{ color: "#66736C" }}>
+            <div className="text-[10px] uppercase tracking-[0.14em]" style={{ color: "var(--color-plantae-mute)" }}>
               Nutrição Vegetal
             </div>
           </div>
@@ -343,7 +343,7 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
         {/* Photo */}
         <figure
           className="relative mt-5 overflow-hidden rounded-[22px]"
-          style={{ backgroundColor: "#EEE8F2" }}
+          style={{ backgroundColor: "var(--color-plantae-lilac)" }}
         >
           <img
             src={welcomeOrchid}
@@ -354,7 +354,7 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
           />
           <span
             className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em]"
-            style={{ backgroundColor: "#F3DCE7", color: "#B72D72" }}
+            style={{ backgroundColor: "var(--color-plantae-rose)", color: "var(--color-plantae-magenta)" }}
           >
             <Sparkles size={11} /> Método de 2 passos
           </span>
@@ -363,24 +363,24 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
         {/* Title */}
         <h1
           className="mt-6 font-display leading-[1.02] tracking-tight"
-          style={{ color: "#173D32" }}
+          style={{ color: "var(--color-plantae-green)" }}
         >
-          <span className="block text-[22px] font-normal" style={{ color: "#58705D" }}>
+          <span className="block text-[22px] font-normal" style={{ color: "var(--color-plantae-mute)" }}>
             Guia Prático
           </span>
           <span className="mt-1 block text-[36px] leading-[1.05] font-normal min-[390px]:text-[40px] sm:text-[44px] [word-spacing:0.02em]">
             <span className="whitespace-nowrap">Orquídeas</span>{" "}
-            <em className="not-italic whitespace-nowrap" style={{ color: "#B72D72" }}>
+            <em className="not-italic whitespace-nowrap" style={{ color: "var(--color-plantae-magenta)" }}>
               Floridas
             </em>
           </span>
         </h1>
 
         {/* Promise */}
-        <p className="mt-4 text-[15px] font-semibold" style={{ color: "#173D32" }}>
+        <p className="mt-4 text-[15px] font-semibold" style={{ color: "var(--color-plantae-green)" }}>
           Seu plano guiado de 21 dias
         </p>
-        <p className="mt-1.5 text-[14px] leading-relaxed" style={{ color: "#66736C" }}>
+        <p className="mt-1.5 text-[14px] leading-relaxed" style={{ color: "var(--color-plantae-mute)" }}>
           Observe sua orquídea, fortaleça a base e acompanhe os sinais da planta com uma rotina
           simples.
         </p>
@@ -392,17 +392,17 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
             label="Enraizar"
             support="Fortalecer a base"
             text="Cuidar das raízes e preparar a planta para aproveitar melhor a rotina."
-            bg="#DCEBDD"
-            ink="#173D32"
-            badge="#173D32"
-            badgeInk="#F8F5EE"
+            bg="var(--color-plantae-lilac)"
+            ink="var(--color-plantae-green)"
+            badge="var(--color-plantae-green)"
+            badgeInk="var(--color-plantae-cream)"
             icon={<Sprout size={18} strokeWidth={2} />}
           />
           <div
             className="flex items-center gap-2 pl-6 text-[10px] uppercase tracking-[0.2em]"
-            style={{ color: "#66736C" }}
+            style={{ color: "var(--color-plantae-mute)" }}
           >
-            <span className="h-px w-6" style={{ backgroundColor: "#66736C" }} />
+            <span className="h-px w-6" style={{ backgroundColor: "var(--color-plantae-mute)" }} />
             depois
           </div>
           <StepCard
@@ -410,10 +410,10 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
             label="Nutrir"
             support="Apoiar o desenvolvimento"
             text="Oferecer suporte nutricional para o vigor e os próximos ciclos da planta."
-            bg="#EEE8F2"
-            ink="#173D32"
-            badge="#B72D72"
-            badgeInk="#F8F5EE"
+            bg="var(--color-plantae-lilac)"
+            ink="var(--color-plantae-green)"
+            badge="var(--color-plantae-magenta)"
+            badgeInk="var(--color-plantae-cream)"
             icon={<Leaf size={18} strokeWidth={2} />}
           />
         </div>
@@ -423,22 +423,22 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
           className="mt-5 rounded-2xl px-4 py-3"
           style={{
             backgroundColor: "rgba(255,255,255,0.6)",
-            color: "#26352E",
+            color: "var(--color-plantae-ink)",
             border: "1px solid rgba(23,61,50,0.08)",
           }}
         >
           <div className="flex items-center gap-2">
-            <Stethoscope size={13} style={{ color: "#173D32" }} />
-            <CalendarCheck size={13} style={{ color: "#173D32" }} />
-            <Camera size={13} style={{ color: "#173D32" }} />
+            <Stethoscope size={13} style={{ color: "var(--color-plantae-green)" }} />
+            <CalendarCheck size={13} style={{ color: "var(--color-plantae-green)" }} />
+            <Camera size={13} style={{ color: "var(--color-plantae-green)" }} />
             <span
               className="ml-1 text-[12px] font-semibold uppercase tracking-[0.09em]"
-              style={{ color: "#173D32" }}
+              style={{ color: "var(--color-plantae-green)" }}
             >
               Diagnóstico · Tarefas · Fotos
             </span>
           </div>
-          <p className="mt-1.5 text-[14px] leading-relaxed" style={{ color: "#66736C" }}>
+          <p className="mt-1.5 text-[14px] leading-relaxed" style={{ color: "var(--color-plantae-mute)" }}>
             Acompanhe tudo em um só lugar.
           </p>
         </div>
@@ -448,14 +448,14 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
           <button
             onClick={onStart}
             className="rounded-full px-6 py-4 text-[15px] font-semibold uppercase tracking-[0.06em] transition-transform active:scale-[0.98]"
-            style={{ backgroundColor: "#173D32", color: "#F8F5EE" }}
+            style={{ backgroundColor: "var(--color-plantae-green)", color: "var(--color-plantae-cream)" }}
           >
             Começar meu plano
           </button>
           <button
             onClick={onExplore}
             className="rounded-full px-6 py-2.5 text-[13px] font-medium underline-offset-4 hover:underline"
-            style={{ color: "#58705D" }}
+            style={{ color: "var(--color-plantae-mute)" }}
           >
             Explorar o conteúdo
           </button>
@@ -510,7 +510,7 @@ function StepCard({
           </p>
           <p
             className="mt-1.5 text-[14.5px] leading-[1.55]"
-            style={{ color: "#26352E", opacity: 0.85 }}
+            style={{ color: "var(--color-plantae-ink)", opacity: 0.85 }}
           >
             {text}
           </p>
@@ -2328,11 +2328,11 @@ function Drawer({
 }) {
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-[#173D32]/40 backdrop-blur-md sm:items-center"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-[var(--color-plantae-green)]/40 backdrop-blur-md sm:items-center"
       onClick={onClose}
     >
       <div
-        className="max-h-[90vh] w-full max-w-[440px] overflow-hidden rounded-t-[32px] border-t border-white/20 bg-[#F8F5EE] shadow-2xl animate-in slide-in-from-bottom duration-300 sm:rounded-[32px] sm:border"
+        className="max-h-[90vh] w-full max-w-[440px] overflow-hidden rounded-t-[32px] border-t border-white/20 bg-[var(--color-plantae-cream)] shadow-2xl animate-in slide-in-from-bottom duration-300 sm:rounded-[32px] sm:border"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Barra de arraste visual para mobile */}
@@ -2342,7 +2342,7 @@ function Drawer({
           <div className="mb-6 flex items-start justify-between">
             <div className="flex items-center gap-4">
               {icon && (
-                <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[#DCEBDD] text-[#173D32]">
+                <div className="grid h-12 w-12 place-items-center rounded-2xl bg-[var(--color-plantae-lilac)] text-[var(--color-plantae-green)]">
                   {icon}
                 </div>
               )}
@@ -2350,12 +2350,12 @@ function Drawer({
                 <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-accent">
                   Biblioteca
                 </div>
-                <div className="font-display text-2xl font-normal text-[#173D32]">{title}</div>
+                <div className="font-display text-2xl font-normal text-[var(--color-plantae-green)]">{title}</div>
               </div>
             </div>
             <button
               onClick={onClose}
-              className="grid h-10 w-10 place-items-center rounded-full bg-white/50 text-[#173D32] transition-colors hover:bg-white"
+              className="grid h-10 w-10 place-items-center rounded-full bg-white/50 text-[var(--color-plantae-green)] transition-colors hover:bg-white"
             >
               <X size={20} />
             </button>
@@ -2368,7 +2368,7 @@ function Drawer({
 
           <button
             onClick={onClose}
-            className="mt-8 w-full rounded-full bg-[#173D32] py-4 text-sm font-semibold uppercase tracking-wider text-[#F8F5EE] transition-transform active:scale-[0.98]"
+            className="mt-8 w-full rounded-full bg-[var(--color-plantae-green)] py-4 text-sm font-semibold uppercase tracking-wider text-[var(--color-plantae-cream)] transition-transform active:scale-[0.98]"
           >
             Entendido
           </button>
