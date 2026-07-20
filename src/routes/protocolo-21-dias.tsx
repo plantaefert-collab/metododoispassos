@@ -1945,11 +1945,12 @@ function PlanoTab({ actorId, setTab, onPreviewDay, setStatus }: PlanoTabProps) {
           onUpdate={(patch) => updateDay(day, patch, actorId)}
           diagnosisFresh={diagnosisFresh}
           trackingPoints={trackingPoints}
+          setStatus={setStatus}
         />
       )}
 
       {meta.stages && meta.stages.length > 0 && (
-        <StagesList day={day} meta={meta} onOpenMethod={() => setShowMethod(true)} />
+        <StagesList day={day} meta={meta} onOpenMethod={() => setShowMethod(true)} setStatus={setStatus} />
       )}
 
       {isApplication && day !== 1 && (
