@@ -1135,7 +1135,7 @@ function DiagnosisResultScreen({ onBack, onFinish }: { onBack: () => void; onFin
   const { state } = useProtocolStore();
   const observations = totalObservations(state.diagnosis);
   const current = isDiagnosisCurrent(state);
-  const result = current ? state.diagnosisResult : null;
+  const result = state.diagnosisResult;
 
   return (
     <div className="min-h-screen bg-background">
