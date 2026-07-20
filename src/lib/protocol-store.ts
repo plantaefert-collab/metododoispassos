@@ -1,4 +1,6 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { supabase } from "@/integrations/supabase/client";
+
 import {
   computeDiagnosisResult,
   type DiagnosisAnswers,
@@ -713,22 +715,118 @@ function newId(): string {
 export function useProtocolStore() {
   const [, force] = useState(0);
   const [hydrated, setHydrated] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+  const loadingRef = useRef(false);
 
+  // Initialize and Sync with Cloud
   useEffect(() => {
     ensureStoreInitialized();
     setHydrated(true);
+
+    const checkUser = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUserId(session?.user?.id ?? null);
+      
+      if (session?.user?.id) {
+        await syncFromCloud(session.user.id);
+      }
+    };
+
+    checkUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUserId(session?.user?.id ?? null);
+      if (session?.user?.id) {
+        syncFromCloud(session.user.id);
+      }
+    });
+
     const unsub = subscribe(() => force((n) => n + 1));
-    return unsub;
+    return () => {
+      unsub();
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const syncFromCloud = async (uid: string) => {
+    if (loadingRef.current) return;
+    loadingRef.current = true;
+    try {
+      // Sync Profile
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", uid)
+        .maybeSingle();
+
+      // Sync Progress
+      const { data: progress } = await supabase
+        .from("protocol_progress")
+        .select("*")
+        .eq("user_id", uid)
+        .maybeSingle();
+
+      if (profile || progress) {
+        setState((s) => {
+          const next = { ...s };
+          if (profile) {
+            next.plant = {
+              ...next.plant,
+              name: profile.plant_name ?? next.plant.name,
+              full_name: profile.full_name ?? "",
+            } as any;
+            next.onboarded = profile.onboarded ?? next.onboarded;
+          }
+          if (progress) {
+            next.currentDay = progress.current_day;
+            next.days = progress.completed_tasks as any;
+            next.applications = progress.applications as any;
+            next.diagnosisResult = progress.diagnosis_result as any;
+          }
+          return next;
+        });
+      }
+    } finally {
+      loadingRef.current = false;
+    }
+  };
+
+  const syncToCloud = useCallback(async (uid: string, s: ProtocolState) => {
+    // Sync Profile
+    await supabase.from("profiles").upsert({
+      id: uid,
+      plant_name: s.plant.name,
+      onboarded: s.onboarded,
+      updated_at: new Date().toISOString(),
+    });
+
+    // Sync Progress
+    await supabase.from("protocol_progress").upsert({
+      user_id: uid,
+      current_day: s.currentDay,
+      completed_tasks: s.days as any,
+      applications: s.applications as any,
+      diagnosis_result: s.diagnosisResult as any,
+      updated_at: new Date().toISOString(),
+    });
   }, []);
 
   const state = hydrated ? getState() : defaultState;
 
+  const wrapSetState = useCallback((updater: (s: ProtocolState) => ProtocolState) => {
+    const result = setState(updater);
+    if (result.ok && userId) {
+      syncToCloud(userId, getState());
+    }
+    return result;
+  }, [userId, syncToCloud]);
+
   const updatePlant = useCallback((patch: Partial<PlantInfo>) => {
-    setState((s) => ({ ...s, plant: { ...s.plant, ...patch } }));
-  }, []);
+    wrapSetState((s) => ({ ...s, plant: { ...s.plant, ...patch } }));
+  }, [wrapSetState]);
 
   const toggleDiagnosis = useCallback((cat: DiagnosisCategory, value: string) => {
-    setState((s) => {
+    wrapSetState((s) => {
       const arr = s.diagnosis[cat];
       const next = arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value];
       const nextStatus: DiagnosisStatus =
@@ -740,39 +838,39 @@ export function useProtocolStore() {
         diagnosisStatus: nextStatus,
       };
     });
-  }, []);
+  }, [wrapSetState]);
 
   const saveDiagnosisResult = useCallback(() => {
-    return setState((s) => {
+    return wrapSetState((s) => {
       const result = computeDiagnosisResult(s.diagnosis, s.answersVersion);
       return { ...s, diagnosisResult: result, diagnosisStatus: "fresh" };
     });
-  }, []);
+  }, [wrapSetState]);
 
   const updateDay = useCallback((day: number, patch: Partial<DayEntry>) => {
-    setState((s) => {
+    wrapSetState((s) => {
       const existing: DayEntry = s.days[day] ?? { checklist: {}, note: "", completed: false };
       return { ...s, days: { ...s.days, [day]: { ...existing, ...patch } } };
     });
-  }, []);
+  }, [wrapSetState]);
 
   const toggleChecklist = useCallback((day: number, key: string) => {
-    setState((s) => {
+    wrapSetState((s) => {
       const existing: DayEntry = s.days[day] ?? { checklist: {}, note: "", completed: false };
       const checklist = { ...existing.checklist, [key]: !existing.checklist[key] };
       return { ...s, days: { ...s.days, [day]: { ...existing, checklist } } };
     });
-  }, []);
+  }, [wrapSetState]);
 
   const toggleDayCompleted = useCallback((day: number) => {
-    setState((s) => {
+    wrapSetState((s) => {
       const existing: DayEntry = s.days[day] ?? { checklist: {}, note: "", completed: false };
       return { ...s, days: { ...s.days, [day]: { ...existing, completed: !existing.completed } } };
     });
-  }, []);
+  }, [wrapSetState]);
 
   const registerApplication = useCallback((day: number) => {
-    setState((s) => {
+    wrapSetState((s) => {
       const record: ApplicationRecord = { id: newId(), day, timestamp: new Date().toISOString() };
       const existing: DayEntry = s.days[day] ?? { checklist: {}, note: "", completed: false };
       return {
@@ -781,19 +879,19 @@ export function useProtocolStore() {
         days: { ...s.days, [day]: { ...existing, applicationDone: true } },
       };
     });
-  }, []);
+  }, [wrapSetState]);
 
   const setCurrentDay = useCallback((day: number) => {
-    setState((s) => ({ ...s, currentDay: day }));
-  }, []);
+    wrapSetState((s) => ({ ...s, currentDay: day }));
+  }, [wrapSetState]);
 
   const setOnboarded = useCallback((v: boolean) => {
-    setState((s) => ({ ...s, onboarded: v }));
-  }, []);
+    wrapSetState((s) => ({ ...s, onboarded: v }));
+  }, [wrapSetState]);
 
   const updateFinalEval = useCallback((patch: Partial<FinalEvaluation>) => {
-    setState((s) => ({ ...s, finalEval: { ...s.finalEval, ...patch } }));
-  }, []);
+    wrapSetState((s) => ({ ...s, finalEval: { ...s.finalEval, ...patch } }));
+  }, [wrapSetState]);
 
   const reset = useCallback(() => {
     try {
@@ -813,6 +911,7 @@ export function useProtocolStore() {
   return {
     state,
     hydrated,
+    userId,
     updatePlant,
     toggleDiagnosis,
     saveDiagnosisResult,
@@ -827,3 +926,4 @@ export function useProtocolStore() {
     clearSaveError: clearSaveErrorCb,
   };
 }
+
