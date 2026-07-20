@@ -2132,7 +2132,7 @@ function DayHeaderCard({ meta }: { meta: ProtocolDay }) {
           {phase.range}
         </div>
         <h2 className="mt-1 text-lg font-display text-primary">
-          Dia {meta.day} — {meta.title}
+          Dia <span className="text-2xl text-accent">{meta.day}</span> — {meta.title}
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">{meta.objective}</p>
         <p className="mt-2 text-sm text-foreground/85">{meta.mainAction}</p>
@@ -2174,7 +2174,7 @@ function DayContentCard({
           {phaseOf(meta.day).range}
         </div>
         <h2 className="mt-1 text-lg font-display text-primary">
-          Dia {meta.day} — {meta.title}
+          Dia <span className="text-2xl text-accent">{meta.day}</span> — {meta.title}
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">{meta.objective}</p>
         <p className="mt-2 text-sm text-foreground/85">{meta.mainAction}</p>
@@ -2223,8 +2223,13 @@ function StagesList({
             value={stage.id}
             className="overflow-hidden rounded-xl border border-border bg-card"
           >
-            <AccordionTrigger className="px-5 py-4 text-left text-[15px] font-semibold text-primary hover:no-underline">
-              {stage.title}
+            <AccordionTrigger className="px-5 py-4 text-left text-[15px] font-semibold text-primary hover:no-underline group">
+              <span className="flex items-center gap-2">
+                <span className="text-accent group-data-[state=open]:rotate-90 transition-transform">
+                  <Flower2 size={14} />
+                </span>
+                {stage.title}
+              </span>
             </AccordionTrigger>
             <AccordionContent className="px-5 pb-5 pt-0">
               <StageBody
