@@ -221,7 +221,7 @@ function ProtocoloPage() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 bg-background"
+            className="fixed inset-0 z-50 overflow-y-auto bg-background"
           >
             <SignupScreen
               actorId={actorId}
@@ -237,7 +237,7 @@ function ProtocoloPage() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-50 bg-background"
+            className="fixed inset-0 z-50 overflow-y-auto bg-background"
           >
             <DiagnosisScreen
               actorId={actorId}
@@ -257,6 +257,7 @@ function ProtocoloPage() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-50 overflow-y-auto bg-background"
           >
             <DiagnosisResultScreen
               actorId={actorId}
@@ -765,8 +766,8 @@ function SignupScreen({ actorId, onNext }: { actorId: string; onNext: () => void
   const canSave = plant.name.trim().length > 0;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto min-h-screen max-w-[440px] px-5 py-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card sm:shadow-[0_15px_50px_-30px_rgba(23,61,50,0.25)]">
+    <div className="min-h-screen overflow-y-auto bg-background">
+      <div className="mx-auto flex min-h-screen max-w-[440px] flex-col px-5 py-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card sm:shadow-[0_15px_50px_-30px_rgba(23,61,50,0.25)]">
         <StepHeader
           step={1}
           total={3}
@@ -885,6 +886,7 @@ function SignupScreen({ actorId, onNext }: { actorId: string; onNext: () => void
             )}
           </Field>
         </div>
+        <div className="mt-8 pb-4">
 
         <button
           onClick={async () => {
@@ -912,6 +914,7 @@ function SignupScreen({ actorId, onNext }: { actorId: string; onNext: () => void
         >
           Salvar e fazer diagnóstico
         </button>
+        </div>
       </div>
     </div>
   );
@@ -998,8 +1001,8 @@ function DiagnosisScreen({ actorId, onFinish, onBack }: { actorId: string; onFin
   const isLast = stepIdx === total - 1;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto min-h-screen max-w-[440px] px-5 py-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card sm:shadow-[0_15px_50px_-30px_rgba(23,61,50,0.25)]">
+    <div className="min-h-screen overflow-y-auto bg-background">
+      <div className="mx-auto flex min-h-screen max-w-[440px] flex-col px-5 py-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card sm:shadow-[0_15px_50px_-30px_rgba(23,61,50,0.25)]">
         <StepHeader
           step={2}
           total={3}
@@ -1088,7 +1091,7 @@ function DiagnosisScreen({ actorId, onFinish, onBack }: { actorId: string; onFin
           próximos dias.
         </InfoCard>
 
-        <div className="mt-6 flex gap-2">
+        <div className="mt-auto pt-8 flex gap-2 pb-4">
           <button
             onClick={() => (stepIdx === 0 ? onBack() : setStepIdx((i) => i - 1))}
             className="flex items-center gap-1 rounded-full border border-border px-4 py-3 text-sm font-medium text-foreground hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -1117,8 +1120,8 @@ function DiagnosisResultScreen({ actorId, onBack, onFinish }: { actorId: string;
   const result = state.diagnosisResult;
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto min-h-screen max-w-[440px] px-5 py-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card sm:shadow-[0_15px_50px_-30px_rgba(23,61,50,0.25)]">
+    <div className="min-h-screen overflow-y-auto bg-background">
+      <div className="mx-auto flex min-h-screen max-w-[440px] flex-col px-5 py-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card sm:shadow-[0_15px_50px_-30px_rgba(23,61,50,0.25)]">
         <StepHeader
           step={3}
           total={3}
@@ -1152,7 +1155,7 @@ function DiagnosisResultScreen({ actorId, onBack, onFinish }: { actorId: string;
           </div>
         )}
 
-        <div className="mt-6 flex gap-2">
+        <div className="mt-auto pt-8 flex gap-2 pb-4">
           <button
             onClick={onBack}
             className="flex items-center gap-1 rounded-full border border-border px-4 py-3 text-sm font-medium text-foreground hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
