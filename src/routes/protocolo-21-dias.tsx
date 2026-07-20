@@ -360,7 +360,7 @@ function ProtocoloPage() {
                   style={{ perspective: "1000px" }}
                 >
                   {tab === "inicio" && <InicioTab actorId={actorId} setTab={setTab} setStatus={setStatus} />}
-                  {tab === "plano" && <PlanoTab actorId={actorId} setTab={setTab} />}
+                  {tab === "plano" && <PlanoTab actorId={actorId} setTab={setTab} onPreviewDay={setPreviewDay} />}
                   {tab === "diagnostico" && (
                     <DiagnosticoTab actorId={actorId} onRedo={() => setStatus("needs_diagnosis")} setTab={setTab} />
                   )}
