@@ -16,7 +16,7 @@ export function useAuthBootstrap() {
       // Carrega estado de visitante
       const guestState = loadFromCache("guest");
       if (guestState) {
-        store.setState(guestState);
+        store.setState(() => guestState);
       } else {
         store.reset();
       }
