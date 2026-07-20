@@ -2355,6 +2355,7 @@ function StagesList({
                 stage={stage}
                 onOpenMethod={isApplicationStage ? onOpenMethod : undefined}
                 setStatus={setStatus}
+                day={day}
               />
             </AccordionContent>
           </AccordionItem>
@@ -2364,7 +2365,7 @@ function StagesList({
   );
 }
 
-function StageBody({ stage, onOpenMethod, setStatus }: { stage: DayStage; onOpenMethod?: () => void; setStatus?: (status: AuthBootstrapStatus) => void }) {
+function StageBody({ stage, onOpenMethod, setStatus, day }: { stage: DayStage; onOpenMethod?: () => void; setStatus?: (status: AuthBootstrapStatus) => void; day?: number }) {
   return (
     <div className="space-y-3 text-sm text-foreground/85">
       {stage.objective && <p className="text-sm text-muted-foreground">{stage.objective}</p>}
@@ -2388,7 +2389,7 @@ function StageBody({ stage, onOpenMethod, setStatus }: { stage: DayStage; onOpen
         attention={stage.attention}
         personalizedTracking={[]}
         customObserveTitle={(stage as any).observeTitle as string | undefined}
-        setStatus={setStatus}
+        setStatus={day === 1 && stage.id === "etapa-1-registrar" ? setStatus : undefined}
       />
       {onOpenMethod && (
         <button
