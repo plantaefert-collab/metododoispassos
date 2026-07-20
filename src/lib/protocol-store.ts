@@ -841,16 +841,13 @@ export function useProtocolStore() {
             next.plant = {
               ...next.plant,
               name: profile.plant_name ?? next.plant.name,
-              full_name: profile.full_name ?? "",
-            } as any;
-            // Só sobrescreve onboarded se o remoto for verdadeiro
+            };
             if (profile.onboarded) {
               next.onboarded = true;
             }
           }
           
           if (progress) {
-            // Se o progresso remoto tiver diagnóstico, mas o local não, ou o remoto for mais novo
             return mergeRemoteProgressState(next, progress);
           }
           
