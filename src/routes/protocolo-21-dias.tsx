@@ -35,7 +35,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { useProtocolStore, isDiagnosisCurrent, defaultState } from "@/lib/protocol-store";
+import { useProtocolStore, isDiagnosisCurrent, defaultState, getState } from "@/lib/protocol-store";
 import { compressImage, PHOTO_ERROR_MESSAGE } from "@/lib/image-compress";
 import {
   getProtocolDay,
