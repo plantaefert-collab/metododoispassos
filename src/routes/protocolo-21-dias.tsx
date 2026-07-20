@@ -208,6 +208,19 @@ function ProtocoloPage() {
           </motion.div>
         )}
 
+        {status === "signing_in" && (
+          <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#F8F5EE]/90 backdrop-blur-sm">
+            <motion.div 
+              animate={{ rotate: 360 }} 
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              className="mb-4 text-[#173D32]"
+            >
+              <Loader2 size={40} strokeWidth={1.5} />
+            </motion.div>
+            <div className="font-display text-xl text-[#173D32]">Sincronizando seus dados...</div>
+          </div>
+        )}
+
         {status === "needs_plant_registration" && (
           <motion.div
             key="signup"

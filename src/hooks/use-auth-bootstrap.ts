@@ -90,11 +90,14 @@ export function useAuthBootstrap() {
       // Determinar destino
       const hasPlant = profileRes.data?.plant_registered_at !== null;
       const diagnosisReady = isDiagnosisCurrent(finalState);
+      const hasObservations = totalObservations(finalState.diagnosis) > 0;
 
       if (!hasPlant) {
         setStatus("needs_plant_registration");
-      } else if (!diagnosisReady) {
+      } else if (!diagnosisReady && !hasObservations) {
         setStatus("needs_diagnosis");
+      } else if (!diagnosisReady && hasObservations) {
+        setStatus("reviewing_diagnosis_result");
       } else {
         setStatus("ready");
       }
