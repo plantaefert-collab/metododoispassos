@@ -450,6 +450,7 @@ function AppShell({
           </div>
         </main>
 
+        <PhaseProgressBar currentDay={state.currentDay} />
         <nav className="sticky bottom-0 z-20 border-t border-border bg-card/80 backdrop-blur-md sm:rounded-b-2xl">
           <div className="grid grid-cols-5">
             <TabBtn
