@@ -1659,25 +1659,6 @@ function PlanoTab({ actorId, setTab }: PlanoTabProps) {
         </div>
       </div>
 
-      {!diagnosisFresh && state.diagnosisResult && (
-        <div className="mb-2 rounded-xl border border-primary/20 bg-primary/5 p-4">
-          <div className="flex items-start gap-3">
-            <Info className="mt-0.5 shrink-0 text-primary" size={18} />
-            <div className="flex-1">
-              <p className="text-[14px] font-medium leading-relaxed text-primary/90">
-                Você pode fazer o diagnóstico para receber orientações personalizadas para sua planta.
-              </p>
-              <button
-                onClick={() => setTab("diagnostico")}
-                className="mt-3 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-[13px] font-semibold text-primary-foreground shadow-sm transition-transform active:scale-95"
-              >
-                Fazer diagnóstico
-                <ChevronRight size={14} />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <WeekPicker
         currentWeek={week}
@@ -1689,6 +1670,29 @@ function PlanoTab({ actorId, setTab }: PlanoTabProps) {
         onSelectDay={(d) => setCurrentDay(d, actorId)}
         weekDays={activeWeek.days}
       />
+
+      {!diagnosisFresh && day === 1 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl border-2 border-dashed border-primary/20 bg-primary/5 p-6 text-center"
+        >
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <Stethoscope size={24} />
+          </div>
+          <h3 className="font-display text-lg text-primary">Personalize seu plano</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            O diagnóstico ajuda a identificar as necessidades específicas da sua orquídea hoje.
+          </p>
+          <button
+            onClick={() => setTab("diagnostico")}
+            className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground shadow-md transition-transform active:scale-95"
+          >
+            Fazer diagnóstico agora
+            <ChevronRight size={16} />
+          </button>
+        </motion.div>
+      )}
 
       {meta.stages && meta.stages.length > 0 ? (
         <DayHeaderCard meta={meta} />
