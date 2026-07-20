@@ -460,30 +460,40 @@ function AppShell({
   return (
     <div className="min-h-screen bg-background font-sans selection:bg-primary/10">
       <div className="mx-auto flex min-h-screen max-w-[440px] flex-col shadow-[0_30px_90px_-20px_rgba(23,61,50,0.1)] sm:my-4 sm:min-h-[calc(100vh-2rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card">
-        <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-border bg-card/80 px-4 py-4 backdrop-blur-md sm:rounded-t-2xl">
-          <div className="flex items-center gap-2">
-            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground shadow-md shadow-primary/20">
-              <Leaf size={18} strokeWidth={2.2} />
+        <header className="sticky top-0 z-20 flex flex-col border-b border-border bg-card/80 backdrop-blur-md sm:rounded-t-2xl">
+          <div className="flex items-center justify-between gap-3 px-4 py-4">
+            <div className="flex items-center gap-2">
+              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground shadow-md shadow-primary/20">
+                <Leaf size={18} strokeWidth={2.2} />
+              </div>
+              <div className="min-w-0">
+                <div className="text-xs font-bold tracking-tight text-primary uppercase">PlantaeFert</div>
+                <div className="truncate text-[10px] font-medium text-muted-foreground/80">LABS · NUTRIÇÃO</div>
+              </div>
             </div>
-            <div className="min-w-0">
-              <div className="text-xs font-bold tracking-tight text-primary uppercase">PlantaeFert</div>
-              <div className="truncate text-[10px] font-medium text-muted-foreground/80">LABS · NUTRIÇÃO</div>
+            <div className="flex items-center gap-1">
+              {state.plant.name && (
+                <div className="hidden max-w-[130px] items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground sm:flex">
+                  <Flower2 size={12} className="shrink-0" />
+                  <span className="truncate">{state.plant.name}</span>
+                </div>
+              )}
+              <button
+                onClick={onReset}
+                className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
+                aria-label="Reiniciar meu plano"
+              >
+                <RefreshCw size={16} />
+              </button>
             </div>
           </div>
-          <div className="flex items-center gap-1">
-            {state.plant.name && (
-              <div className="hidden max-w-[130px] items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground sm:flex">
-                <Flower2 size={12} className="shrink-0" />
-                <span className="truncate">{state.plant.name}</span>
-              </div>
-            )}
-            <button
-              onClick={onReset}
-              className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
-              aria-label="Reiniciar meu plano"
-            >
-              <RefreshCw size={16} />
-            </button>
+          
+          {/* Marca d'água botânica linear sutil no header */}
+          <div className="absolute right-0 top-0 h-full w-32 pointer-events-none opacity-[0.04] overflow-hidden">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-primary w-full h-full">
+              <path d="M10 90C30 70 40 40 90 10M10 90C40 80 60 70 90 10" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
+              <path d="M40 60C45 55 55 55 60 60M30 70C35 65 45 65 50 70" stroke="currentColor" strokeWidth="0.5" strokeLinecap="round"/>
+            </svg>
           </div>
         </header>
 
@@ -1743,10 +1753,11 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
                 setTab("plano");
                 toast.info(`Navegando para o Dia ${d}`);
               }}
-              className="flex items-center gap-1.5 rounded-xl border border-border bg-card px-3.5 py-2 text-xs font-semibold text-foreground transition-all hover:border-primary/40 hover:bg-muted active:scale-95"
+              className="flex flex-col items-center justify-center min-w-[60px] gap-1 rounded-xl border border-border bg-card px-3 py-3 text-xs font-semibold text-foreground transition-all hover:border-primary/40 hover:bg-muted active:scale-95"
             >
-              Dia {d}
-              <ChevronRight size={12} className="text-muted-foreground/40" />
+              <span className="text-[10px] text-muted-foreground/60 uppercase">Dia</span>
+              <span className="font-display text-2xl text-primary leading-none">{d}</span>
+              <ChevronRight size={10} className="text-muted-foreground/40 mt-1" />
             </button>
           ))}
         </div>
@@ -1831,9 +1842,9 @@ function PlanoTab({ actorId, setTab }: PlanoTabProps) {
               y: { duration: 0.4 },
               scale: { duration: 0.6, delay: 0.2, ease: "easeOut" }
             }}
-            className="text-2xl font-display tracking-tight text-primary outline-none focus-visible:ring-2 focus-visible:ring-primary/20 rounded-lg"
+            className="text-3xl font-display tracking-tight text-primary outline-none focus-visible:ring-2 focus-visible:ring-primary/20 rounded-lg"
           >
-            Plano de 21 dias
+            Plano de <span className="text-4xl text-accent">21</span> dias
           </motion.h1>
         </div>
       </div>
