@@ -475,23 +475,6 @@ function AppShell({
                 }} 
               />
             )}
-            {tab === "inicio" && (
-              <div className="mb-6 flex flex-col gap-4">
-                <button
-                  onClick={() => setStatus?.("signed_out")}
-                  className="flex items-center gap-2 rounded-xl bg-secondary/50 p-4 text-sm font-medium text-primary transition-colors hover:bg-secondary"
-                >
-                  <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10">
-                    <BookOpen size={20} />
-                  </div>
-                  <div className="text-left">
-                    <div className="font-bold">Ver o Método</div>
-                    <div className="text-xs text-muted-foreground">Revisar os 2 passos (Enraizar + Nutrir)</div>
-                  </div>
-                  <ChevronRight size={16} className="ml-auto opacity-50" />
-                </button>
-              </div>
-            )}
             {children}
           </div>
         </main>
