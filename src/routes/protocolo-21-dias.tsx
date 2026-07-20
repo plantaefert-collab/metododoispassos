@@ -225,6 +225,7 @@ function ProtocoloPage() {
           >
             <SignupScreen
               actorId={actorId}
+              onBack={() => setStatus("ready")}
               onNext={() => setStatus("diagnosing")}
             />
           </motion.div>
