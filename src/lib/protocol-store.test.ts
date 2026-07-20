@@ -574,8 +574,6 @@ describe("migrateProtocolState reconciliação", () => {
 // -------- TESTE 10 / 11 / 12: fluxo via hook actions --------
 // Reproduz a lógica das ações do useProtocolStore sem montar React.
 
-import { computeDiagnosisResult } from "./diagnosis-matrix";
-
 describe("Fluxo de alteração e nova conclusão", () => {
   it("TESTE 10 — toggle após resultado válido incrementa versão e marca outdated", () => {
     // Semear estado válido com versão 2 e resultado compatível.

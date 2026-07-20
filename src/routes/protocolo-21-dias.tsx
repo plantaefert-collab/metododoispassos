@@ -25,6 +25,12 @@ import {
   Flower2,
   Sparkles,
 } from "lucide-react";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 import { useProtocolStore, isDiagnosisCurrent } from "@/lib/protocol-store";
 import {
   compressImage,
@@ -35,9 +41,12 @@ import {
   getProtocolPhase,
   APPLICATION_DAYS,
   PHOTO_DAYS,
-  PROTOCOL_DAYS,
   PROTOCOL_PHASES,
+  WEEKS,
+  getWeekForDay,
   type ProtocolDay,
+  type DayStage,
+  type RegisterOption,
 } from "@/lib/protocol-plan";
 import {
   CATEGORY_LABEL,
@@ -157,9 +166,9 @@ function ProtocoloPage() {
       {tab === "aprender" && <AprenderTab />}
       {showReset && (
         <ConfirmModal
-          title="Reiniciar demonstração?"
+          title="Reiniciar meu plano?"
           description="Isso apagará cadastro, diagnóstico, checklists, fotos e anotações salvas no seu navegador."
-          confirmLabel="Reiniciar"
+          confirmLabel="Reiniciar meu plano"
           onCancel={() => setShowReset(false)}
           onConfirm={() => {
             store.reset();
@@ -209,7 +218,7 @@ function AppShell({
             <button
               onClick={onReset}
               className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
-              aria-label="Reiniciar demonstração"
+              aria-label="Reiniciar meu plano"
             >
               <RefreshCw size={16} />
             </button>
@@ -1081,8 +1090,8 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
       )}
 
       <div className="rounded-3xl border border-border bg-card p-5">
-        <div className="text-sm font-bold text-primary">Simular outro dia</div>
-        <p className="mt-1 text-xs text-muted-foreground">Esta versão é uma demonstração local. Escolha um dia para explorar.</p>
+        <div className="text-sm font-bold text-primary">Explorar dias do plano</div>
+        <p className="mt-1 text-xs text-muted-foreground">Escolha uma semana e um dia para consultar.</p>
         <div className="mt-3 flex flex-wrap gap-1.5">
           {[1, 7, 14, 21].map((d) => (
             <button
@@ -1103,93 +1112,111 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
 
 /* ---------------- Plano ---------------- */
 
-// O DAY_META agora é derivado do PROTOCOL_DAYS no lib/protocol-plan.ts
-
 function PlanoTab() {
-  const { state, setCurrentDay, updateDay, toggleChecklist, toggleDayCompleted } = useProtocolStore();
-  const [showMethod, setShowMethod] = useState(false);
+  const {
+    state,
+    setCurrentDay,
+    updateDay,
+    toggleChecklist,
+    toggleDayCompleted,
+  } = useProtocolStore();
   const day = state.currentDay;
+  const [week, setWeek] = useState<1 | 2 | 3>(() => getWeekForDay(day));
+  const [showMethod, setShowMethod] = useState(false);
   const meta = getProtocolDay(day);
   const entry = state.days[day] ?? { checklist: {}, note: "", completed: false };
   const isApplication = APPLICATION_DAYS.includes(day);
+  const trackingPoints = state.diagnosisResult?.trackingPoints ?? [];
+  const diagnosisFresh = isDiagnosisCurrent(state);
+  const activeWeek = WEEKS.find((w) => w.id === week) ?? WEEKS[0];
 
   return (
     <div className="space-y-4">
       <div>
-        <div className="text-xs font-bold uppercase tracking-wider text-accent">Meu plano</div>
-        <h1 className="text-2xl font-black tracking-tight text-primary">Tela do dia</h1>
+        <div className="text-xs font-bold uppercase tracking-wider text-accent">
+          Meu plano
+        </div>
+        <h1 className="text-2xl font-black tracking-tight text-primary">
+          Plano de 21 dias
+        </h1>
       </div>
 
-      <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
-        {PROTOCOL_DAYS.map((d) => (
-          <button
-            key={d.day}
-            onClick={() => setCurrentDay(d.day)}
-            className={`shrink-0 rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
-              day === d.day
-                ? "bg-primary text-primary-foreground"
-                : APPLICATION_DAYS.includes(d.day)
-                ? "border border-accent/40 bg-accent/10 text-accent"
-                : "border border-border bg-card text-foreground"
-            }`}
-          >
-            Dia {d.day}
-          </button>
-        ))}
-      </div>
+      <WeekPicker
+        currentWeek={week}
+        onSelect={setWeek}
+        currentDay={day}
+        onSelectDay={setCurrentDay}
+        weekDays={activeWeek.days}
+      />
+
+      {meta.stages && meta.stages.length > 0 ? (
+        <DayHeaderCard meta={meta} />
+      ) : (
+        <DayContentCard
+          meta={meta}
+          entry={entry}
+          onToggleChecklist={(item) => toggleChecklist(day, item)}
+          onUpdate={(patch) => updateDay(day, patch)}
+          diagnosisFresh={diagnosisFresh}
+          trackingPoints={trackingPoints}
+        />
+      )}
+
+      {meta.stages && meta.stages.length > 0 && (
+        <StagesList day={day} meta={meta} onOpenMethod={() => setShowMethod(true)} />
+      )}
+
+      {isApplication && (
+        <button
+          onClick={() => setShowMethod(true)}
+          className="w-full rounded-full bg-accent px-4 py-3 text-sm font-semibold text-accent-foreground active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          Abrir Método de 2 Passos
+        </button>
+      )}
 
       <div className="rounded-3xl border border-border bg-card p-5">
-        <div className="text-xs font-semibold uppercase tracking-wider text-accent">{phaseOf(day).range}</div>
-        <h2 className="mt-1 text-lg font-bold text-primary">{meta.title}</h2>
-        <p className="mt-1 text-sm text-muted-foreground">{meta.objective}</p>
-        <p className="mt-2 text-sm text-foreground/80">{meta.mainAction}</p>
-
-        <div className="mt-4 space-y-2">
-          {meta.checklist.map((item: string) => {
+        <div className="grid gap-2">
+          {meta.checklist.map((item) => {
             const checked = !!entry.checklist[item];
             return (
               <button
                 key={item}
                 onClick={() => toggleChecklist(day, item)}
-                className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left text-sm transition-colors ${
-                  checked ? "border-primary bg-primary/5 text-primary" : "border-border bg-card text-foreground"
+                aria-pressed={checked}
+                className={`flex w-full items-start gap-3 rounded-2xl border px-4 py-3 text-left text-sm transition-colors ${
+                  checked
+                    ? "border-primary bg-primary/5 text-primary"
+                    : "border-border bg-card text-foreground"
                 }`}
               >
-                {checked ? <CheckCircle2 size={18} /> : <Circle size={18} className="text-muted-foreground" />}
-                <span>{item}</span>
+                {checked ? (
+                  <CheckCircle2 size={18} className="mt-0.5 shrink-0" />
+                ) : (
+                  <Circle size={18} className="mt-0.5 shrink-0 text-muted-foreground" />
+                )}
+                <span className="min-w-0 flex-1">{item}</span>
               </button>
             );
           })}
         </div>
 
-        <label className="mt-4 block">
-          <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">Anotação</span>
-          <textarea
-            value={entry.note}
-            onChange={(e) => updateDay(day, { note: e.target.value })}
-            placeholder="O que você observou hoje?"
-            rows={3}
-            className="w-full rounded-xl border border-input bg-card px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-          />
-        </label>
-
-        {isApplication && (
-          <button
-            onClick={() => setShowMethod(true)}
-            className="mt-4 w-full rounded-full bg-accent px-4 py-3 text-sm font-semibold text-accent-foreground active:scale-[0.98]"
-          >
-            Abrir Método de 2 Passos
-          </button>
-        )}
+        <RegisterField
+          meta={meta}
+          entry={entry}
+          onChange={(note) => updateDay(day, { note })}
+        />
 
         <button
           onClick={() => toggleDayCompleted(day)}
           aria-pressed={entry.completed}
-          className={`mt-2 w-full rounded-full px-4 py-3 text-sm font-semibold active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-            entry.completed ? "bg-secondary text-secondary-foreground" : "bg-primary text-primary-foreground"
+          className={`mt-4 w-full rounded-full px-4 py-3 text-sm font-semibold active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+            entry.completed
+              ? "bg-secondary text-secondary-foreground"
+              : "bg-primary text-primary-foreground"
           }`}
         >
-          {entry.completed ? "Tarefa concluída ✓ · Desfazer" : "Concluir tarefa"}
+          {entry.completed ? "Tarefa concluída ✓ · Desmarcar" : "Concluir tarefa"}
         </button>
       </div>
 
@@ -1200,46 +1227,472 @@ function PlanoTab() {
   );
 }
 
+function WeekPicker({
+  currentWeek,
+  onSelect,
+  currentDay,
+  onSelectDay,
+  weekDays,
+}: {
+  currentWeek: 1 | 2 | 3;
+  onSelect: (w: 1 | 2 | 3) => void;
+  currentDay: number;
+  onSelectDay: (day: number) => void;
+  weekDays: number[];
+}) {
+  return (
+    <div className="space-y-3">
+      <div
+        role="tablist"
+        aria-label="Semanas do plano"
+        className="grid grid-cols-3 gap-1.5 rounded-full border border-border bg-card p-1"
+      >
+        {WEEKS.map((w) => {
+          const active = w.id === currentWeek;
+          return (
+            <button
+              key={w.id}
+              role="tab"
+              aria-selected={active}
+              onClick={() => onSelect(w.id)}
+              className={`min-h-[44px] rounded-full px-2 text-[12px] font-semibold transition-colors ${
+                active
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              {w.label}
+            </button>
+          );
+        })}
+      </div>
+      <div
+        className="grid grid-cols-4 gap-2"
+        role="group"
+        aria-label={`Dias da semana ${currentWeek}`}
+      >
+        {weekDays.map((d) => {
+          const active = d === currentDay;
+          const isApp = APPLICATION_DAYS.includes(d);
+          return (
+            <button
+              key={d}
+              onClick={() => onSelectDay(d)}
+              aria-current={active ? "step" : undefined}
+              aria-label={
+                isApp ? `Dia ${d}, dia de aplicação` : `Dia ${d}`
+              }
+              className={`relative min-h-[44px] rounded-2xl border px-2 py-2 text-[13px] font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+                active
+                  ? "border-primary bg-primary text-primary-foreground"
+                  : "border-border bg-card text-foreground hover:border-primary/40"
+              }`}
+            >
+              Dia {d}
+              {isApp && (
+                <span
+                  aria-hidden
+                  className={`absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full ${
+                    active ? "bg-accent-foreground" : "bg-accent"
+                  }`}
+                />
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function DayHeaderCard({ meta }: { meta: ProtocolDay }) {
+  return (
+    <div className="rounded-3xl border border-border bg-card p-5">
+      <div className="text-xs font-semibold uppercase tracking-wider text-accent">
+        {phaseOf(meta.day).range}
+      </div>
+      <h2 className="mt-1 text-lg font-bold text-primary">
+        Dia {meta.day} — {meta.title}
+      </h2>
+      <p className="mt-1 text-sm text-muted-foreground">{meta.objective}</p>
+      <p className="mt-2 text-sm text-foreground/85">{meta.mainAction}</p>
+      {meta.tip && (
+        <div className="mt-3 rounded-2xl bg-secondary/60 px-3 py-2 text-sm text-secondary-foreground">
+          <span className="font-semibold text-primary">Dica: </span>
+          {meta.tip}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function DayContentCard({
+  meta,
+  entry,
+  onToggleChecklist: _onToggleChecklist,
+  onUpdate: _onUpdate,
+  diagnosisFresh,
+  trackingPoints,
+}: {
+  meta: ProtocolDay;
+  entry: { checklist: Record<string, boolean>; note: string; completed: boolean };
+  onToggleChecklist: (item: string) => void;
+  onUpdate: (patch: { note?: string }) => void;
+  diagnosisFresh: boolean;
+  trackingPoints: string[];
+}) {
+  void entry;
+  const tracking = diagnosisFresh ? trackingPoints.slice(0, 3) : [];
+  return (
+    <div className="rounded-3xl border border-border bg-card p-5">
+      <div className="text-xs font-semibold uppercase tracking-wider text-accent">
+        {phaseOf(meta.day).range}
+      </div>
+      <h2 className="mt-1 text-lg font-bold text-primary">
+        Dia {meta.day} — {meta.title}
+      </h2>
+      <p className="mt-1 text-sm text-muted-foreground">{meta.objective}</p>
+      <p className="mt-2 text-sm text-foreground/85">{meta.mainAction}</p>
+      {meta.tip && (
+        <div className="mt-3 rounded-2xl bg-secondary/60 px-3 py-2 text-sm text-secondary-foreground">
+          <span className="font-semibold text-primary">Dica: </span>
+          {meta.tip}
+        </div>
+      )}
+
+      <DetailAccordions
+        howTo={meta.howTo}
+        observe={meta.observe}
+        avoid={meta.avoid}
+        registerText={meta.registerText}
+        attention={meta.attention}
+        personalizedTracking={meta.personalizedContext ? tracking : []}
+      />
+    </div>
+  );
+}
+
+function StagesList({
+  day,
+  meta,
+  onOpenMethod,
+}: {
+  day: number;
+  meta: ProtocolDay;
+  onOpenMethod: () => void;
+}) {
+  const stages = meta.stages ?? [];
+  return (
+    <Accordion
+      type="multiple"
+      defaultValue={stages.length > 0 ? [stages[0].id] : []}
+      className="space-y-2"
+    >
+      {stages.map((stage, idx) => {
+        const isApplicationStage =
+          APPLICATION_DAYS.includes(day) && idx === stages.length - 1;
+        return (
+          <AccordionItem
+            key={stage.id}
+            value={stage.id}
+            className="overflow-hidden rounded-3xl border border-border bg-card"
+          >
+            <AccordionTrigger className="px-5 py-4 text-left text-[15px] font-semibold text-primary hover:no-underline">
+              {stage.title}
+            </AccordionTrigger>
+            <AccordionContent className="px-5 pb-5 pt-0">
+              <StageBody
+                stage={stage}
+                onOpenMethod={isApplicationStage ? onOpenMethod : undefined}
+              />
+            </AccordionContent>
+          </AccordionItem>
+        );
+      })}
+    </Accordion>
+  );
+}
+
+function StageBody({
+  stage,
+  onOpenMethod,
+}: {
+  stage: DayStage;
+  onOpenMethod?: () => void;
+}) {
+  return (
+    <div className="space-y-3 text-sm text-foreground/85">
+      {stage.objective && (
+        <p className="text-sm text-muted-foreground">{stage.objective}</p>
+      )}
+      {stage.mainAction && (
+        <p className="text-sm text-foreground/85">
+          <span className="font-semibold text-primary">O que fazer: </span>
+          {stage.mainAction}
+        </p>
+      )}
+      {stage.tip && (
+        <div className="rounded-2xl bg-secondary/60 px-3 py-2 text-sm text-secondary-foreground">
+          <span className="font-semibold text-primary">Dica: </span>
+          {stage.tip}
+        </div>
+      )}
+      <DetailAccordions
+        howTo={stage.howTo}
+        observe={stage.observe}
+        avoid={stage.avoid}
+        registerText={stage.registerText}
+        attention={stage.attention}
+        personalizedTracking={[]}
+      />
+      {onOpenMethod && (
+        <button
+          onClick={onOpenMethod}
+          className="mt-2 w-full rounded-full bg-accent px-4 py-3 text-sm font-semibold text-accent-foreground active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          Abrir Método de 2 Passos
+        </button>
+      )}
+    </div>
+  );
+}
+
+function DetailAccordions({
+  howTo,
+  observe,
+  avoid,
+  registerText,
+  attention,
+  personalizedTracking,
+}: {
+  howTo?: string[];
+  observe?: string[];
+  avoid?: string[];
+  registerText?: string;
+  attention?: string[];
+  personalizedTracking: string[];
+}) {
+  const sections: Array<{ id: string; title: string; content: ReactNode }> = [];
+
+  if (howTo && howTo.length > 0) {
+    sections.push({
+      id: "como-fazer",
+      title: "Como fazer",
+      content: <BulletList items={howTo} />,
+    });
+  }
+  if (observe && observe.length > 0) {
+    sections.push({
+      id: "observe",
+      title: "Observe",
+      content: <BulletList items={observe} />,
+    });
+  }
+  if (avoid && avoid.length > 0) {
+    sections.push({
+      id: "evite",
+      title: "Evite",
+      content: <BulletList items={avoid} />,
+    });
+  }
+  if (registerText) {
+    sections.push({
+      id: "registre",
+      title: "Registre",
+      content: <p className="text-sm text-foreground/85">{registerText}</p>,
+    });
+  }
+  if (attention && attention.length > 0) {
+    sections.push({
+      id: "atencao",
+      title: "Atenção",
+      content: <BulletList items={attention} />,
+    });
+  }
+  if (personalizedTracking.length > 0) {
+    sections.push({
+      id: "no-seu-caso",
+      title: "No seu caso",
+      content: <BulletList items={personalizedTracking} />,
+    });
+  }
+
+  if (sections.length === 0) return null;
+
+  return (
+    <Accordion type="multiple" className="mt-3 space-y-2">
+      {sections.map((s) => (
+        <AccordionItem
+          key={s.id}
+          value={s.id}
+          className="overflow-hidden rounded-2xl border border-border bg-background/40"
+        >
+          <AccordionTrigger className="px-4 py-3 text-[14px] font-semibold text-primary hover:no-underline">
+            {s.title}
+          </AccordionTrigger>
+          <AccordionContent className="px-4 pb-4 pt-0">{s.content}</AccordionContent>
+        </AccordionItem>
+      ))}
+    </Accordion>
+  );
+}
+
+function BulletList({ items }: { items: string[] }) {
+  return (
+    <ul className="space-y-1.5 text-sm text-foreground/85">
+      {items.map((it, i) => (
+        <li key={`${i}-${it.slice(0, 20)}`} className="flex gap-2">
+          <span aria-hidden className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-primary/60" />
+          <span className="min-w-0 flex-1">{it}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function RegisterField({
+  meta,
+  entry,
+  onChange,
+}: {
+  meta: ProtocolDay;
+  entry: { note: string };
+  onChange: (v: string) => void;
+}) {
+  const label = meta.recordPrompt || "Registre sua observação de hoje.";
+  const options: RegisterOption[] | undefined = meta.registerOptions;
+  const inputId = `note-day-${meta.day}`;
+
+  return (
+    <div className="mt-4 space-y-2">
+      <label
+        htmlFor={inputId}
+        className="block text-[13px] font-semibold text-primary"
+      >
+        {label}
+      </label>
+      {options && options.length > 0 && (
+        <div
+          role="radiogroup"
+          aria-label={label}
+          className="flex flex-wrap gap-1.5"
+        >
+          {options.map((opt) => {
+            const active = entry.note.startsWith(opt.label);
+            return (
+              <button
+                key={opt.value}
+                type="button"
+                role="radio"
+                aria-checked={active}
+                onClick={() => {
+                  const rest = entry.note.replace(/^[^\n]*\n?/, "");
+                  onChange(rest ? `${opt.label}\n${rest}` : opt.label);
+                }}
+                className={`min-h-[36px] rounded-full border px-3 text-xs font-semibold transition-colors ${
+                  active
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border bg-card text-foreground hover:border-primary/40"
+                }`}
+              >
+                {opt.label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+      <textarea
+        id={inputId}
+        value={entry.note}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={
+          options && options.length > 0
+            ? "Observação complementar (opcional)"
+            : "Sua anotação"
+        }
+        rows={3}
+        className="w-full rounded-xl border border-input bg-card px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+      />
+    </div>
+  );
+}
+
 function MethodDrawer({ day, onClose }: { day: number; onClose: () => void }) {
   const { registerApplication, state } = useProtocolStore();
   const applicationsForDay = state.applications.filter((a) => a.day === day);
+  const entry = state.days[day] ?? { checklist: {}, note: "", completed: false };
+  const checklist = getProtocolDay(day).checklist;
+  const allChecked = checklist.every((item) => !!entry.checklist[item]);
+  const canRegister = !APPLICATION_DAYS.includes(day) || allChecked;
+
   return (
     <Drawer onClose={onClose} title="Método de 2 Passos">
-      <p className="text-sm text-muted-foreground">
-        Aplicação nos Dias 1, 7, 14 e 21. Produtos prontos para uso. Prefira horário fresco, evite sol forte e não atinja diretamente as flores.
+      <p className="text-sm text-foreground/85">
+        Realize o Método de 2 Passos uma vez por semana, preferencialmente nos
+        horários mais frescos do dia. Os produtos são prontos para uso e não
+        precisam de diluição.
       </p>
 
-      <div className="mt-4 space-y-4">
+      <div className="mt-4 space-y-3">
         <div className="rounded-2xl border border-border bg-secondary/50 p-4">
           <div className="flex items-center gap-2 text-primary">
-            <span className="grid h-7 w-7 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">1</span>
+            <span className="grid h-7 w-7 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+              1
+            </span>
+            <Sprout size={18} strokeWidth={2.2} />
             <span className="text-base font-bold">Enraizar</span>
           </div>
-          <p className="mt-1.5 text-sm text-secondary-foreground/90">
-            Aplicar em raízes e substrato. Ajuda a fortalecer o sistema radicular e criar condições favoráveis ao vigor.
+          <p className="mt-2 text-sm text-secondary-foreground/90">
+            Aplique primeiro o Enraizador nas raízes e no substrato. Distribua o
+            produto de forma uniforme até umedecer levemente as áreas indicadas,
+            sem escorrer e sem encharcar.
           </p>
-          <ProductPlaceholder title="Enraizador Forte 500 ml Pronto Uso" />
+          <div className="mt-2 text-[12px] font-semibold uppercase tracking-wider text-primary/80">
+            Enraizador Forte 500 ml Pronto Uso
+          </div>
         </div>
 
         <div className="rounded-2xl border border-border bg-lilac/60 p-4">
           <div className="flex items-center gap-2 text-lilac-foreground">
-            <span className="grid h-7 w-7 place-items-center rounded-full bg-accent text-xs font-bold text-accent-foreground">2</span>
+            <span className="grid h-7 w-7 place-items-center rounded-full bg-accent text-xs font-bold text-accent-foreground">
+              2
+            </span>
+            <Leaf size={18} strokeWidth={2.2} />
             <span className="text-base font-bold">Nutrir</span>
           </div>
-          <p className="mt-1.5 text-sm text-lilac-foreground/90">
-            Aplicar depois do Enraizador em raízes, folhas e substrato. Auxilia na nutrição e contribui para novos ciclos de floração.
+          <p className="mt-2 text-sm text-lilac-foreground/90">
+            Em seguida, aplique o Bokashi nas raízes, folhas e substrato.
+            Distribua o produto de forma uniforme até umedecer levemente, sem
+            escorrer e sem encharcar. Evite aplicar diretamente nas flores.
           </p>
-          <ProductPlaceholder title="Bokashi Orquídeas Premium 500 ml Pronto Uso" />
+          <div className="mt-2 text-[12px] font-semibold uppercase tracking-wider text-primary/80">
+            Bokashi Orquídeas Premium 500 ml Pronto Uso
+          </div>
         </div>
       </div>
 
-      <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
-        Sem indicação de quantidade nesta versão. Siga sempre o rótulo do produto e evite aplicação direta nas flores.
-      </InfoCard>
+      <div className="mt-4 rounded-2xl border border-accent/30 bg-accent/10 p-4 text-sm text-accent">
+        <div className="flex items-center gap-2">
+          <AlertTriangle size={16} />
+          <span className="font-semibold">Cuidados</span>
+        </div>
+        <ul className="mt-2 space-y-1 text-[13px] text-accent">
+          <li>Não diluir</li>
+          <li>Preferir horários mais frescos</li>
+          <li>Não aplicar sob sol forte, especialmente entre 9h e 16h</li>
+          <li>Evitar aplicação direta nas flores</li>
+          <li>Não deixar o produto escorrer</li>
+          <li>Não encharcar raízes ou substrato</li>
+          <li>Não misturar com outros produtos durante a aplicação</li>
+          <li>Não repetir a aplicação por engano</li>
+        </ul>
+      </div>
 
       {applicationsForDay.length > 0 && (
         <div className="mt-4 rounded-xl border border-border bg-secondary/40 p-3 text-xs text-secondary-foreground">
-          <div className="font-semibold text-primary">Histórico de aplicações no Dia {day}</div>
+          <div className="font-semibold text-primary">
+            Histórico de aplicações no Dia {day}
+          </div>
           <ul className="mt-1 space-y-0.5">
             {applicationsForDay.map((a) => (
               <li key={a.id}>
@@ -1251,44 +1704,27 @@ function MethodDrawer({ day, onClose }: { day: number; onClose: () => void }) {
           </ul>
         </div>
       )}
-      {(() => {
-        const entry = state.days[day] ?? { checklist: {}, note: "", completed: false };
-        const checklist = getProtocolDay(day).checklist;
-        const allChecked = checklist.every((item) => !!entry.checklist[item]);
-        const canRegister = !APPLICATION_DAYS.includes(day) || allChecked;
 
-        return (
-          <div className="mt-4 space-y-3">
-            {!canRegister && (
-              <p className="text-center text-[11px] font-medium text-accent">
-                Complete todo o checklist para liberar o registro.
-              </p>
-            )}
-            <button
-              disabled={!canRegister}
-              onClick={() => {
-                registerApplication(day);
-                onClose();
-              }}
-              className="w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              {applicationsForDay.length > 0 ? "Registrar nova aplicação" : "Registrar aplicação concluída"}
-            </button>
-          </div>
-        );
-      })()}
-    </Drawer>
-  );
-}
-
-function ProductPlaceholder({ title }: { title: string }) {
-  return (
-    <div className="mt-3 grid gap-2 rounded-xl border-2 border-dashed border-border bg-card/70 p-3 text-center">
-      <div className="grid h-28 place-items-center rounded-lg bg-muted/60">
-        <div className="text-xs font-medium text-muted-foreground">Inserir imagem real do produto</div>
+      <div className="mt-4 space-y-3">
+        {!canRegister && (
+          <p className="text-center text-[11px] font-medium text-accent">
+            Complete todo o checklist para liberar o registro.
+          </p>
+        )}
+        <button
+          disabled={!canRegister}
+          onClick={() => {
+            registerApplication(day);
+            onClose();
+          }}
+          className="w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+        >
+          {applicationsForDay.length > 0
+            ? "Registrar nova aplicação"
+            : "Registrar aplicação concluída"}
+        </button>
       </div>
-      <div className="text-xs font-semibold text-foreground">{title}</div>
-    </div>
+    </Drawer>
   );
 }
 
