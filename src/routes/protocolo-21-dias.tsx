@@ -258,6 +258,8 @@ function ProtocoloPage() {
               onFinish={() => {
                 store.saveDiagnosisResult(actorId);
                 setStatus("reviewing_diagnosis_result");
+                // Ao concluir o diagnóstico, a "Tarefa do dia" correspondente será exibida 
+                // naturalmente ao retornar ao fluxo principal ou ao ver o resumo.
               }}
             />
           </motion.div>
@@ -278,6 +280,7 @@ function ProtocoloPage() {
               onFinish={() => {
                 store.setOnboarded(true, actorId);
                 setStatus("ready");
+                // Fluxo automático: levar diretamente para o Plano (onde está a tarefa do dia)
                 setTab("plano");
               }}
             />
@@ -497,7 +500,18 @@ function AppShell({
             <TabBtn
               active={tab === "diagnostico"}
               onClick={() => setTab("diagnostico")}
-              icon={<Stethoscope size={20} />}
+              icon={
+                <div className="relative">
+                  <Stethoscope size={20} />
+                  {!diagnosisFresh && (
+                    <motion.div 
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-accent shadow-[0_0_8px_rgba(217,70,239,0.8)]" 
+                    />
+                  )}
+                </div>
+              }
               label="Exame"
             />
             <TabBtn
@@ -1407,9 +1421,9 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           <div className="mt-4 flex flex-col gap-2">
             <button
               onClick={() => setStatus("needs_diagnosis")}
-              className="flex items-center justify-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2.5 text-xs font-bold text-primary transition-colors hover:bg-primary/20"
+              className="flex items-center justify-center gap-2 rounded-full border-2 border-primary/30 bg-primary/10 px-6 py-3.5 text-sm font-bold text-primary transition-all hover:bg-primary/20 active:scale-[0.98] sm:py-3"
             >
-              <Stethoscope size={14} /> Fazer diagnóstico
+              <Stethoscope size={18} /> Fazer diagnóstico
             </button>
             <button
               onClick={() => setTab("plano")}
@@ -1463,9 +1477,9 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           <div className="mt-3 flex flex-wrap gap-2">
             <button
               onClick={() => setStatus("needs_diagnosis")}
-              className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2.5 text-xs font-bold text-primary transition-colors hover:bg-primary/20"
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full border-2 border-primary/30 bg-primary/10 px-6 py-3.5 text-sm font-bold text-primary transition-all hover:bg-primary/20 active:scale-[0.98] sm:w-auto sm:py-3"
             >
-              <Stethoscope size={14} /> Fazer diagnóstico
+              <Stethoscope size={18} /> Fazer diagnóstico
             </button>
           </div>
         </div>
