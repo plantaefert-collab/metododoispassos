@@ -1,4 +1,4 @@
-import { ProtocolState } from "./protocol-store";
+import { ProtocolState } from "../protocol-store";
 
 export type AuthBootstrapStatus = 
   | "booting" 
