@@ -1487,7 +1487,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             </p>
             <div className="mt-5 flex flex-col gap-3">
               <button
-                onClick={() => setTab("diagnostico")}
+                onClick={() => setStatus("needs_diagnosis")}
                 className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-accent-foreground shadow-lg shadow-accent/20 transition-all hover:brightness-110 active:scale-[0.98]"
               >
                 Fazer diagnóstico <ChevronRight size={16} />
