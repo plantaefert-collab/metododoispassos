@@ -283,7 +283,7 @@ function ProtocoloPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <AppShell tab={tab} setTab={setTab} onReset={() => setShowReset(true)} userEmail={user?.email}>
+            <AppShell tab={tab} setTab={setTab} onReset={() => setShowReset(true)} userEmail={user?.email} setStatus={setStatus}>
               <AnimatePresence mode="wait">
                 <motion.div
                   key={tab}
@@ -365,12 +365,14 @@ function AppShell({
   setTab,
   onReset,
   userEmail,
+  setStatus,
   children,
 }: {
   tab: Tab;
   setTab: (t: Tab) => void;
   onReset: () => void;
   userEmail?: string;
+  setStatus?: (s: AuthBootstrapStatus) => void;
   children: ReactNode;
 }) {
   const { state, clearSaveError } = useProtocolStore();
@@ -430,6 +432,23 @@ function AppShell({
                   // O bootstrap cuidará do redirecionamento
                 }} 
               />
+            )}
+            {tab === "inicio" && (
+              <div className="mb-6 flex flex-col gap-4">
+                <button
+                  onClick={() => setStatus?.("signed_out")}
+                  className="flex items-center gap-2 rounded-xl bg-secondary/50 p-4 text-sm font-medium text-primary transition-colors hover:bg-secondary"
+                >
+                  <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10">
+                    <BookOpen size={20} />
+                  </div>
+                  <div className="text-left">
+                    <div className="font-bold">Ver o Método</div>
+                    <div className="text-xs text-muted-foreground">Revisar os 2 passos (Enraizar + Nutrir)</div>
+                  </div>
+                  <ChevronRight size={16} className="ml-auto opacity-50" />
+                </button>
+              </div>
             )}
             {children}
           </div>
@@ -1439,27 +1458,45 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
       )}
 
       {!diagnosisFresh && (
-        <div className="rounded-2xl border border-accent/20 bg-accent/5 p-5">
-          <div className="flex items-center gap-2 text-accent">
-            <Stethoscope size={16} />
-            <div className="text-sm font-bold">Diagnóstico Necessário</div>
+        <div className="group relative overflow-hidden rounded-2xl border border-accent/20 bg-accent/5 p-6 shadow-sm transition-all hover:shadow-md">
+          {/* Decorative element */}
+          <div className="absolute -right-4 -top-4 text-accent/10 transition-transform group-hover:scale-110">
+            <Stethoscope size={80} />
           </div>
-          <p className="mt-2 text-sm text-primary/80">
-            Seu diagnóstico está desatualizado ou ainda não foi concluído. Vamos atualizar para que seu plano seja mais preciso?
-          </p>
-          <button
-            onClick={() => setStatus("needs_diagnosis")}
-            className="mt-4 w-full rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground shadow-sm active:scale-[0.98]"
-          >
-            Fazer novo diagnóstico
-          </button>
+          
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 text-accent">
+              <Sparkles size={18} className="animate-pulse" />
+              <div className="font-display text-lg font-bold">Inicie seu Diagnóstico</div>
+            </div>
+            <p className="mt-2 text-sm leading-relaxed text-primary/80">
+              Para liberar seu <strong>Plano de 21 Dias</strong> personalizado, precisamos entender o estado atual da sua orquídea.
+            </p>
+            <div className="mt-5 flex flex-col gap-3">
+              <button
+                onClick={() => setStatus("needs_diagnosis")}
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-accent-foreground shadow-lg shadow-accent/20 transition-all hover:brightness-110 active:scale-[0.98]"
+              >
+                Começar agora <ChevronRight size={16} />
+              </button>
+              <div className="flex items-center justify-center gap-4 text-[10px] font-bold tracking-widest text-accent/60 uppercase">
+                <span className="flex items-center gap-1"><CheckCircle2 size={10} /> 5 Áreas</span>
+                <span className="flex items-center gap-1"><CheckCircle2 size={10} /> 2 Minutos</span>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
       {diagnosisFresh && (
-        <div className="rounded-2xl border border-border bg-card p-5">
+        <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
           <div className="flex items-center justify-between">
-            <div className="text-sm font-bold text-primary">Seu diagnóstico</div>
+            <div className="flex items-center gap-2">
+              <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary/10 text-primary">
+                <Stethoscope size={16} />
+              </div>
+              <div className="text-sm font-bold text-primary">Diagnóstico Concluído</div>
+            </div>
             <button
               onClick={() => setStatus("needs_diagnosis")}
               className="text-xs font-medium text-muted-foreground hover:text-accent hover:underline"
@@ -1467,12 +1504,12 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
               Refazer
             </button>
           </div>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Você já realizou o diagnóstico. Toque no botão abaixo ou na aba "Exame" para ver os detalhes.
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            Seu exame está atualizado. Você pode revisar os detalhes ou atualizar o estado da sua planta a qualquer momento.
           </p>
           <button
             onClick={() => setTab("diagnostico")}
-            className="mt-3 inline-flex items-center gap-1 rounded-full border border-border px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
+            className="mt-4 inline-flex items-center gap-2 rounded-xl border border-border px-5 py-2.5 text-sm font-bold text-foreground transition-colors hover:bg-muted"
           >
             Ver detalhes <ChevronRight size={14} />
           </button>

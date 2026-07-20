@@ -90,14 +90,14 @@ export function useAuthBootstrap() {
       // Determinar destino
       const hasPlant = profileRes.data?.plant_registered_at !== null;
       const diagnosisReady = isDiagnosisCurrent(finalState);
-      const hasObservations = totalObservations(finalState.diagnosis) > 0;
 
       if (!hasPlant) {
         setStatus("needs_plant_registration");
+      } else if (!diagnosisReady && !finalState.onboarded) {
+        // Se tem planta mas nunca completou o diagnóstico inicial (onboarded),
+        // força o diagnóstico antes de liberar o Início/Plano.
+        setStatus("needs_diagnosis");
       } else {
-        // Agora sempre redireciona para "ready" se tiver a planta,
-        // A lógica de forçar diagnóstico foi movida para o componente (opcional)
-        // ou permitimos que o usuário veja o Início primeiro.
         setStatus("ready");
       }
     } catch (err: any) {

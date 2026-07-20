@@ -1,6 +1,11 @@
 /**
  * Chat, antes a gente tinha uma outra página inicial, né? Tinha uma imagem, falava sobre os dois passos, o me-- certo?
+ * 
+ * Chat, eu quero mudar esse fluxo. Eu quero que esta página de boas-vindas, que fala sobre o método dois passos, seja a página inicial, a pess-- depois vem login, página de login e lá dentro do início, a pessoa-- o primeiro passo tem que ser fazer-- a gente tem que ter uma seção, um card lá dentro do início pra ela fazer o diagnóstico e depois ter acesso ao plano. Como que a gente pode fazer isso?
+ * 
  * Qual que é a página inicial do meu aplicativo?
+ * Chat, outro ponto é que assim, a pessoa que já fez o login, já fez o diagnóstico, após ela fazer o login novamente, ela tem que ser dire-e-redirecionada para a página de início e não pra fazer o diagnóstico novamente. 
+
 
  * Chat, outro ponto é que assim, a pessoa que já fez o login, já fez o diagnóstico, após ela fazer o login novamente, ela tem que ser dire-e-redirecionada para a página de início e não pra fazer o diagnóstico novamente. 
 
