@@ -633,4 +633,5 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     isApplicationDay: true,
     evaluationType: "final",
   },
+};
 
