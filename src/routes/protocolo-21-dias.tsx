@@ -1260,9 +1260,14 @@ function PlanoTab({ setTab }: PlanoTabProps) {
 
   return (
     <div className="space-y-4">
-      <div>
-        <div className="text-xs font-bold uppercase tracking-wider text-accent">Meu plano</div>
-        <h1 className="text-2xl font-display tracking-tight text-primary">Plano de 21 dias</h1>
+      <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-6">
+        <div className="absolute -right-4 -top-4 opacity-[0.08] text-primary rotate-12">
+          <Flower2 size={120} />
+        </div>
+        <div className="relative z-10">
+          <div className="text-xs font-bold uppercase tracking-wider text-accent">Meu plano</div>
+          <h1 className="text-2xl font-display tracking-tight text-primary">Plano de 21 dias</h1>
+        </div>
       </div>
 
       {!diagnosisFresh && state.diagnosisResult && (
@@ -1466,22 +1471,28 @@ function WeekPicker({
 }
 
 function DayHeaderCard({ meta }: { meta: ProtocolDay }) {
+  const phase = phaseOf(meta.day);
   return (
-    <div className="rounded-3xl border border-border bg-card p-5">
-      <div className="text-xs font-semibold uppercase tracking-wider text-accent">
-        {phaseOf(meta.day).range}
+    <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-5">
+      <div className="absolute -right-6 -top-6 opacity-[0.05] text-primary rotate-12">
+        <Sprout size={100} />
       </div>
-      <h2 className="mt-1 text-lg font-bold text-primary">
-        Dia {meta.day} — {meta.title}
-      </h2>
-      <p className="mt-1 text-sm text-muted-foreground">{meta.objective}</p>
-      <p className="mt-2 text-sm text-foreground/85">{meta.mainAction}</p>
-      {meta.tip && (
-        <div className="mt-3 rounded-2xl bg-secondary/60 px-3 py-2 text-sm text-secondary-foreground">
-          <span className="font-semibold text-primary">Dica: </span>
-          {meta.tip}
+      <div className="relative z-10">
+        <div className="text-xs font-semibold uppercase tracking-wider text-accent">
+          {phase.range}
         </div>
-      )}
+        <h2 className="mt-1 text-lg font-display text-primary">
+          Dia {meta.day} — {meta.title}
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">{meta.objective}</p>
+        <p className="mt-2 text-sm text-foreground/85">{meta.mainAction}</p>
+        {meta.tip && (
+          <div className="mt-3 rounded-xl bg-secondary/60 px-3 py-2 text-sm text-secondary-foreground">
+            <span className="font-semibold text-primary">Dica: </span>
+            {meta.tip}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
@@ -1504,31 +1515,36 @@ function DayContentCard({
   void entry;
   const tracking = diagnosisFresh ? trackingPoints.slice(0, 3) : [];
   return (
-    <div className="rounded-3xl border border-border bg-card p-5">
-      <div className="text-xs font-semibold uppercase tracking-wider text-accent">
-        {phaseOf(meta.day).range}
+    <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-5">
+      <div className="absolute -right-6 -top-6 opacity-[0.05] text-primary rotate-12">
+        <Leaf size={100} />
       </div>
-      <h2 className="mt-1 text-lg font-bold text-primary">
-        Dia {meta.day} — {meta.title}
-      </h2>
-      <p className="mt-1 text-sm text-muted-foreground">{meta.objective}</p>
-      <p className="mt-2 text-sm text-foreground/85">{meta.mainAction}</p>
-      {meta.tip && (
-        <div className="mt-3 rounded-2xl bg-secondary/60 px-3 py-2 text-sm text-secondary-foreground">
-          <span className="font-semibold text-primary">Dica: </span>
-          {meta.tip}
+      <div className="relative z-10">
+        <div className="text-xs font-semibold uppercase tracking-wider text-accent">
+          {phaseOf(meta.day).range}
         </div>
-      )}
+        <h2 className="mt-1 text-lg font-display text-primary">
+          Dia {meta.day} — {meta.title}
+        </h2>
+        <p className="mt-1 text-sm text-muted-foreground">{meta.objective}</p>
+        <p className="mt-2 text-sm text-foreground/85">{meta.mainAction}</p>
+        {meta.tip && (
+          <div className="mt-3 rounded-xl bg-secondary/60 px-3 py-2 text-sm text-secondary-foreground">
+            <span className="font-semibold text-primary">Dica: </span>
+            {meta.tip}
+          </div>
+        )}
 
-      <DetailAccordions
-        howTo={meta.howTo}
-        observe={meta.observe}
-        avoid={meta.avoid}
-        registerText={meta.registerText}
-        attention={meta.attention}
-        personalizedTracking={meta.personalizedContext ? tracking : []}
-        customObserveTitle={meta.observeTitle}
-      />
+        <DetailAccordions
+          howTo={meta.howTo}
+          observe={meta.observe}
+          avoid={meta.avoid}
+          registerText={meta.registerText}
+          attention={meta.attention}
+          personalizedTracking={meta.personalizedContext ? tracking : []}
+          customObserveTitle={meta.observeTitle}
+        />
+      </div>
     </div>
   );
 }
@@ -1555,7 +1571,7 @@ function StagesList({
           <AccordionItem
             key={stage.id}
             value={stage.id}
-            className="overflow-hidden rounded-3xl border border-border bg-card"
+            className="overflow-hidden rounded-xl border border-border bg-card"
           >
             <AccordionTrigger className="px-5 py-4 text-left text-[15px] font-semibold text-primary hover:no-underline">
               {stage.title}
@@ -1888,12 +1904,17 @@ function DiagnosticoTab({
 
   return (
     <div className="space-y-4">
-      <div>
-        <div className="text-xs font-bold uppercase tracking-wider text-accent">Diagnóstico</div>
-        <h1 className="text-2xl font-black tracking-tight text-primary">Sinais observados</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Este resumo orienta sua observação. Um sinal isolado não fecha um diagnóstico.
-        </p>
+      <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-6">
+        <div className="absolute -right-4 -top-4 opacity-[0.08] text-primary rotate-12">
+          <Stethoscope size={120} />
+        </div>
+        <div className="relative z-10">
+          <div className="text-xs font-bold uppercase tracking-wider text-accent">Diagnóstico</div>
+          <h1 className="text-2xl font-display tracking-tight text-primary">Sinais observados</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Este resumo orienta sua observação. Um sinal isolado não fecha um diagnóstico.
+          </p>
+        </div>
       </div>
 
       {result && !current && (
@@ -1974,21 +1995,30 @@ function DiarioTab() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <div className="text-xs font-bold uppercase tracking-wider text-accent">
-          Diário fotográfico
+      <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-6">
+        <div className="absolute -right-4 -top-4 opacity-[0.08] text-primary rotate-12">
+          <Images size={120} />
         </div>
-        <h1 className="text-2xl font-black tracking-tight text-primary">Linha do tempo</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Registre fotos e observações nos Dias 1, 7, 14 e 21.
-        </p>
+        <div className="relative z-10">
+          <div className="text-xs font-bold uppercase tracking-wider text-accent">
+            Diário fotográfico
+          </div>
+          <h1 className="text-2xl font-display tracking-tight text-primary">Linha do tempo</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Registre fotos e observações nos Dias 1, 7, 14 e 21.
+          </p>
+        </div>
       </div>
 
       <div className="space-y-3">
         {PHOTO_DAYS.map((d: number) => {
           const entry = state.days[d] ?? { checklist: {}, note: "", completed: false };
           return (
-            <div key={d} className="rounded-3xl border border-border bg-card p-4">
+            <div key={d} className="relative overflow-hidden rounded-2xl border border-border bg-card p-4">
+              <div className="absolute -right-6 -top-6 opacity-[0.03] text-primary rotate-12">
+                <Camera size={80} />
+              </div>
+              <div className="relative z-10">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-[11px] font-bold uppercase tracking-wider text-accent">
@@ -2058,6 +2088,7 @@ function DiarioTab() {
                   value={entry.observations ?? ""}
                   onChange={(v) => updateDay(d, { observations: v })}
                 />
+              </div>
               </div>
             </div>
           );
@@ -2278,12 +2309,17 @@ function AprenderTab() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <div className="text-xs font-bold uppercase tracking-wider text-accent">Aprender</div>
-        <h1 className="text-2xl font-black tracking-tight text-primary">Biblioteca educativa</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Conteúdo curto e prático para consultar quando precisar.
-        </p>
+      <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-6">
+        <div className="absolute -right-4 -top-4 opacity-[0.08] text-primary rotate-12">
+          <BookOpen size={120} />
+        </div>
+        <div className="relative z-10">
+          <div className="text-xs font-bold uppercase tracking-wider text-accent">Aprender</div>
+          <h1 className="text-2xl font-display tracking-tight text-primary">Biblioteca educativa</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Conteúdo curto e prático para consultar quando precisar.
+          </p>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 gap-3">
