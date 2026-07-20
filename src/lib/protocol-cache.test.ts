@@ -7,8 +7,8 @@ import {
   hasLegacyData,
   getLegacyData,
   clearLegacyData 
-} from "../protocol-cache";
-import { ProtocolState } from "../protocol-store";
+} from "./protocol-cache";
+import { ProtocolState } from "./protocol-store";
 
 const mockState: ProtocolState = {
   schemaVersion: 2,
