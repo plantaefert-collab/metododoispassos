@@ -1690,6 +1690,29 @@ function PlanoTab({ actorId, setTab }: PlanoTabProps) {
         weekDays={activeWeek.days}
       />
 
+      {!diagnosisFresh && day === 1 && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl border-2 border-dashed border-primary/20 bg-primary/5 p-6 text-center"
+        >
+          <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <Stethoscope size={24} />
+          </div>
+          <h3 className="font-display text-lg text-primary">Personalize seu plano</h3>
+          <p className="mt-1 text-sm text-muted-foreground">
+            O diagnóstico ajuda a identificar as necessidades específicas da sua orquídea hoje.
+          </p>
+          <button
+            onClick={() => setTab("diagnostico")}
+            className="mt-4 inline-flex items-center gap-2 rounded-full bg-primary px-6 py-2.5 text-sm font-bold text-primary-foreground shadow-md transition-transform active:scale-95"
+          >
+            Fazer diagnóstico agora
+            <ChevronRight size={16} />
+          </button>
+        </motion.div>
+      )}
+
       {meta.stages && meta.stages.length > 0 ? (
         <DayHeaderCard meta={meta} />
       ) : (
