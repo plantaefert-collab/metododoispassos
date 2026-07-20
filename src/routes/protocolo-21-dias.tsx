@@ -421,6 +421,7 @@ function AppShell({
   children: ReactNode;
 }) {
   const { state, clearSaveError } = useProtocolStore();
+  const diagnosisFresh = isDiagnosisCurrent(state);
   return (
     <div className="min-h-screen bg-background font-sans selection:bg-primary/10">
       <div className="mx-auto flex min-h-screen max-w-[440px] flex-col shadow-[0_30px_90px_-20px_rgba(23,61,50,0.1)] sm:my-4 sm:min-h-[calc(100vh-2rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card">
