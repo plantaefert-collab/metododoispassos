@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState, type ReactNode, type ChangeEvent } from "react";
+import { useMemo, useState, type ReactNode, type ChangeEvent, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -26,6 +26,8 @@ import {
   Info,
   Flower2,
   Sparkles,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 import {
   Accordion,
@@ -54,7 +56,13 @@ import {
   type DiagnosisCategory,
   type DiagnosisGuidance,
 } from "@/lib/diagnosis-matrix";
+import { useAuthBootstrap } from "@/hooks/use-auth-bootstrap";
+import { AuthScreen } from "@/components/auth/AuthScreen";
+import { AccountMenu } from "@/components/auth/AccountMenu";
+import { LegacyProgressDialog } from "@/components/auth/LegacyProgressDialog";
+import { hasLegacyData, getLegacyData, clearLegacyData } from "@/lib/protocol-cache";
 import welcomeOrchid from "@/assets/welcome-orchid.jpg";
+
 
 export const Route = createFileRoute("/protocolo-21-dias")({
   head: () => ({
