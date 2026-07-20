@@ -40,7 +40,9 @@ export function useAuthBootstrap() {
         return;
       }
 
-      if (profileRes.error) throw new Error("Erro ao carregar perfil");
+      if (profileRes.error && profileRes.error.code !== "PGRST116") {
+        throw new Error("Erro ao carregar perfil: " + profileRes.error.message);
+      }
       
       const remoteProgress = progressRes.data;
       const remoteTimestamp = remoteProgress?.updated_at || null;
@@ -89,7 +91,8 @@ export function useAuthBootstrap() {
 
       // Determinar destino
       // O diagnóstico e o cadastro da planta agora são opcionais.
-      // Sempre redirecionamos para "ready" (Início) após o login.
+      // Se for um novo usuário sem perfil, ele será criado via upsert em saveProfileRemote em chamadas subsequentes
+      // mas aqui garantimos que o status seja 'ready' para liberar a UI.
       setStatus("ready");
     } catch (err: any) {
       if (generation === bootstrapGenerationRef.current) {

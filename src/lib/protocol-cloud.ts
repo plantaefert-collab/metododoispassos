@@ -20,7 +20,7 @@ export async function fetchUserProfile(userId: string): Promise<{ data: UserProf
       plant_difficulty
     `)
     .eq("id", userId)
-    .single();
+    .maybeSingle();
 
   if (error) return { data: null, error };
   return { data: data as UserProfile, error: null };
@@ -58,8 +58,10 @@ export async function saveProgressRemote(userId: string, state: ProtocolState): 
 export async function saveProfileRemote(userId: string, profile: Partial<UserProfile>): Promise<{ error: PostgrestError | null }> {
   const { error } = await supabase
     .from("profiles")
-    .update(profile)
-    .eq("id", userId);
+    .upsert({
+      id: userId,
+      ...profile,
+    }, { onConflict: "id" });
 
   return { error };
 }
@@ -75,11 +77,11 @@ export async function registerPlantRemote(userId: string, plantData: {
 }): Promise<{ error: PostgrestError | null }> {
   const { error } = await supabase
     .from("profiles")
-    .update({
+    .upsert({
+      id: userId,
       ...plantData,
       plant_registered_at: new Date().toISOString()
-    })
-    .eq("id", userId);
+    }, { onConflict: "id" });
 
   return { error };
 }
