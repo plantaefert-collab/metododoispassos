@@ -160,7 +160,7 @@ function ProtocoloPage() {
   return (
     <AppShell tab={tab} setTab={setTab} onReset={() => setShowReset(true)}>
       {tab === "inicio" && <InicioTab setTab={setTab} />}
-      {tab === "plano" && <PlanoTab />}
+      {tab === "plano" && <PlanoTab setTab={setTab} />}
       {tab === "diagnostico" && <DiagnosticoTab onRedo={() => setScreen("diagnosis")} />}
       {tab === "diario" && <DiarioTab />}
       {tab === "aprender" && <AprenderTab />}

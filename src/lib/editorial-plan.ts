@@ -124,7 +124,7 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
           "Misturar produtos não previstos",
           "Repetir a aplicação por engano",
           "Alterar a quantidade recomendada",
-          "Aplicar diretamente nas flores, caso essa restrição seja confirmada",
+          "Aplicar diretamente nas flores",
         ],
         attention: [
           "Verifique a umidade do substrato antes de iniciar.",
@@ -901,7 +901,7 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
       "Registrei o que ainda precisa de atenção",
       "Selecionei a classificação da evolução",
       "Defini o cuidado que será mantido",
-      "Conclui a avaliação",
+      "Concluí a avaliação",
       "Realizei o Passo 1 (Enraizar)",
       "Realizei o Passo 2 (Nutrir)",
       "Registrei a quarta aplicação do plano",
