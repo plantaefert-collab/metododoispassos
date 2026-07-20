@@ -1398,12 +1398,16 @@ function InfoCard({
 
 function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t: Tab) => void; setStatus: (s: AuthBootstrapStatus) => void }) {
   const { state, setCurrentDay } = useProtocolStore();
-
   const day = state.currentDay;
   const phase = phaseOf(day);
   const isApplicationDay = APPLICATION_DAYS.includes(day);
   const trackingPoints = state.diagnosisResult?.trackingPoints ?? [];
   const diagnosisFresh = isDiagnosisCurrent(state);
+
+  const completedDays = Object.values(state.days).filter((d) => d.completed).length;
+  const totalApplications = state.applications.length;
+  const totalNotes = Object.values(state.days).filter((d) => d.note?.trim()).length;
+  const totalPhotos = Object.values(state.days).filter((d) => d.photo).length;
 
   return (
     <div className="space-y-4">
@@ -1485,6 +1489,66 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           </div>
         </div>
       )}
+
+      {/* Resumo da Jornada */}
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
+            <FileText size={18} />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-primary">Sua jornada até aqui</h3>
+            <p className="text-[10px] text-muted-foreground">Progresso consolidado</p>
+          </div>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          <StatCard label="Dias concluídos" value={`${completedDays}/21`} icon={<CalendarCheck size={14} />} />
+          <StatCard label="Aplicações" value={totalApplications} icon={<Droplets size={14} />} />
+          <StatCard label="Observações" value={totalNotes} icon={<BookOpen size={14} />} />
+          <StatCard label="Fotos" value={totalPhotos} icon={<Images size={14} />} />
+        </div>
+      </div>
+
+      {/* Linha do Tempo */}
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-sm font-bold text-primary">Linha do Tempo</h3>
+          <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">21 dias</div>
+        </div>
+        <div className="space-y-4">
+          {[1, 2, 3].map((weekNum) => {
+            const weekDays = [1, 2, 3, 4, 5, 6, 7].map(d => (weekNum - 1) * 7 + d);
+            const weekCompleted = weekDays.filter(d => state.days[d]?.completed).length;
+            const weekPhaseColor = weekNum === 1 ? "bg-primary" : weekNum === 2 ? "bg-[#D946EF]" : "bg-accent";
+            
+            return (
+              <div key={weekNum} className="relative pl-6">
+                <div className="absolute left-0 top-1 h-full w-px bg-border/60" />
+                <div className={`absolute -left-[3px] top-1.5 h-1.5 w-1.5 rounded-full ${weekPhaseColor}`} />
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Semana {weekNum}
+                  </span>
+                  <span className="text-[10px] font-medium text-primary">
+                    {weekCompleted}/7 concluídos
+                  </span>
+                </div>
+                
+                <div className="mt-2 grid grid-cols-7 gap-1">
+                  {weekDays.map(d => (
+                    <div 
+                      key={d} 
+                      className={`h-1.5 rounded-full transition-colors ${state.days[d]?.completed ? weekPhaseColor : 'bg-secondary/60'}`}
+                      title={`Dia ${d}`}
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
 
       <div className="rounded-2xl border border-border bg-card p-5">
         <div className="mb-3 flex items-center justify-between">
