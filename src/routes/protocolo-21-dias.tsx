@@ -28,6 +28,8 @@ import {
   Sparkles,
   AlertCircle,
   Loader2,
+  FileText,
+  Download,
 } from "lucide-react";
 import {
   Accordion,
@@ -95,7 +97,7 @@ export const Route = createFileRoute("/protocolo-21-dias")({
   component: ProtocoloPage,
 });
 
-type Tab = "inicio" | "plano" | "diagnostico" | "diario" | "aprender";
+type Tab = "inicio" | "plano" | "diagnostico" | "diario" | "aprender" | "resumo";
 
 function phaseOf(day: number) {
   const phase = getProtocolPhase(day);
@@ -305,6 +307,7 @@ function ProtocoloPage() {
                   )}
                   {tab === "diario" && <DiarioTab actorId={actorId} />}
                   {tab === "aprender" && <AprenderTab />}
+                  {tab === "resumo" && <ResumoTab actorId={actorId} />}
                 </motion.div>
               </AnimatePresence>
             </AppShell>
@@ -366,9 +369,10 @@ function ProtocoloPage() {
 
 function PhaseProgressBar({ currentDay }: { currentDay: number }) {
   const phaseInfo = useMemo(() => {
-    if (currentDay <= 7) return { label: "Fase 1: Dias 1–7", progress: (currentDay / 7) * 100, color: "bg-primary" };
-    if (currentDay <= 14) return { label: "Fase 2: Dias 8–14", progress: ((currentDay - 7) / 7) * 100, color: "bg-lilac-500" };
-    return { label: "Fase 3: Dias 15–21", progress: ((currentDay - 14) / 7) * 100, color: "bg-accent" };
+    const day = Math.min(21, Math.max(1, currentDay));
+    if (day <= 7) return { label: "Fase 1: Dias 1–7", progress: (day / 7) * 100, color: "bg-primary" };
+    if (day <= 14) return { label: "Fase 2: Dias 8–14", progress: ((day - 7) / 7) * 100, color: "bg-[#D946EF]" }; // matching accent magenta
+    return { label: "Fase 3: Dias 15–21", progress: ((day - 14) / 7) * 100, color: "bg-accent" };
   }, [currentDay]);
 
   return (
@@ -383,6 +387,7 @@ function PhaseProgressBar({ currentDay }: { currentDay: number }) {
       </div>
       <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
         <motion.div
+          key={phaseInfo.label}
           initial={{ width: 0 }}
           animate={{ width: `${Math.min(100, Math.max(0, phaseInfo.progress))}%` }}
           transition={{ duration: 0.5, ease: "easeOut" }}
@@ -481,6 +486,19 @@ function AppShell({
                   <div className="text-left">
                     <div className="font-bold">Ver o Método</div>
                     <div className="text-xs text-muted-foreground">Revisar os 2 passos (Enraizar + Nutrir)</div>
+                  </div>
+                  <ChevronRight size={16} className="ml-auto opacity-50" />
+                </button>
+                <button
+                  onClick={() => setTab("resumo")}
+                  className="flex items-center gap-2 rounded-xl border border-primary/20 bg-primary/5 p-4 text-sm font-medium text-primary transition-all hover:bg-primary/10"
+                >
+                  <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/20">
+                    <FileText size={20} />
+                  </div>
+                  <div className="text-left">
+                    <div className="font-bold">Resumo & PDF</div>
+                    <div className="text-xs text-muted-foreground">Exportar progresso e estatísticas</div>
                   </div>
                   <ChevronRight size={16} className="ml-auto opacity-50" />
                 </button>
@@ -1354,12 +1372,14 @@ function ResultSection({
   );
 }
 
-function ProgressBar({ value, className = "" }: { value: number; className?: string }) {
+function ProgressBar({ value, className = "", color = "bg-primary" }: { value: number; className?: string; color?: string }) {
   return (
     <div className={`h-2 w-full overflow-hidden rounded-full bg-muted ${className}`}>
-      <div
-        className="h-full rounded-full bg-primary transition-all"
-        style={{ width: `${Math.max(0, Math.min(100, value))}%` }}
+      <motion.div
+        initial={{ width: 0 }}
+        animate={{ width: `${Math.max(0, Math.min(100, value))}%` }}
+        transition={{ duration: 0.8, ease: "circOut" }}
+        className={`h-full rounded-full ${color}`}
       />
     </div>
   );
@@ -1426,7 +1446,11 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             <div className="text-sm font-medium">Progresso do plano</div>
             <div className="text-sm font-bold">Dia {day} de 21</div>
           </div>
-          <ProgressBar className="mt-2" value={(day / 21) * 100} />
+          <ProgressBar 
+            className="mt-2" 
+            value={(day / 21) * 100} 
+            color={day <= 7 ? "bg-primary" : day <= 14 ? "bg-[#D946EF]" : "bg-accent"} 
+          />
         </div>
       </div>
 
@@ -2892,6 +2916,181 @@ function ConfirmModal({
           </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+
+/* ---------------- Resumo ---------------- */
+
+function ResumoTab({ actorId }: { actorId: string }) {
+  const { state } = useProtocolStore();
+  const [isGenerating, setIsGenerating] = useState(false);
+
+  const completedDays = Object.values(state.days).filter((d) => d.completed).length;
+  const totalApplications = state.applications.length;
+  const totalNotes = Object.values(state.days).filter((d) => d.note?.trim()).length;
+  const totalPhotos = Object.values(state.days).filter((d) => d.photo).length;
+
+  const generatePDF = async () => {
+    setIsGenerating(true);
+    try {
+      const { jsPDF } = await import("jspdf");
+      const { default: autoTable } = await import("jspdf-autotable");
+      
+      const doc = new jsPDF();
+      
+      // Header
+      doc.setFontSize(22);
+      doc.setTextColor(23, 61, 50); // #173D32
+      doc.text("Relatório: Guia Prático Orquídeas Floridas", 14, 22);
+      
+      doc.setFontSize(12);
+      doc.setTextColor(100);
+      doc.text(`Gerado em: ${new Date().toLocaleDateString("pt-BR")}`, 14, 30);
+      doc.text(`Planta: ${state.plant.name || "Não informada"}`, 14, 37);
+
+      // Summary Table
+      autoTable(doc, {
+        startY: 45,
+        head: [["Métrica", "Valor"]],
+        body: [
+          ["Dias Concluídos", `${completedDays} de 21`],
+          ["Aplicações Realizadas", totalApplications.toString()],
+          ["Registros de Observação", totalNotes.toString()],
+          ["Fotos Registradas", totalPhotos.toString()],
+        ],
+        theme: "striped",
+        headStyles: { fillColor: [23, 61, 50] },
+      });
+
+      // Detailed Records
+      const records = Object.entries(state.days)
+        .filter(([_, d]) => d.completed || d.note?.trim())
+        .sort(([a], [b]) => Number(a) - Number(b))
+        .map(([day, d]) => [
+          `Dia ${day}`,
+          d.completed ? "Sim" : "Não",
+          d.note || "-",
+          d.applicationDone ? "Realizada" : "-"
+        ]);
+
+      if (records.length > 0) {
+        doc.setFontSize(16);
+        doc.setTextColor(23, 61, 50);
+        doc.text("Detalhamento por Dia", 14, (doc as any).lastAutoTable.finalY + 15);
+
+        autoTable(doc, {
+          startY: (doc as any).lastAutoTable.finalY + 20,
+          head: [["Dia", "Concluído", "Observação", "Aplicação"]],
+          body: records,
+          theme: "grid",
+          headStyles: { fillColor: [217, 70, 239] }, // Accent color
+        });
+      }
+
+      doc.save(`protocolo-orquidea-${state.plant.name || "resumo"}.pdf`);
+    } catch (error) {
+      console.error("Erro ao gerar PDF:", error);
+      alert("Ocorreu um erro ao gerar o PDF. Tente novamente.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
+            <FileText size={20} />
+          </div>
+          <div>
+            <h2 className="font-display text-xl text-primary">Resumo da Jornada</h2>
+            <p className="text-xs text-muted-foreground">Visão geral do seu progresso de 21 dias.</p>
+          </div>
+        </div>
+
+        <div className="mt-6 grid grid-cols-2 gap-3">
+          <StatCard label="Dias concluídos" value={`${completedDays}/21`} icon={<CalendarCheck size={16} />} />
+          <StatCard label="Aplicações" value={totalApplications} icon={<Droplets size={16} />} />
+          <StatCard label="Observações" value={totalNotes} icon={<BookOpen size={16} />} />
+          <StatCard label="Fotos" value={totalPhotos} icon={<Images size={16} />} />
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <h3 className="text-sm font-bold text-primary">Exportar Dados</h3>
+        <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
+          Gere um arquivo PDF completo com todos os seus registros, observações e progresso para arquivar ou compartilhar.
+        </p>
+        
+        <button
+          onClick={generatePDF}
+          disabled={isGenerating}
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50"
+        >
+          {isGenerating ? (
+            <>
+              <Loader2 size={18} className="animate-spin" />
+              Gerando PDF...
+            </>
+          ) : (
+            <>
+              <Download size={18} />
+              Baixar Relatório em PDF
+            </>
+          )}
+        </button>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card p-5">
+        <h3 className="mb-4 text-sm font-bold text-primary">Linha do Tempo</h3>
+        <div className="space-y-4">
+          {[1, 2, 3].map((weekNum) => {
+            const weekDays = [1, 2, 3, 4, 5, 6, 7].map(d => (weekNum - 1) * 7 + d);
+            const weekCompleted = weekDays.filter(d => state.days[d]?.completed).length;
+            
+            return (
+              <div key={weekNum} className="relative pl-6">
+                <div className="absolute left-0 top-1 h-full w-px bg-border" />
+                <div className="absolute -left-[3px] top-1.5 h-1.5 w-1.5 rounded-full bg-accent" />
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                    Semana {weekNum}
+                  </span>
+                  <span className="text-[10px] font-medium text-accent">
+                    {weekCompleted}/7 concluídos
+                  </span>
+                </div>
+                
+                <div className="mt-2 grid grid-cols-7 gap-1">
+                  {weekDays.map(d => (
+                    <div 
+                      key={d} 
+                      className={`h-1.5 rounded-full ${state.days[d]?.completed ? 'bg-primary' : 'bg-secondary'}`}
+                      title={`Dia ${d}`}
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StatCard({ label, value, icon }: { label: string; value: string | number; icon: ReactNode }) {
+  return (
+    <div className="rounded-xl border border-border bg-secondary/30 p-3">
+      <div className="flex items-center gap-1.5 text-muted-foreground">
+        {icon}
+        <span className="text-[10px] font-bold uppercase tracking-wider">{label}</span>
+      </div>
+      <div className="mt-1 text-xl font-display text-primary">{value}</div>
     </div>
   );
 }
