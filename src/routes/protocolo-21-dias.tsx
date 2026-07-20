@@ -1405,28 +1405,18 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             Enraizar primeiro, depois nutrir. Prefira horário fresco e evite sol forte.
           </p>
           <div className="mt-4 flex flex-col gap-2">
-            {!diagnosisFresh && (
-              <button
-                onClick={() => setStatus("needs_diagnosis")}
-                className="flex items-center justify-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2.5 text-xs font-bold text-primary transition-colors hover:bg-primary/20"
-              >
-                <Stethoscope size={14} /> Fazer diagnóstico
-              </button>
-            )}
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => setTab("plano")}
-                className="rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
-              >
-                Ver tarefa
-              </button>
-              <button
-                onClick={() => setTab("plano")}
-                className="rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground"
-              >
-                Registrar aplicação
-              </button>
-            </div>
+            <button
+              onClick={() => setStatus("needs_diagnosis")}
+              className="flex items-center justify-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2.5 text-xs font-bold text-primary transition-colors hover:bg-primary/20"
+            >
+              <Stethoscope size={14} /> Fazer diagnóstico
+            </button>
+            <button
+              onClick={() => setTab("plano")}
+              className="rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground"
+            >
+              Registrar aplicação
+            </button>
           </div>
         </div>
       )}
@@ -1471,19 +1461,11 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           <h2 className="mt-1 text-lg font-display text-foreground">{getProtocolDay(day).title}</h2>
           <p className="mt-1 text-sm text-muted-foreground">{getProtocolDay(day).objective}</p>
           <div className="mt-3 flex flex-wrap gap-2">
-            {!diagnosisFresh && (
-              <button
-                onClick={() => setStatus("needs_diagnosis")}
-                className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2.5 text-xs font-bold text-primary transition-colors hover:bg-primary/20"
-              >
-                <Stethoscope size={14} /> Fazer diagnóstico
-              </button>
-            )}
             <button
-              onClick={() => setTab("plano")}
-              className="inline-flex items-center gap-1 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
+              onClick={() => setStatus("needs_diagnosis")}
+              className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-4 py-2.5 text-xs font-bold text-primary transition-colors hover:bg-primary/20"
             >
-              Abrir meu plano <ChevronRight size={16} />
+              <Stethoscope size={14} /> Fazer diagnóstico
             </button>
           </div>
         </div>
