@@ -2023,6 +2023,7 @@ function WeekPicker({
   onSelectDay: (day: number) => void;
   weekDays: number[];
 }) {
+  const { state } = useProtocolStore();
   return (
     <div className="space-y-3">
       <div
@@ -2057,20 +2058,28 @@ function WeekPicker({
         {weekDays.map((d) => {
           const active = d === currentDay;
           const isApp = APPLICATION_DAYS.includes(d);
+          const isCompleted = state.days[d]?.completed;
           return (
             <button
               key={d}
               onClick={() => onSelectDay(d)}
               aria-current={active ? "step" : undefined}
-              aria-label={isApp ? `Dia ${d}, dia de aplicação` : `Dia ${d}`}
-              className={`relative min-h-[44px] rounded-xl border px-2 py-2 text-[13px] font-semibold transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
+              aria-label={`${isApp ? `Dia ${d}, dia de aplicação` : `Dia ${d}`}${isCompleted ? ", concluído" : ""}`}
+              className={`relative min-h-[44px] rounded-xl border px-2 py-2 text-[13px] font-semibold transition-all focus:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
                 active
-                  ? "border-primary bg-primary text-primary-foreground"
-                  : "border-border bg-card text-foreground hover:border-primary/40"
+                  ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                  : isCompleted 
+                    ? "border-primary/20 bg-primary/5 text-primary/80"
+                    : "border-border bg-card text-foreground hover:border-primary/40"
               }`}
             >
               Dia {d}
-              {isApp && (
+              {isCompleted && (
+                <div className={`absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-primary text-[8px] text-primary-foreground shadow-sm ${active ? 'ring-1 ring-primary-foreground' : ''}`}>
+                  ✓
+                </div>
+              )}
+              {isApp && !isCompleted && (
                 <span
                   aria-hidden
                   className={`absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full ${
