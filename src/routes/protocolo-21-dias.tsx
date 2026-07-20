@@ -2050,7 +2050,8 @@ function DiarioTab() {
                       <Camera size={22} />
                       <span className="text-xs font-medium">Adicionar foto</span>
                     </div>
-                  )}
+                  </div>
+                )}
                 <input
                   type="file"
                   accept="image/*"
