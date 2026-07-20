@@ -307,6 +307,7 @@ function ProtocoloPage() {
                   )}
                   {tab === "diario" && <DiarioTab actorId={actorId} />}
                   {tab === "aprender" && <AprenderTab />}
+                  {tab === "resumo" && <ResumoTab actorId={actorId} />}
                 </motion.div>
               </AnimatePresence>
             </AppShell>
