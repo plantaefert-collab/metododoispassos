@@ -2411,7 +2411,7 @@ function FinalEvaluation({ actorId }: { actorId: string }) {
             </span>
             <textarea
               value={fe[q.key as keyof typeof fe] as string}
-              onChange={(e) => updateFinalEval({ [q.key]: e.target.value } as Partial<typeof fe>)}
+              onChange={(e) => updateFinalEval({ [q.key]: e.target.value } as Partial<typeof fe>, actorId)}
               rows={2}
               className="w-full rounded-xl border border-input bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             />
