@@ -1804,10 +1804,20 @@ function PlanoTab({ actorId, setTab }: PlanoTabProps) {
         <div className="relative z-10">
           <div className="text-xs font-bold uppercase tracking-wider text-accent">Meu plano</div>
           <motion.h1 
-            initial={{ opacity: 0.8 }}
-            animate={{ opacity: 1, scale: [1, 1.02, 1] }}
-            transition={{ duration: 0.5 }}
-            className="text-2xl font-display tracking-tight text-primary"
+            ref={titleRef}
+            tabIndex={-1}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ 
+              opacity: 1, 
+              y: 0,
+              scale: [1, 1.05, 1],
+            }}
+            transition={{ 
+              opacity: { duration: 0.4 },
+              y: { duration: 0.4 },
+              scale: { duration: 0.6, delay: 0.2, ease: "easeOut" }
+            }}
+            className="text-2xl font-display tracking-tight text-primary outline-none focus-visible:ring-2 focus-visible:ring-primary/20 rounded-lg"
           >
             Plano de 21 dias
           </motion.h1>
