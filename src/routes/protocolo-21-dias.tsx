@@ -1246,13 +1246,14 @@ function PlanoTab({ setTab }: PlanoTabProps) {
   const { state, setCurrentDay, updateDay, toggleChecklist, toggleDayCompleted } =
     useProtocolStore();
   const day = state.currentDay;
-  const [week, setWeek] = useState<1 | 2 | 3>(() => getWeekForDay(day));
   const [showMethod, setShowMethod] = useState(false);
   const meta = getProtocolDay(day);
   const entry = state.days[day] ?? { checklist: {}, note: "", completed: false };
   const isApplication = APPLICATION_DAYS.includes(day);
   const trackingPoints = state.diagnosisResult?.trackingPoints ?? [];
   const diagnosisFresh = isDiagnosisCurrent(state);
+
+  const week = useMemo(() => getWeekForDay(day), [day]);
   const activeWeek = WEEKS.find((w) => w.id === week) ?? WEEKS[0];
 
   return (
@@ -1264,7 +1265,10 @@ function PlanoTab({ setTab }: PlanoTabProps) {
 
       <WeekPicker
         currentWeek={week}
-        onSelect={setWeek}
+        onSelect={(w) => {
+          const firstDay = w === 1 ? 1 : w === 2 ? 8 : 15;
+          setCurrentDay(firstDay);
+        }}
         currentDay={day}
         onSelectDay={setCurrentDay}
         weekDays={activeWeek.days}
