@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState, type ReactNode, type ChangeEvent, useEffect, useRef } from "react";
+import { useMemo, useState, type ReactNode, type ChangeEvent, useEffect, useRef, useLayoutEffect } from "react";
 import { toast, Toaster } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -153,16 +153,26 @@ function ProtocoloPage() {
 
   if (status === "booting" || status === "loading_remote_data") {
     return (
-      <div className="min-h-screen bg-[#F8F5EE] flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-screen bg-[#F8F5EE] relative flex flex-col items-center justify-center p-6 text-center overflow-hidden">
+        {/* Marca d'água botânica */}
+        <div className="absolute inset-0 pointer-events-none opacity-[0.03] flex items-center justify-center">
+          <svg width="400" height="400" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-[#173D32]">
+             <path d="M50 10C50 10 40 30 40 50C40 70 50 90 50 90M50 10C50 10 60 30 60 50C60 70 50 90 50 90M20 50C20 50 40 45 50 50C60 55 80 50 80 50" stroke="currentColor" strokeWidth="0.5" strokeLinecap="round"/>
+             <circle cx="50" cy="50" r="2" fill="currentColor"/>
+          </svg>
+        </div>
+        
         <motion.div 
           animate={{ rotate: 360 }} 
-          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          className="mb-4 text-[#173D32]"
+          transition={{ duration: 3, repeat: Infinity, ease: "linear" }}
+          className="mb-6 text-[#173D32] relative z-10"
         >
-          <Loader2 size={40} strokeWidth={1.5} />
+          <div className="p-3 bg-white/50 backdrop-blur-sm rounded-full border border-[#173D32]/10 shadow-sm">
+            <Loader2 size={32} strokeWidth={1.5} />
+          </div>
         </motion.div>
-        <div className="font-display text-xl text-[#173D32]">Preparando sua jornada...</div>
-        <div className="mt-2 text-sm text-[#173D32]/60 font-medium uppercase tracking-widest">PlantaeFert Nutrição</div>
+        <div className="font-display text-2xl text-[#173D32] relative z-10 mb-2">Preparando sua jornada...</div>
+        <div className="text-[10px] text-[#173D32]/50 font-bold uppercase tracking-[0.2em] relative z-10">PlantaeFert Nutrição Vegetal</div>
       </div>
     );
   }
@@ -411,7 +421,7 @@ function PhaseProgressBar({ currentDay }: { currentDay: number }) {
           Progresso da {phaseInfo.label}
         </span>
         <span className="text-[10px] font-bold text-muted-foreground">
-          Dia {currentDay} de 21
+          Dia <span className="font-display text-lg text-primary">{currentDay}</span> de 21
         </span>
       </div>
       <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
@@ -450,30 +460,40 @@ function AppShell({
   return (
     <div className="min-h-screen bg-background font-sans selection:bg-primary/10">
       <div className="mx-auto flex min-h-screen max-w-[440px] flex-col shadow-[0_30px_90px_-20px_rgba(23,61,50,0.1)] sm:my-4 sm:min-h-[calc(100vh-2rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card">
-        <header className="sticky top-0 z-20 flex items-center justify-between gap-3 border-b border-border bg-card/80 px-4 py-4 backdrop-blur-md sm:rounded-t-2xl">
-          <div className="flex items-center gap-2">
-            <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground shadow-md shadow-primary/20">
-              <Leaf size={18} strokeWidth={2.2} />
+        <header className="sticky top-0 z-20 flex flex-col border-b border-border bg-card/80 backdrop-blur-md sm:rounded-t-2xl">
+          <div className="flex items-center justify-between gap-3 px-4 py-4">
+            <div className="flex items-center gap-2">
+              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground shadow-md shadow-primary/20">
+                <Leaf size={18} strokeWidth={2.2} />
+              </div>
+              <div className="min-w-0">
+                <div className="text-xs font-bold tracking-tight text-primary uppercase">PlantaeFert</div>
+                <div className="truncate text-[10px] font-medium text-muted-foreground/80">LABS · NUTRIÇÃO</div>
+              </div>
             </div>
-            <div className="min-w-0">
-              <div className="text-xs font-bold tracking-tight text-primary uppercase">PlantaeFert</div>
-              <div className="truncate text-[10px] font-medium text-muted-foreground/80">LABS · NUTRIÇÃO</div>
+            <div className="flex items-center gap-1">
+              {state.plant.name && (
+                <div className="hidden max-w-[130px] items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground sm:flex">
+                  <Flower2 size={12} className="shrink-0" />
+                  <span className="truncate">{state.plant.name}</span>
+                </div>
+              )}
+              <button
+                onClick={onReset}
+                className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
+                aria-label="Reiniciar meu plano"
+              >
+                <RefreshCw size={16} />
+              </button>
             </div>
           </div>
-          <div className="flex items-center gap-1">
-            {state.plant.name && (
-              <div className="hidden max-w-[130px] items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground sm:flex">
-                <Flower2 size={12} className="shrink-0" />
-                <span className="truncate">{state.plant.name}</span>
-              </div>
-            )}
-            <button
-              onClick={onReset}
-              className="grid h-9 w-9 place-items-center rounded-full text-muted-foreground hover:bg-muted hover:text-foreground"
-              aria-label="Reiniciar meu plano"
-            >
-              <RefreshCw size={16} />
-            </button>
+          
+          {/* Marca d'água botânica linear sutil no header */}
+          <div className="absolute right-0 top-0 h-full w-32 pointer-events-none opacity-[0.04] overflow-hidden">
+            <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-primary w-full h-full">
+              <path d="M10 90C30 70 40 40 90 10M10 90C40 80 60 70 90 10" stroke="currentColor" strokeWidth="1" strokeLinecap="round"/>
+              <path d="M40 60C45 55 55 55 60 60M30 70C35 65 45 65 50 70" stroke="currentColor" strokeWidth="0.5" strokeLinecap="round"/>
+            </svg>
           </div>
         </header>
 
@@ -1733,10 +1753,11 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
                 setTab("plano");
                 toast.info(`Navegando para o Dia ${d}`);
               }}
-              className="flex items-center gap-1.5 rounded-xl border border-border bg-card px-3.5 py-2 text-xs font-semibold text-foreground transition-all hover:border-primary/40 hover:bg-muted active:scale-95"
+              className="flex flex-col items-center justify-center min-w-[60px] gap-1 rounded-xl border border-border bg-card px-3 py-3 text-xs font-semibold text-foreground transition-all hover:border-primary/40 hover:bg-muted active:scale-95"
             >
-              Dia {d}
-              <ChevronRight size={12} className="text-muted-foreground/40" />
+              <span className="text-[10px] text-muted-foreground/60 uppercase">Dia</span>
+              <span className="font-display text-2xl text-primary leading-none">{d}</span>
+              <ChevronRight size={10} className="text-muted-foreground/40 mt-1" />
             </button>
           ))}
         </div>
@@ -1802,8 +1823,11 @@ function PlanoTab({ actorId, setTab }: PlanoTabProps) {
   return (
     <div ref={containerRef} className="space-y-4">
       <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-6">
-        <div className="absolute -right-4 -top-4 opacity-[0.08] text-primary rotate-12">
-          <Flower2 size={120} />
+        <div className="absolute -right-4 -top-4 opacity-[0.04] text-primary rotate-12">
+          <svg width="120" height="120" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+             <path d="M50 10C50 10 30 40 30 60C30 80 50 95 50 95C50 95 70 80 70 60C70 40 50 10 50 10Z" stroke="currentColor" strokeWidth="1"/>
+             <path d="M30 60C30 60 40 55 50 60C60 65 70 60 70 60" stroke="currentColor" strokeWidth="0.5"/>
+          </svg>
         </div>
         <div className="relative z-10">
           <div className="text-xs font-bold uppercase tracking-wider text-accent">Meu plano</div>
@@ -1821,9 +1845,9 @@ function PlanoTab({ actorId, setTab }: PlanoTabProps) {
               y: { duration: 0.4 },
               scale: { duration: 0.6, delay: 0.2, ease: "easeOut" }
             }}
-            className="text-2xl font-display tracking-tight text-primary outline-none focus-visible:ring-2 focus-visible:ring-primary/20 rounded-lg"
+            className="text-3xl font-display tracking-tight text-primary outline-none focus-visible:ring-2 focus-visible:ring-primary/20 rounded-lg"
           >
-            Plano de 21 dias
+            Plano de <span className="text-4xl text-accent">21</span> dias
           </motion.h1>
         </div>
       </div>
@@ -2111,7 +2135,7 @@ function DayHeaderCard({ meta }: { meta: ProtocolDay }) {
           {phase.range}
         </div>
         <h2 className="mt-1 text-lg font-display text-primary">
-          Dia {meta.day} — {meta.title}
+          Dia <span className="text-2xl text-accent">{meta.day}</span> — {meta.title}
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">{meta.objective}</p>
         <p className="mt-2 text-sm text-foreground/85">{meta.mainAction}</p>
@@ -2153,7 +2177,7 @@ function DayContentCard({
           {phaseOf(meta.day).range}
         </div>
         <h2 className="mt-1 text-lg font-display text-primary">
-          Dia {meta.day} — {meta.title}
+          Dia <span className="text-2xl text-accent">{meta.day}</span> — {meta.title}
         </h2>
         <p className="mt-1 text-sm text-muted-foreground">{meta.objective}</p>
         <p className="mt-2 text-sm text-foreground/85">{meta.mainAction}</p>
@@ -2202,8 +2226,13 @@ function StagesList({
             value={stage.id}
             className="overflow-hidden rounded-xl border border-border bg-card"
           >
-            <AccordionTrigger className="px-5 py-4 text-left text-[15px] font-semibold text-primary hover:no-underline">
-              {stage.title}
+            <AccordionTrigger className="px-5 py-4 text-left text-[15px] font-semibold text-primary hover:no-underline group">
+              <span className="flex items-center gap-2">
+                <span className="text-accent group-data-[state=open]:rotate-90 transition-transform">
+                  <Flower2 size={14} />
+                </span>
+                {stage.title}
+              </span>
             </AccordionTrigger>
             <AccordionContent className="px-5 pb-5 pt-0">
               <StageBody
@@ -2535,7 +2564,7 @@ function DiagnosticoTab({ actorId, onRedo, setTab }: { actorId: string; onRedo: 
         </div>
         <div className="relative z-10">
           <div className="text-xs font-bold uppercase tracking-wider text-accent">Diagnóstico</div>
-          <h1 className="text-2xl font-display tracking-tight text-primary">Sinais observados</h1>
+          <h1 className="text-2xl font-display tracking-tight text-primary">Sinais <span className="text-3xl text-accent">Observados</span></h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Este resumo orienta sua observação. Um sinal isolado não fecha um diagnóstico.
           </p>
@@ -2629,7 +2658,7 @@ function DiarioTab({ actorId }: { actorId: string }) {
           <div className="text-xs font-bold uppercase tracking-wider text-accent">
             Diário fotográfico
           </div>
-          <h1 className="text-2xl font-display tracking-tight text-primary">Linha do tempo</h1>
+          <h1 className="text-2xl font-display tracking-tight text-primary">Linha do tempo <span className="text-3xl text-accent">21</span></h1>
           <p className="mt-1 text-sm text-muted-foreground">
             Registre fotos e observações nos Dias 1, 7, 14 e 21.
           </p>
@@ -2650,7 +2679,7 @@ function DiarioTab({ actorId }: { actorId: string }) {
                   <div className="text-[11px] font-bold uppercase tracking-wider text-accent">
                     {phaseOf(d).range}
                   </div>
-                  <div className="text-lg font-bold text-primary">Dia {d}</div>
+                  <div className="text-lg font-bold text-primary">Dia <span className="font-display text-2xl text-accent">{d}</span></div>
                 </div>
                 {entry.photo ? (
                   <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-[11px] font-semibold text-primary">
@@ -2789,7 +2818,7 @@ function FinalEvaluation({ actorId }: { actorId: string }) {
   return (
     <div className="rounded-3xl border border-border bg-card p-5">
       <div className="text-xs font-bold uppercase tracking-wider text-accent">Avaliação final</div>
-      <h2 className="mt-1 text-lg font-bold text-primary">Comparação e reflexão</h2>
+      <h2 className="mt-1 text-lg font-bold text-primary">Reflexão <span className="font-display text-2xl text-accent">Final</span></h2>
 
       <div className="mt-4 grid grid-cols-4 gap-2">
         {PHOTO_DAYS.map((d: number) => {
@@ -2803,7 +2832,7 @@ function FinalEvaluation({ actorId }: { actorId: string }) {
                 <img src={p} alt={`Dia ${d}`} className="h-full w-full object-cover" />
               ) : (
                 <div className="grid h-full place-items-center text-[10px] font-semibold text-muted-foreground">
-                  Dia {d}
+                  Dia <span className="font-display text-xs">{d}</span>
                 </div>
               )}
             </div>
@@ -3170,7 +3199,7 @@ function ResumoTab({ actorId }: { actorId: string }) {
             <FileText size={20} />
           </div>
           <div>
-            <h2 className="font-display text-xl text-primary">Resumo da Jornada</h2>
+            <h2 className="font-display text-xl text-primary">Resumo da Jornada <span className="text-2xl text-accent">21</span></h2>
             <p className="text-xs text-muted-foreground">Visão geral do seu progresso de 21 dias.</p>
           </div>
         </div>
@@ -3222,7 +3251,7 @@ function ResumoTab({ actorId }: { actorId: string }) {
                 
                 <div className="flex items-center justify-between">
                   <span className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
-                    Semana {weekNum}
+                    Semana <span className="font-display text-sm">{weekNum}</span>
                   </span>
                   <span className="text-[10px] font-medium text-accent">
                     {weekCompleted}/7 concluídos
@@ -3254,7 +3283,7 @@ function StatCard({ label, value, icon }: { label: string; value: string | numbe
         {icon}
         <span className="text-[10px] font-bold uppercase tracking-wider">{label}</span>
       </div>
-      <div className="mt-1 text-xl font-display text-primary">{value}</div>
+      <div className="mt-1 text-2xl font-display text-primary leading-none">{value}</div>
     </div>
   );
 }
