@@ -1,22 +1,29 @@
-## Plano de correção
+## Causa raiz
 
-1. Corrigir o salvamento do resultado ao finalizar o diagnóstico
-- Garantir que, ao clicar em “Ver resultado”, o resultado recém-gerado seja renderizado imediatamente na tela seguinte.
-- Evitar que a tela leia uma versão antiga do estado no mesmo ciclo de renderização.
+O erro **409 Conflict** não vem do `UPDATE` em `profiles` (isso é `plant_registered_at`), vem do `upsert` em `protocol_progress` que dispara logo em seguida, no mesmo salvamento do onboarding.
 
-2. Blindar a sincronização com o banco
-- Ajustar o carregamento remoto para não sobrescrever um diagnóstico local recém-criado com `diagnosis_result: null` vindo do banco.
-- Normalizar o resultado recebido do banco antes de aplicar no estado, preservando `diagnosisStatus` e `answersVersion` corretamente.
-- Após salvar o diagnóstico, sincronizar também as respostas e a versão das respostas, não apenas o objeto `diagnosisResult`.
+A tabela `protocol_progress` tem duas restrições únicas:
 
-3. Corrigir a mensagem incorreta
-- Trocar a lógica da tela de resultado para nunca mostrar “Nenhum diagnóstico encontrado” quando houver respostas marcadas ou quando um resultado acabou de ser gerado.
-- Se o usuário não marcou nada, ainda assim gerar um resultado educativo com os blocos de “informações insuficientes”, em vez de bloquear a visualização.
+- `PRIMARY KEY (id)`
+- `UNIQUE (user_id)` ← e o trigger `handle_new_user` já criou uma linha nessa chave para todo usuário novo
 
-4. Garantir navegação correta depois do diagnóstico
-- Após finalizar o diagnóstico, manter o usuário na tela “Seu resultado personalizado”.
-- O botão “Ir para meu plano” continuará levando ao plano somente depois que a pessoa visualizar o resultado.
+O código atual em `src/lib/protocol-cloud.ts` chama:
 
-5. Validação
-- Adicionar/ajustar testes do store para cobrir: diagnóstico salvo, resultado preservado após sync, banco com resultado nulo não apagando resultado local recente.
-- Verificar no preview o fluxo completo: login/onboarding → diagnóstico → resultado personalizado visível.
+```ts
+supabase.from("protocol_progress").upsert({ user_id, ... })
+```
+
+Sem `onConflict`, o PostgREST resolve o conflito pela PK (`id`). Como não enviamos `id`, ele tenta um `INSERT` novo, colide com a linha já existente pela `UNIQUE(user_id)` e devolve **409**. O `UPDATE` do perfil funciona; a UI só não avança porque o `Promise.all`/sequência de sync quebra no progresso.
+
+## Correção
+
+Arquivo único: `src/lib/protocol-cloud.ts`
+
+- Em `saveProgressRemote`, trocar `.upsert({...})` por `.upsert({...}, { onConflict: "user_id" })` para que o `ON CONFLICT` alvo seja a chave única correta.
+
+Nada mais precisa mudar — a linha já existe (criada pelo trigger), então o upsert vira `UPDATE` limpo e o fluxo Cadastro → Início destrava.
+
+## Verificação
+
+1. Rodar o onboarding no preview autenticado e confirmar avanço para a aba Início.
+2. Conferir no console/network que `PATCH /protocol_progress` retorna 200/204 (não 409).
