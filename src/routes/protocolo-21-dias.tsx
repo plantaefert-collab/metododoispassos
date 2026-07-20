@@ -2426,7 +2426,7 @@ function FinalEvaluation() {
             return (
               <button
                 key={p.id}
-                onClick={() => updateFinalEval({{ path: p.id }, actorId)}
+                onClick={() => updateFinalEval({ path: p.id }, actorId)}
                 className={`rounded-2xl border p-3 text-left text-sm transition-colors ${
                   active
                     ? p.tone === "warn"
