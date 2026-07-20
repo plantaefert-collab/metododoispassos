@@ -2309,6 +2309,7 @@ function DayContentCard({
           attention={meta.attention}
           personalizedTracking={meta.personalizedContext ? tracking : []}
           customObserveTitle={meta.observeTitle}
+          setStatus={setStatus}
         />
       </div>
     </div>
