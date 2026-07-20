@@ -1154,7 +1154,7 @@ function DiagnosisResultScreen({ actorId, onBack, onFinish }: { actorId: string;
           </div>
         )}
 
-        <div className="mt-6 flex gap-2">
+        <div className="mt-auto pt-8 flex gap-2 pb-4">
           <button
             onClick={onBack}
             className="flex items-center gap-1 rounded-full border border-border px-4 py-3 text-sm font-medium text-foreground hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
