@@ -1,12 +1,24 @@
 import { supabase } from "@/integrations/supabase/client";
-import { ProtocolState, mergeRemoteProgressState } from "./protocol-store";
+import { ProtocolState } from "./protocol-store";
 import { UserProfile } from "./auth/types";
 import { PostgrestError } from "@supabase/supabase-js";
 
 export async function fetchUserProfile(userId: string): Promise<{ data: UserProfile | null; error: PostgrestError | null }> {
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, full_name, plant_name, onboarded")
+    .select(`
+      id, 
+      full_name, 
+      plant_name, 
+      onboarded,
+      plant_registered_at,
+      plant_species,
+      plant_unknown_species,
+      plant_location,
+      plant_pot,
+      plant_substrate,
+      plant_difficulty
+    `)
     .eq("id", userId)
     .single();
 
@@ -19,7 +31,7 @@ export async function fetchUserProgress(userId: string): Promise<{ data: any | n
     .from("protocol_progress")
     .select("*")
     .eq("user_id", userId)
-    .single();
+    .maybeSingle();
 
   if (error) return { data: null, error };
   return { data, error: null };
@@ -31,7 +43,7 @@ export async function saveProgressRemote(userId: string, state: ProtocolState): 
     .upsert({
       user_id: userId,
       current_day: state.currentDay,
-      completed_tasks: state.days, // Map directly as the normalization handles it
+      completed_tasks: state.days,
       applications: state.applications,
       diagnosis_answers: state.diagnosis,
       diagnosis_result: state.diagnosisResult,
@@ -47,6 +59,26 @@ export async function saveProfileRemote(userId: string, profile: Partial<UserPro
   const { error } = await supabase
     .from("profiles")
     .update(profile)
+    .eq("id", userId);
+
+  return { error };
+}
+
+export async function registerPlantRemote(userId: string, plantData: {
+  plant_name: string;
+  plant_species?: string | null;
+  plant_unknown_species: boolean;
+  plant_location?: string | null;
+  plant_pot?: string | null;
+  plant_substrate?: string | null;
+  plant_difficulty?: string | null;
+}): Promise<{ error: PostgrestError | null }> {
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      ...plantData,
+      plant_registered_at: new Date().toISOString()
+    })
     .eq("id", userId);
 
   return { error };

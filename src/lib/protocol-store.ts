@@ -1,14 +1,20 @@
-import { useEffect, useState, useCallback, useRef } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import type { Json } from "@/integrations/supabase/types";
+import { useState, useCallback, useEffect } from "react";
 import { saveToCache } from "./protocol-cache";
 
 import {
   computeDiagnosisResult,
+  migrateLegacyDiagnosis,
+  normalizeCurrentDay,
+  normalizeDays,
+  normalizeApplications,
+  normalizeFinalEval,
+  normalizeDiagnosisStatus,
+  normalizeAnswersVersion,
+  normalizeDiagnosisResult,
+  reconcileDiagnosisResultState,
   totalObservations,
   type DiagnosisAnswers,
   type DiagnosisCategory,
-  type DiagnosisGuidance,
   type DiagnosisResult,
 } from "./diagnosis-matrix";
 
@@ -69,18 +75,9 @@ export type ProtocolState = {
   saveError?: string;
 };
 
-export type PersistResult =
-  | { ok: true }
-  | { ok: false; reason: "quota" | "unavailable" | "unknown" };
-
 export const SAVE_ERROR_MESSAGE =
   "Não foi possível salvar esta alteração no navegador. Libere espaço ou remova alguma fotografia e tente novamente.";
 
-/**
- * Condição única para determinar se o resultado do diagnóstico salvo pode
- * ser exibido como “atual”. Toda tela deve reutilizar esta função em vez
- * de recomputar a mesma verificação.
- */
 export function isDiagnosisCurrent(state: ProtocolState): boolean {
   return (
     state.diagnosisStatus === "fresh" &&
@@ -89,8 +86,6 @@ export function isDiagnosisCurrent(state: ProtocolState): boolean {
   );
 }
 
-const STORAGE_KEY = "plantaefert-protocolo-21d";
-const LEGACY_KEY_V1 = "plantaefert-protocolo-21d-v1";
 const DEFAULT_CURRENT_DAY = 1;
 
 const emptyPlant: PlantInfo = {
@@ -112,7 +107,7 @@ const emptyDiag: DiagnosisAnswers = {
   wateringAndRoutine: [],
 };
 
-const defaultState: ProtocolState = {
+export const defaultState: ProtocolState = {
   schemaVersion: 2,
   currentDay: DEFAULT_CURRENT_DAY,
   plant: emptyPlant,
@@ -126,618 +121,15 @@ const defaultState: ProtocolState = {
   onboarded: false,
 };
 
-// ---------- Normalização defensiva ----------
-
-function isPlainObject(v: unknown): v is Record<string, unknown> {
-  return typeof v === "object" && v !== null && !Array.isArray(v);
-}
-
-function asString(v: unknown, fallback = ""): string {
-  return typeof v === "string" ? v : fallback;
-}
-function asBool(v: unknown, fallback = false): boolean {
-  return typeof v === "boolean" ? v : fallback;
-}
-function asNumber(v: unknown, fallback = 0): number {
-  return typeof v === "number" && Number.isFinite(v) ? v : fallback;
-}
-function asStringArray(v: unknown): string[] {
-  if (!Array.isArray(v)) return [];
-  return v.filter((x): x is string => typeof x === "string");
-}
-
-export function uniqueStrings(values: string[]): string[] {
-  const seen = new Set<string>();
-  const out: string[] = [];
-  for (const v of values) {
-    if (typeof v !== "string") continue;
-    if (v.length === 0) continue;
-    if (seen.has(v)) continue;
-    seen.add(v);
-    out.push(v);
-  }
-  return out;
-}
-
-export function normalizeCurrentDay(v: unknown): number {
-  if (typeof v !== "number") return DEFAULT_CURRENT_DAY;
-  if (!Number.isInteger(v)) return DEFAULT_CURRENT_DAY;
-  if (v < 1 || v > 21) return DEFAULT_CURRENT_DAY;
-  return v;
-}
-
-// ---------- Mapeamento de respostas antigas ----------
-
-function mapRootAnswer(v: string): string[] {
-  switch (v) {
-    case "Firmes":
-      return ["Firmes, verdes ou prateadas"];
-    case "Pontas novas":
-      return ["Pontas novas em crescimento"];
-    case "Poucas raízes":
-      return ["Poucas raízes visíveis"];
-    case "Secas ou ocas":
-      return ["Raízes secas ou ocas"];
-    case "Escuras ou moles":
-      return ["Raízes escuras", "Raízes moles"];
-    case "Mau cheiro":
-      return ["Mau cheiro próximo às raízes ou ao substrato"];
-    default:
-      return [v];
-  }
-}
-
-function mapLeafAnswer(v: string): string[] {
-  switch (v) {
-    case "Firmes":
-      return ["Firmes e sem alterações aparentes"];
-    case "Enrugadas":
-      return ["Folhas enrugadas"];
-    case "Amareladas":
-      return ["Folhas amareladas"];
-    case "Manchas":
-      return ["Manchas escuras"];
-    case "Folha nova":
-      return ["Folha nova surgindo"];
-    case "Brotação":
-      return ["Brotação nova visível"];
-    default:
-      return [v];
-  }
-}
-
-type Redirect = { category: DiagnosisCategory; values: string[] };
-
-function mapEnvironmentAnswer(v: string): Redirect {
-  switch (v) {
-    case "Boa claridade":
-    case "Boa claridade indireta":
-      return { category: "environment", values: ["Boa luminosidade indireta"] };
-    case "Sol forte direto":
-      return { category: "environment", values: ["Sol direto forte"] };
-    case "Local abafado":
-      return { category: "environment", values: ["Ambiente abafado"] };
-    case "Boa ventilação":
-      return { category: "environment", values: ["Boa circulação de ar"] };
-    case "Mudei a planta recentemente":
-      return { category: "environment", values: ["Mudada de lugar recentemente"] };
-    case "Água acumulada no vaso":
-      return {
-        category: "potAndSubstrate",
-        values: ["Água acumulada no pratinho ou cachepot"],
-      };
-    case "Substrato compactado":
-      return { category: "potAndSubstrate", values: ["Substrato compactado"] };
-    default:
-      return { category: "environment", values: [v] };
-  }
-}
-
-function mapRoutineAnswer(v: string): Redirect {
-  switch (v) {
-    case "Verifico umidade antes de regar":
-      return {
-        category: "wateringAndRoutine",
-        values: ["Verifico a umidade antes de regar"],
-      };
-    case "Rego por calendário":
-    case "Rega por calendário":
-    case "Rega por calendário fixo":
-      return {
-        category: "wateringAndRoutine",
-        values: ["Rego sempre em dias fixos"],
-      };
-    case "Uso vários produtos":
-      return {
-        category: "wateringAndRoutine",
-        values: ["Uso vários fertilizantes ou produtos ao mesmo tempo"],
-      };
-    case "Mudei a planta recentemente":
-      return { category: "environment", values: ["Mudada de lugar recentemente"] };
-    case "Água acumulada no vaso":
-      return {
-        category: "potAndSubstrate",
-        values: ["Água acumulada no pratinho ou cachepot"],
-      };
-    case "Substrato compactado":
-      return { category: "potAndSubstrate", values: ["Substrato compactado"] };
-    default:
-      return { category: "wateringAndRoutine", values: [v] };
-  }
-}
-
-/**
- * Converte respostas do diagnóstico (formato antigo e/ou atual) para o
- * formato atual da matriz, movendo itens para a categoria correta,
- * expandindo respostas combinadas ("Escuras ou moles") e removendo
- * duplicatas. Nunca lança.
- */
-export function migrateLegacyDiagnosis(saved: unknown): DiagnosisAnswers {
-  const acc: DiagnosisAnswers = {
-    roots: [],
-    leaves: [],
-    environment: [],
-    potAndSubstrate: [],
-    wateringAndRoutine: [],
-  };
-  if (!isPlainObject(saved)) return acc;
-
-  const push = (cat: DiagnosisCategory, values: string[]) => {
-    for (const v of values) if (typeof v === "string" && v.length > 0) acc[cat].push(v);
-  };
-
-  for (const v of asStringArray(saved.roots)) push("roots", mapRootAnswer(v));
-  for (const v of asStringArray(saved.leaves)) push("leaves", mapLeafAnswer(v));
-  for (const v of asStringArray(saved.environment)) {
-    const m = mapEnvironmentAnswer(v);
-    push(m.category, m.values);
-  }
-  // Campo antigo `routine` ou novo `wateringAndRoutine`.
-  for (const v of asStringArray(saved.routine)) {
-    const m = mapRoutineAnswer(v);
-    push(m.category, m.values);
-  }
-  for (const v of asStringArray(saved.wateringAndRoutine)) {
-    const m = mapRoutineAnswer(v);
-    push(m.category, m.values);
-  }
-  for (const v of asStringArray(saved.potAndSubstrate)) push("potAndSubstrate", [v]);
-
-  return {
-    roots: uniqueStrings(acc.roots),
-    leaves: uniqueStrings(acc.leaves),
-    environment: uniqueStrings(acc.environment),
-    potAndSubstrate: uniqueStrings(acc.potAndSubstrate),
-    wateringAndRoutine: uniqueStrings(acc.wateringAndRoutine),
-  };
-}
-
-function normalizePlant(v: unknown): PlantInfo {
-  const o = isPlainObject(v) ? v : {};
-  return {
-    name: asString(o.name),
-    species: asString(o.species),
-    unknownSpecies: asBool(o.unknownSpecies),
-    location: asString(o.location),
-    pot: asString(o.pot),
-    substrate: asString(o.substrate),
-    difficulty: asString(o.difficulty),
-    photo: typeof o.photo === "string" ? o.photo : null,
-  };
-}
-
-function normalizeDayEntry(v: unknown): DayEntry {
-  const o = isPlainObject(v) ? v : {};
-  const checklist = isPlainObject(o.checklist)
-    ? Object.fromEntries(Object.entries(o.checklist).map(([k, val]) => [k, Boolean(val)]))
-    : {};
-  return {
-    checklist,
-    note: asString(o.note),
-    completed: asBool(o.completed),
-    photo: typeof o.photo === "string" ? o.photo : null,
-    photoCaption: asString(o.photoCaption),
-    roots: asString(o.roots),
-    leavesObs: asString(o.leavesObs),
-    shoots: asString(o.shoots),
-    observations: asString(o.observations),
-    applicationDone: asBool(o.applicationDone),
-  };
-}
-
-function normalizeDays(v: unknown): Record<number, DayEntry> {
-  if (!isPlainObject(v)) return {};
-  const out: Record<number, DayEntry> = {};
-  for (const [k, val] of Object.entries(v)) {
-    const n = Number(k);
-    // Aceitar apenas dias 1–21 inteiros.
-    if (!Number.isInteger(n) || n < 1 || n > 21) continue;
-    // Rejeitar chaves como "2.5" que Number() aceita mas não são inteiros na string.
-    if (String(n) !== k.trim()) continue;
-    out[n] = normalizeDayEntry(val);
-  }
-  return out;
-}
-
-function normalizeApplications(v: unknown, days: Record<number, DayEntry>): ApplicationRecord[] {
-  const out: ApplicationRecord[] = [];
-  const seenIds = new Set<string>();
-  const daysCovered = new Set<number>();
-
-  if (Array.isArray(v)) {
-    for (const r of v) {
-      if (!isPlainObject(r)) continue;
-      const day = asNumber(r.day, NaN);
-      if (!Number.isFinite(day)) continue;
-      const id =
-        asString(r.id) ||
-        `app-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
-      if (seenIds.has(id)) continue;
-      const timestamp = typeof r.timestamp === "string" ? r.timestamp : null;
-      const migrated = asBool(r.migrated) || timestamp === null;
-      seenIds.add(id);
-      daysCovered.add(day);
-      const rec: ApplicationRecord = { id, day, timestamp };
-      if (migrated) rec.migrated = true;
-      out.push(rec);
-    }
-  }
-
-  // Mescla registros sintetizados a partir de days[n].applicationDone.
-  // Nunca inventa data. Não cria duplicata se já existe registro para o dia.
-  for (const [k, entry] of Object.entries(days)) {
-    if (!entry.applicationDone) continue;
-    const day = Number(k);
-    if (!Number.isInteger(day) || day < 1 || day > 21) continue;
-    if (daysCovered.has(day)) continue;
-    const id = `legacy-${day}`;
-    if (seenIds.has(id)) continue;
-    seenIds.add(id);
-    daysCovered.add(day);
-    out.push({ id, day, timestamp: null, migrated: true });
-  }
-  return out;
-}
-
-function normalizeFinalEval(v: unknown): FinalEvaluation {
-  const o = isPlainObject(v) ? v : {};
-  const path = o.path;
-  const allowed: FinalEvaluation["path"][] = [
-    "",
-    "evolved",
-    "stable",
-    "worsening",
-    "healthy-no-bloom",
-  ];
-  return {
-    improved: asString(o.improved),
-    same: asString(o.same),
-    attention: asString(o.attention),
-    keep: asString(o.keep),
-    path: (allowed as string[]).includes(path as string) ? (path as FinalEvaluation["path"]) : "",
-  };
-}
-
-function normalizeDiagnosisStatus(v: unknown): DiagnosisStatus {
-  return v === "fresh" || v === "outdated" || v === "none" ? v : "none";
-}
-
-/**
- * Aceita apenas inteiros finitos ≥ 0. Qualquer outro valor retorna 0.
- */
-export function normalizeAnswersVersion(value: unknown): number {
-  if (typeof value !== "number") return 0;
-  if (!Number.isFinite(value)) return 0;
-  if (!Number.isInteger(value)) return 0;
-  if (value < 0) return 0;
-  return value;
-}
-
-/**
- * Reconciliação entre resultado do diagnóstico, status e versão de respostas.
- *
- * - Resultado ausente → status forçado a "none";
- * - Resultado com versão diferente → preservado, status "outdated";
- * - Versões iguais e status salvo "fresh" → "fresh";
- * - Versões iguais e status salvo "outdated" → permanece "outdated"
- *   (apenas uma nova conclusão pode retornar para "fresh");
- * - Versões iguais e status "none"/inválido → "fresh".
- */
-export function reconcileDiagnosisResultState(
-  diagnosisResult: DiagnosisResult | null,
-  diagnosisStatus: DiagnosisStatus,
-  answersVersion: number,
-): { diagnosisResult: DiagnosisResult | null; diagnosisStatus: DiagnosisStatus } {
-  if (diagnosisResult === null) {
-    return { diagnosisResult: null, diagnosisStatus: "none" };
-  }
-  if (diagnosisResult.answersVersion !== answersVersion) {
-    return { diagnosisResult, diagnosisStatus: "outdated" };
-  }
-  if (diagnosisStatus === "outdated") {
-    return { diagnosisResult, diagnosisStatus: "outdated" };
-  }
-  return { diagnosisResult, diagnosisStatus: "fresh" };
-}
-
-export type RemoteProtocolProgress = {
-  current_day?: unknown;
-  completed_tasks?: unknown;
-  applications?: unknown;
-  diagnosis_result?: unknown;
-  diagnosis_answers?: unknown;
-  diagnosis_status?: unknown;
-  answers_version?: unknown;
-};
-
-/**
- * Mescla o progresso salvo no banco com o estado local sem apagar um
- * diagnóstico recém-gerado quando a linha remota ainda está vazia ou atrasada.
- */
-export function mergeRemoteProgressState(
-  local: ProtocolState,
-  progress: RemoteProtocolProgress,
-): ProtocolState {
-  const next: ProtocolState = {
-    ...local,
-    currentDay: normalizeCurrentDay(progress.current_day),
-  };
-
-  const remoteDays = normalizeDays(progress.completed_tasks);
-  if (Object.keys(remoteDays).length > 0 || Object.keys(local.days).length === 0) {
-    next.days = remoteDays;
-  }
-
-  const remoteApplications = normalizeApplications(progress.applications, next.days);
-  if (remoteApplications.length > 0 || local.applications.length === 0) {
-    next.applications = remoteApplications;
-  }
-
-  const remoteDiagnosis = migrateLegacyDiagnosis(progress.diagnosis_answers);
-  const remoteDiagnosisCount = totalObservations(remoteDiagnosis);
-  const remoteResult = normalizeDiagnosisResult(progress.diagnosis_result);
-  const remoteStatus = normalizeDiagnosisStatus(progress.diagnosis_status);
-  const storedAnswersVersion = normalizeAnswersVersion(progress.answers_version);
-  const remoteAnswersVersion = remoteResult
-    ? Math.max(storedAnswersVersion, remoteResult.answersVersion)
-    : storedAnswersVersion;
-  const hasRemoteDiagnosisState =
-    remoteResult !== null ||
-    remoteDiagnosisCount > 0 ||
-    remoteAnswersVersion > 0 ||
-    remoteStatus !== "none";
-
-  if (!hasRemoteDiagnosisState) {
-    return next;
-  }
-
-  if (remoteResult === null && local.diagnosisResult !== null) {
-    return next;
-  }
-
-  const reconciled = reconcileDiagnosisResultState(remoteResult, remoteStatus, remoteAnswersVersion);
-  return {
-    ...next,
-    diagnosis: remoteDiagnosisCount > 0 ? remoteDiagnosis : next.diagnosis,
-    answersVersion: remoteAnswersVersion,
-    diagnosisResult: reconciled.diagnosisResult,
-    diagnosisStatus: reconciled.diagnosisStatus,
-  };
-}
-
-const VALID_CATEGORIES: DiagnosisCategory[] = [
-  "roots",
-  "leaves",
-  "environment",
-  "potAndSubstrate",
-  "wateringAndRoutine",
-];
-const VALID_CLASSIFICATIONS = ["favorable", "adjustment", "priority", "insufficient"] as const;
-
-/**
- * Valida uma orientação (item das listas do diagnóstico). Retorna `null`
- * quando qualquer campo obrigatório está ausente ou com tipo inválido, para
- * que um item corrompido não derrube a interface ao acessar propriedades.
- */
-export function normalizeDiagnosisGuidance(value: unknown): DiagnosisGuidance | null {
-  if (!isPlainObject(value)) return null;
-  const {
-    id,
-    category,
-    answer,
-    title,
-    classification,
-    explanation,
-    action,
-    tracking,
-    avoid,
-    warning,
-  } = value;
-  if (typeof id !== "string" || id.length === 0) return null;
-  if (typeof category !== "string" || !VALID_CATEGORIES.includes(category as DiagnosisCategory))
-    return null;
-  if (typeof answer !== "string") return null;
-  if (typeof title !== "string") return null;
-  if (
-    typeof classification !== "string" ||
-    !(VALID_CLASSIFICATIONS as readonly string[]).includes(classification)
-  )
-    return null;
-  if (typeof explanation !== "string") return null;
-  if (typeof action !== "string") return null;
-  if (!Array.isArray(tracking)) return null;
-  for (const t of tracking) if (typeof t !== "string") return null;
-  if (avoid !== undefined && typeof avoid !== "string") return null;
-  if (warning !== undefined && typeof warning !== "string") return null;
-  const out: DiagnosisGuidance = {
-    id,
-    category: category as DiagnosisCategory,
-    answer,
-    title,
-    classification: classification as DiagnosisGuidance["classification"],
-    explanation,
-    action,
-    tracking: tracking as string[],
-  };
-  if (typeof avoid === "string") out.avoid = avoid;
-  if (typeof warning === "string") out.warning = warning;
-  return out;
-}
-
-function normalizeGuidanceList(v: unknown): DiagnosisGuidance[] | null {
-  if (!Array.isArray(v)) return null;
-  const out: DiagnosisGuidance[] = [];
-  for (const item of v) {
-    const g = normalizeDiagnosisGuidance(item);
-    if (!g) return null;
-    out.push(g);
-  }
-  return out;
-}
-
-function normalizeDiagnosisResult(v: unknown): DiagnosisResult | null {
-  if (!isPlainObject(v)) return null;
-  const favorable = normalizeGuidanceList(v.favorable);
-  const adjustments = normalizeGuidanceList(v.adjustments);
-  const priorities = normalizeGuidanceList(v.priorities);
-  const insufficientInformation = normalizeGuidanceList(v.insufficientInformation);
-  if (!favorable || !adjustments || !priorities || !insufficientInformation) return null;
-  if (!Array.isArray(v.trackingPoints)) return null;
-  for (const t of v.trackingPoints) if (typeof t !== "string") return null;
-  const trackingPoints = v.trackingPoints as string[];
-  if (
-    typeof v.answersVersion !== "number" ||
-    !Number.isFinite(v.answersVersion) ||
-    !Number.isInteger(v.answersVersion) ||
-    v.answersVersion < 0
-  )
-    return null;
-  if (v.completedAt !== null && typeof v.completedAt !== "string") return null;
-  const completedAt = v.completedAt;
-  return {
-    favorable,
-    adjustments,
-    priorities,
-    insufficientInformation,
-    trackingPoints,
-    completedAt,
-    answersVersion: v.answersVersion,
-  };
-}
-
-/**
- * Migração e normalização segura do estado salvo.
- * Aceita qualquer entrada (v1, v2, parcial, corrompida). Nunca lança.
- * `guestMode` (se presente no JSON) é descartado — só existe em memória.
- */
-export function migrateProtocolState(saved: unknown): ProtocolState {
-  try {
-    if (!isPlainObject(saved)) return { ...defaultState };
-    const days = normalizeDays(saved.days);
-    const diagnosis = migrateLegacyDiagnosis(saved.diagnosis);
-    const answersVersion = normalizeAnswersVersion(saved.answersVersion);
-    const diagnosisResult = normalizeDiagnosisResult(saved.diagnosisResult);
-    const diagnosisStatus = normalizeDiagnosisStatus(saved.diagnosisStatus);
-    const reconciled = reconcileDiagnosisResultState(
-      diagnosisResult,
-      diagnosisStatus,
-      answersVersion,
-    );
-
-    return {
-      schemaVersion: 2,
-      currentDay: normalizeCurrentDay(saved.currentDay),
-      plant: normalizePlant(saved.plant),
-      diagnosis,
-      diagnosisResult: reconciled.diagnosisResult,
-      diagnosisStatus: reconciled.diagnosisStatus,
-      answersVersion,
-      days,
-      applications: normalizeApplications(saved.applications, days),
-      finalEval: normalizeFinalEval(saved.finalEval),
-      onboarded: asBool(saved.onboarded),
-    };
-  } catch {
-    return { ...defaultState };
-  }
-}
-
-function serialize(s: ProtocolState): string {
-  const { saveError: _omit, ...persisted } = s;
-  void _omit;
-  return JSON.stringify(persisted);
-}
-
-/**
- * Persiste o estado no localStorage e classifica o resultado.
- * Nunca lança. Nunca ignora erros silenciosamente.
- */
-export function persistState(nextState: ProtocolState): PersistResult {
-  try {
-    if (typeof window === "undefined" || !window.localStorage) {
-      return { ok: false, reason: "unavailable" };
-    }
-    window.localStorage.setItem(STORAGE_KEY, serialize(nextState));
-    return { ok: true };
-  } catch (err) {
-    if (err instanceof DOMException) {
-      if (err.name === "QuotaExceededError" || err.code === 22) {
-        return { ok: false, reason: "quota" };
-      }
-      return { ok: false, reason: "unavailable" };
-    }
-    return { ok: false, reason: "unknown" };
-  }
-}
-
-function loadState(): ProtocolState {
-  if (typeof window === "undefined") return { ...defaultState };
-  try {
-    const raw = window.localStorage.getItem(STORAGE_KEY);
-    if (raw) {
-      const parsed: unknown = JSON.parse(raw);
-      return migrateProtocolState(parsed);
-    }
-    const legacy = window.localStorage.getItem(LEGACY_KEY_V1);
-    if (legacy) {
-      const migrated = migrateProtocolState(JSON.parse(legacy));
-      // Migração atômica: só remove a chave antiga depois de confirmar
-      // a gravação da nova. Se falhar, mantém legado intacto e expõe
-      // saveError para a UI.
-      const result = persistState(migrated);
-      if (result.ok) {
-        try {
-          window.localStorage.removeItem(LEGACY_KEY_V1);
-        } catch {
-          /* ignore — dados já foram gravados na chave nova */
-        }
-      } else {
-        migrated.saveError = SAVE_ERROR_MESSAGE;
-      }
-      return migrated;
-    }
-    return { ...defaultState };
-  } catch {
-    return { ...defaultState };
-  }
-}
-
 let listeners: Array<() => void> = [];
-let currentState: ProtocolState | null = null;
+let currentState: ProtocolState = { ...defaultState };
 
 function notifyListeners() {
   listeners.forEach((l) => l());
 }
 
-export function ensureStoreInitialized(): ProtocolState {
-  if (currentState === null) {
-    currentState = loadState();
-  }
-  return currentState;
-}
-
 export function getState(): ProtocolState {
-  return ensureStoreInitialized();
+  return currentState;
 }
 
 export function subscribe(listener: () => void): () => void {
@@ -747,163 +139,66 @@ export function subscribe(listener: () => void): () => void {
   };
 }
 
-export function setState(updater: (s: ProtocolState) => ProtocolState): PersistResult {
-  const prev = getState();
-  const next = updater(prev);
-  const result = persistState(next);
-  if (result.ok) {
-    currentState = { ...next, saveError: undefined };
-  } else {
-    // Rollback: preserva estado anterior e expõe o erro para a UI.
-    currentState = { ...prev, saveError: SAVE_ERROR_MESSAGE };
-  }
+export function hydrateStore(state: ProtocolState): void {
+  currentState = { ...state, saveError: undefined };
   notifyListeners();
-  return result;
+}
+
+export function clearStore(): void {
+  currentState = { ...defaultState };
+  notifyListeners();
 }
 
 /**
- * Limpa o aviso de erro de salvamento **apenas em memória**.
- * NÃO chama setState nem localStorage.setItem — o erro é transitório.
+ * Normaliza o progresso vindo do banco (protocol_progress).
  */
-export function clearSaveError(): void {
-  currentState = { ...getState(), saveError: undefined };
-  notifyListeners();
-}
+export function normalizeRemoteProgress(progress: any): ProtocolState {
+  const next: ProtocolState = {
+    ...defaultState,
+    currentDay: normalizeCurrentDay(progress.current_day),
+  };
 
-/** Test-only: reset module state (currentState + listeners). */
-export function __resetStoreForTests(): void {
-  currentState = null;
-  listeners = [];
-}
+  next.days = normalizeDays(progress.completed_tasks);
+  next.applications = normalizeApplications(progress.applications, next.days);
+  
+  const remoteDiagnosis = migrateLegacyDiagnosis(progress.diagnosis_answers);
+  const remoteDiagnosisCount = totalObservations(remoteDiagnosis);
+  const remoteResult = normalizeDiagnosisResult(progress.diagnosis_result);
+  const remoteStatus = normalizeDiagnosisStatus(progress.diagnosis_status);
+  const remoteAnswersVersion = normalizeAnswersVersion(progress.answers_version);
 
-function newId(): string {
-  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+  const reconciled = reconcileDiagnosisResultState(remoteResult, remoteStatus, remoteAnswersVersion);
+  
+  return {
+    ...next,
+    diagnosis: remoteDiagnosisCount > 0 ? remoteDiagnosis : next.diagnosis,
+    answersVersion: remoteAnswersVersion,
+    diagnosisResult: reconciled.diagnosisResult,
+    diagnosisStatus: reconciled.diagnosisStatus,
+  };
 }
 
 export function useProtocolStore() {
   const [, force] = useState(0);
-  const [hydrated, setHydrated] = useState(false);
-  const [userId, setUserId] = useState<string | null>(null);
-  const loadingRef = useRef(false);
-
-  // Initialize and Sync with Cloud
+  
   useEffect(() => {
-    ensureStoreInitialized();
-    setHydrated(true);
-
-    const checkUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setUserId(session?.user?.id ?? null);
-      
-      if (session?.user?.id) {
-        await syncFromCloud(session.user.id);
-      }
-    };
-
-    checkUser();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      setUserId(session?.user?.id ?? null);
-      if (session?.user?.id) {
-        syncFromCloud(session.user.id);
-      }
-    });
-
-    const unsub = subscribe(() => force((n) => n + 1));
-    return () => {
-      unsub();
-      subscription.unsubscribe();
-    };
+    return subscribe(() => force((n) => n + 1));
   }, []);
 
-  const syncFromCloud = async (uid: string) => {
-    if (loadingRef.current) return;
-    loadingRef.current = true;
-    try {
-      // Sync Profile
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("*")
-        .eq("id", uid)
-        .maybeSingle();
+  const state = currentState;
 
-      // Sync Progress
-      const { data: progress } = await supabase
-        .from("protocol_progress")
-        .select("*")
-        .eq("user_id", uid)
-        .maybeSingle();
-
-      if (profile || progress) {
-        setState((s) => {
-          const next = { ...s };
-          
-          if (profile) {
-            next.plant = {
-              ...next.plant,
-              name: profile.plant_name ?? next.plant.name,
-            };
-            if (profile.onboarded) {
-              next.onboarded = true;
-            }
-          }
-          
-          if (progress) {
-            return mergeRemoteProgressState(next, progress);
-          }
-          
-          return next;
-        });
-      }
-    } finally {
-      loadingRef.current = false;
-    }
-  };
-
-  const syncToCloud = useCallback(async (uid: string, s: ProtocolState) => {
-    // Sync Profile
-    await supabase.from("profiles").upsert({
-      id: uid,
-      plant_name: s.plant.name,
-      onboarded: s.onboarded,
-      updated_at: new Date().toISOString(),
-    });
-
-    // Sync Progress
-    await supabase.from("protocol_progress").upsert({
-      user_id: uid,
-      current_day: s.currentDay,
-      completed_tasks: s.days as unknown as Json,
-      applications: s.applications as unknown as Json,
-      diagnosis_answers: s.diagnosis as unknown as Json,
-      diagnosis_result: s.diagnosisResult as unknown as Json,
-      diagnosis_status: s.diagnosisStatus,
-      answers_version: s.answersVersion,
-      updated_at: new Date().toISOString(),
-    });
+  const wrapSetState = useCallback((updater: (s: ProtocolState) => ProtocolState, actorId: string | "guest") => {
+    const next = updater(currentState);
+    currentState = next;
+    notifyListeners();
+    saveToCache(actorId, next);
   }, []);
 
-  const state = hydrated ? getState() : defaultState;
-
-  const wrapSetState = useCallback((updater: (s: ProtocolState) => ProtocolState) => {
-    const prev = getState();
-    const next = updater(prev);
-    const result = setState(updater);
-    if (result.ok) {
-      const uid = userId || "guest";
-      saveToCache(uid, next);
-      if (userId) {
-        syncToCloud(userId, next);
-      }
-    }
-    return result;
-  }, [userId, syncToCloud]);
-
-  const updatePlant = useCallback((patch: Partial<PlantInfo>) => {
-    wrapSetState((s) => ({ ...s, plant: { ...s.plant, ...patch } }));
+  const updatePlant = useCallback((patch: Partial<PlantInfo>, actorId: string | "guest") => {
+    wrapSetState((s) => ({ ...s, plant: { ...s.plant, ...patch } }), actorId);
   }, [wrapSetState]);
 
-  const toggleDiagnosis = useCallback((cat: DiagnosisCategory, value: string) => {
+  const toggleDiagnosis = useCallback((cat: DiagnosisCategory, value: string, actorId: string | "guest") => {
     wrapSetState((s) => {
       const arr = s.diagnosis[cat];
       const next = arr.includes(value) ? arr.filter((v) => v !== value) : [...arr, value];
@@ -915,81 +210,68 @@ export function useProtocolStore() {
         answersVersion: s.answersVersion + 1,
         diagnosisStatus: nextStatus,
       };
-    });
+    }, actorId);
   }, [wrapSetState]);
 
-  const saveDiagnosisResult = useCallback(() => {
-    return wrapSetState((s) => {
+  const saveDiagnosisResult = useCallback((actorId: string | "guest") => {
+    wrapSetState((s) => {
       const result = computeDiagnosisResult(s.diagnosis, s.answersVersion);
       return { ...s, diagnosisResult: result, diagnosisStatus: "fresh" };
-    });
+    }, actorId);
   }, [wrapSetState]);
 
-  const updateDay = useCallback((day: number, patch: Partial<DayEntry>) => {
+  const updateDay = useCallback((day: number, patch: Partial<DayEntry>, actorId: string | "guest") => {
     wrapSetState((s) => {
       const existing: DayEntry = s.days[day] ?? { checklist: {}, note: "", completed: false };
       return { ...s, days: { ...s.days, [day]: { ...existing, ...patch } } };
-    });
+    }, actorId);
   }, [wrapSetState]);
 
-  const toggleChecklist = useCallback((day: number, key: string) => {
+  const toggleChecklist = useCallback((day: number, key: string, actorId: string | "guest") => {
     wrapSetState((s) => {
       const existing: DayEntry = s.days[day] ?? { checklist: {}, note: "", completed: false };
       const checklist = { ...existing.checklist, [key]: !existing.checklist[key] };
       return { ...s, days: { ...s.days, [day]: { ...existing, checklist } } };
-    });
+    }, actorId);
   }, [wrapSetState]);
 
-  const toggleDayCompleted = useCallback((day: number) => {
+  const toggleDayCompleted = useCallback((day: number, actorId: string | "guest") => {
     wrapSetState((s) => {
       const existing: DayEntry = s.days[day] ?? { checklist: {}, note: "", completed: false };
       return { ...s, days: { ...s.days, [day]: { ...existing, completed: !existing.completed } } };
-    });
+    }, actorId);
   }, [wrapSetState]);
 
-  const registerApplication = useCallback((day: number) => {
+  const registerApplication = useCallback((day: number, actorId: string | "guest") => {
     wrapSetState((s) => {
-      const record: ApplicationRecord = { id: newId(), day, timestamp: new Date().toISOString() };
+      const record: ApplicationRecord = { 
+        id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`, 
+        day, 
+        timestamp: new Date().toISOString() 
+      };
       const existing: DayEntry = s.days[day] ?? { checklist: {}, note: "", completed: false };
       return {
         ...s,
         applications: [...s.applications, record],
         days: { ...s.days, [day]: { ...existing, applicationDone: true } },
       };
-    });
+    }, actorId);
   }, [wrapSetState]);
 
-  const setCurrentDay = useCallback((day: number) => {
-    wrapSetState((s) => ({ ...s, currentDay: day }));
+  const setCurrentDay = useCallback((day: number, actorId: string | "guest") => {
+    wrapSetState((s) => ({ ...s, currentDay: day }), actorId);
   }, [wrapSetState]);
 
-  const setOnboarded = useCallback((v: boolean) => {
-    wrapSetState((s) => ({ ...s, onboarded: v }));
+  const setOnboarded = useCallback((v: boolean, actorId: string | "guest") => {
+    wrapSetState((s) => ({ ...s, onboarded: v }), actorId);
   }, [wrapSetState]);
 
-  const updateFinalEval = useCallback((patch: Partial<FinalEvaluation>) => {
-    wrapSetState((s) => ({ ...s, finalEval: { ...s.finalEval, ...patch } }));
+  const updateFinalEval = useCallback((patch: Partial<FinalEvaluation>, actorId: string | "guest") => {
+    wrapSetState((s) => ({ ...s, finalEval: { ...s.finalEval, ...patch } }), actorId);
   }, [wrapSetState]);
-
-  const reset = useCallback(() => {
-    try {
-      window.localStorage.removeItem(STORAGE_KEY);
-      window.localStorage.removeItem(LEGACY_KEY_V1);
-    } catch {
-      /* ignore */
-    }
-    currentState = { ...defaultState };
-    notifyListeners();
-  }, []);
-
-  const clearSaveErrorCb = useCallback(() => {
-    clearSaveError();
-  }, []);
 
   return {
     state,
-    hydrated,
-    userId,
     updatePlant,
     toggleDiagnosis,
     saveDiagnosisResult,
@@ -1000,13 +282,11 @@ export function useProtocolStore() {
     setCurrentDay,
     setOnboarded,
     updateFinalEval,
-    reset,
-    clearSaveError: clearSaveErrorCb,
-    setState: wrapSetState,
-    mergeRemoteProgressState: (progress: any) => {
-      wrapSetState((s) => mergeRemoteProgressState(s, progress));
-    },
+    hydrateStore, // Adicionado para facilitar uso em componentes quando necessário
+    clearStore,   // Adicionado
+    clearSaveError: () => {
+      currentState = { ...currentState, saveError: undefined };
+      notifyListeners();
+    }
   };
 }
-
-

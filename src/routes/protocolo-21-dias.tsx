@@ -1,6 +1,3 @@
-/**
- * Criar um teste ponta a ponta simulando a transição de visitante para usuário autenticado via Google com migração do progresso e abertura correta do plano salvo.
- */
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState, type ReactNode, type ChangeEvent, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -38,7 +35,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { useProtocolStore, isDiagnosisCurrent } from "@/lib/protocol-store";
+import { useProtocolStore, isDiagnosisCurrent, defaultState } from "@/lib/protocol-store";
 import { compressImage, PHOTO_ERROR_MESSAGE } from "@/lib/image-compress";
 import {
   getProtocolDay,
@@ -63,8 +60,19 @@ import { useAuthBootstrap } from "@/hooks/use-auth-bootstrap";
 import { AuthScreen } from "@/components/auth/AuthScreen";
 import { AccountMenu } from "@/components/auth/AccountMenu";
 import { LegacyProgressDialog } from "@/components/auth/LegacyProgressDialog";
-import { hasLegacyData, getLegacyData, clearLegacyData } from "@/lib/protocol-cache";
+import { 
+  hasLegacyData, 
+  getLegacyData, 
+  clearLegacyData, 
+  isGuestActive, 
+  setGuestActive, 
+  getMigrationRecord, 
+  saveMigrationRecord, 
+  saveToCache 
+} from "@/lib/protocol-cache";
+import { saveProgressRemote } from "@/lib/protocol-cloud";
 import welcomeOrchid from "@/assets/welcome-orchid.jpg";
+
 
 
 export const Route = createFileRoute("/protocolo-21-dias")({
@@ -110,11 +118,24 @@ function ProtocoloPage() {
   const [showReset, setShowReset] = useState(false);
   const [showLegacyDialog, setShowLegacyDialog] = useState(false);
 
+  const actorId = user?.id ?? "guest";
+
   useEffect(() => {
-    if (status === "loading_remote_data" && hasLegacyData()) {
-      setShowLegacyDialog(true);
+    // Modo visitante persistente
+    if (status === "signed_out" && isGuestActive()) {
+      setGuestMode(true);
+      setTab("aprender");
     }
   }, [status]);
+
+  useEffect(() => {
+    if (status === "loading_remote_data" && hasLegacyData()) {
+      // Verificação de marcador de migração
+      if (user?.id && !getMigrationRecord(user.id)) {
+        setShowLegacyDialog(true);
+      }
+    }
+  }, [status, user?.id]);
 
   if (status === "booting" || status === "loading_remote_data") {
     return (
@@ -162,6 +183,7 @@ function ProtocoloPage() {
             <WelcomeScreen
               onStart={() => setStatus("signing_in")}
               onExplore={() => {
+                setGuestActive(true);
                 setGuestMode(true);
                 setTab("aprender");
               }}
@@ -180,7 +202,7 @@ function ProtocoloPage() {
             <AuthScreen
               onBack={() => setStatus("signed_out")}
               onSuccess={() => {
-                // O hook useAuthBootstrap cuidará da transição após detectar a nova sessão
+                // O bootstrap cuidará da transição
               }}
             />
           </motion.div>
@@ -194,7 +216,7 @@ function ProtocoloPage() {
             exit={{ opacity: 0, x: -20 }}
             transition={{ duration: 0.3 }}
           >
-            <SignupScreen onNext={() => setStatus("needs_diagnosis")} />
+            <SignupScreen actorId={actorId} onNext={() => setStatus("needs_diagnosis")} />
           </motion.div>
         )}
 
@@ -207,16 +229,35 @@ function ProtocoloPage() {
             transition={{ duration: 0.3 }}
           >
             <DiagnosisScreen
+              actorId={actorId}
               onBack={() => {
                 if (guestMode) setTab("aprender");
                 else setStatus("needs_plant_registration");
               }}
               onFinish={() => {
-                const persistResult = store.saveDiagnosisResult();
-                if (persistResult.ok) {
-                  // A transição para result agora é interna ao store/componente ou via estado ready
-                  // Para manter a UX, vamos forçar a exibição do resultado
-                }
+                store.saveDiagnosisResult(actorId);
+                setStatus("reviewing_diagnosis_result");
+              }}
+            />
+          </motion.div>
+        )}
+
+        {status === "reviewing_diagnosis_result" && (
+          <motion.div
+            key="result"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <DiagnosisResultScreen
+              actorId={actorId}
+
+              onBack={() => setStatus("needs_diagnosis")}
+              onFinish={() => {
+                store.setOnboarded(true, actorId);
+                setStatus("ready");
+                setTab("plano");
               }}
             />
           </motion.div>
@@ -238,12 +279,12 @@ function ProtocoloPage() {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
                 >
-                  {tab === "inicio" && <InicioTab setTab={setTab} />}
-                  {tab === "plano" && <PlanoTab setTab={setTab} />}
+                  {tab === "inicio" && <InicioTab actorId={actorId} setTab={setTab} />}
+                  {tab === "plano" && <PlanoTab actorId={actorId} setTab={setTab} />}
                   {tab === "diagnostico" && (
-                    <DiagnosticoTab onRedo={() => setStatus("needs_diagnosis")} setTab={setTab} />
+                    <DiagnosticoTab actorId={actorId} onRedo={() => setStatus("needs_diagnosis")} setTab={setTab} />
                   )}
-                  {tab === "diario" && <DiarioTab />}
+                  {tab === "diario" && <DiarioTab actorId={actorId} />}
                   {tab === "aprender" && <AprenderTab />}
                 </motion.div>
               </AnimatePresence>
@@ -252,23 +293,26 @@ function ProtocoloPage() {
         )}
       </AnimatePresence>
 
-      {showLegacyDialog && (
+      {showLegacyDialog && user?.id && (
         <LegacyProgressDialog 
-          onImport={() => {
+          onImport={async () => {
             const legacyData = getLegacyData();
-            if (legacyData) {
-              store.setState(() => legacyData);
+            if (legacyData && user.id) {
+              store.hydrateStore(legacyData);
+              await saveProgressRemote(user.id, legacyData);
+              saveMigrationRecord(user.id, { status: "imported", timestamp: new Date().toISOString() });
               clearLegacyData();
             }
             setShowLegacyDialog(false);
           }}
           onContinue={() => {
-            clearLegacyData();
+            if (user.id) {
+              saveMigrationRecord(user.id, { status: "dismissed", timestamp: new Date().toISOString() });
+            }
             setShowLegacyDialog(false);
           }}
         />
       )}
-
 
       <AnimatePresence>
         {showReset && (
@@ -281,13 +325,16 @@ function ProtocoloPage() {
             >
               <ConfirmModal
                 title="Reiniciar meu plano?"
-                description="Isso apagará cadastro, diagnóstico, checklists, fotos e anotações salvas no seu navegador."
+                description="Isso apagará cadastro, diagnóstico, checklists, fotos e anotações salvas."
                 confirmLabel="Reiniciar meu plano"
                 onCancel={() => setShowReset(false)}
-                onConfirm={() => {
-                  store.reset();
+                onConfirm={async () => {
+                  store.clearStore();
+                  saveToCache(actorId, defaultState);
+                  if (user?.id) {
+                    await saveProgressRemote(user.id, defaultState);
+                  }
                   setShowReset(false);
-                  setStatus("signed_out");
                 }}
               />
             </motion.div>
@@ -673,8 +720,9 @@ function StepCard({
 
 
 
-function SignupScreen({ onNext }: { onNext: () => void }) {
+function SignupScreen({ actorId, onNext }: { actorId: string; onNext: () => void }) {
   const { state, updatePlant } = useProtocolStore();
+
   const plant = state.plant;
 
   const handlePhoto = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -682,7 +730,7 @@ function SignupScreen({ onNext }: { onNext: () => void }) {
     if (!file) return;
     try {
       const dataUrl = await compressImage(file);
-      updatePlant({ photo: dataUrl });
+      updatePlant({ photo: dataUrl }, actorId);
     } catch {
       alert(PHOTO_ERROR_MESSAGE);
     }
@@ -704,7 +752,7 @@ function SignupScreen({ onNext }: { onNext: () => void }) {
           <Field label="Nome da planta *">
             <input
               value={plant.name}
-              onChange={(e) => updatePlant({ name: e.target.value })}
+              onChange={(e) => updatePlant({ name: e.target.value }, actorId)}
               placeholder="Ex.: Minha Phalaenopsis"
               className="w-full rounded-lg border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-1 focus:ring-primary"
             />
@@ -713,7 +761,7 @@ function SignupScreen({ onNext }: { onNext: () => void }) {
           <Field label="Espécie (opcional)">
             <input
               value={plant.species}
-              onChange={(e) => updatePlant({ species: e.target.value, unknownSpecies: false })}
+              onChange={(e) => updatePlant({ species: e.target.value, unknownSpecies: false }, actorId)}
               disabled={plant.unknownSpecies}
               placeholder="Ex.: Phalaenopsis, Cattleya…"
               className="w-full rounded-lg border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
@@ -726,7 +774,8 @@ function SignupScreen({ onNext }: { onNext: () => void }) {
                   updatePlant({
                     unknownSpecies: e.target.checked,
                     species: e.target.checked ? "" : plant.species,
-                  })
+                  }, actorId)
+
                 }
                 className="h-4 w-4 rounded border-input accent-primary"
               />
@@ -737,14 +786,14 @@ function SignupScreen({ onNext }: { onNext: () => void }) {
           <SelectField
             label="Local de cultivo"
             value={plant.location}
-            onChange={(v) => updatePlant({ location: v })}
+            onChange={(v) => updatePlant({ location: v }, actorId)}
             options={["Varanda", "Janela interna", "Jardim externo", "Estufa", "Outro"]}
           />
 
           <SelectField
             label="Tipo de vaso"
             value={plant.pot}
-            onChange={(v) => updatePlant({ pot: v })}
+            onChange={(v) => updatePlant({ pot: v }, actorId)}
             options={[
               "Vaso plástico transparente",
               "Vaso plástico comum",
@@ -758,7 +807,7 @@ function SignupScreen({ onNext }: { onNext: () => void }) {
           <SelectField
             label="Tipo de substrato"
             value={plant.substrate}
-            onChange={(v) => updatePlant({ substrate: v })}
+            onChange={(v) => updatePlant({ substrate: v }, actorId)}
             options={[
               "Casca de pinus",
               "Fibra de coco",
@@ -772,7 +821,7 @@ function SignupScreen({ onNext }: { onNext: () => void }) {
           <SelectField
             label="Principal dificuldade"
             value={plant.difficulty}
-            onChange={(v) => updatePlant({ difficulty: v })}
+            onChange={(v) => updatePlant({ difficulty: v }, actorId)}
             options={[
               "Não floresce",
               "Folhas caídas ou enrugadas",
@@ -802,7 +851,7 @@ function SignupScreen({ onNext }: { onNext: () => void }) {
             </label>
             {plant.photo && (
               <button
-                onClick={() => updatePlant({ photo: null })}
+                onClick={() => updatePlant({ photo: null }, actorId)}
                 className="mt-2 text-xs text-muted-foreground underline"
               >
                 Remover foto
@@ -893,8 +942,9 @@ const DIAG_CATEGORIES: Array<{ key: DiagnosisCategory; icon: ReactNode }> = [
   { key: "wateringAndRoutine", icon: <Droplets size={18} /> },
 ];
 
-function DiagnosisScreen({ onFinish, onBack }: { onFinish: () => void; onBack: () => void }) {
+function DiagnosisScreen({ actorId, onFinish, onBack }: { actorId: string; onFinish: () => void; onBack: () => void }) {
   const { state, toggleDiagnosis, clearSaveError } = useProtocolStore();
+
   const [stepIdx, setStepIdx] = useState(0);
   const total = DIAG_CATEGORIES.length;
   const current = DIAG_CATEGORIES[stepIdx];
@@ -968,7 +1018,7 @@ function DiagnosisScreen({ onFinish, onBack }: { onFinish: () => void; onBack: (
                 <button
                   key={opt}
                   type="button"
-                  onClick={() => toggleDiagnosis(current.key, opt)}
+                  onClick={() => toggleDiagnosis(current.key, opt, actorId)}
                   aria-pressed={active}
                   className={`flex items-center justify-between rounded-xl border px-4 py-3.5 text-left text-[15px] transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
                     active
@@ -1015,7 +1065,7 @@ function DiagnosisScreen({ onFinish, onBack }: { onFinish: () => void; onBack: (
 
 /* ---------------- Diagnosis Result Screen ---------------- */
 
-function DiagnosisResultScreen({ onBack, onFinish }: { onBack: () => void; onFinish: () => void }) {
+function DiagnosisResultScreen({ actorId, onBack, onFinish }: { actorId: string; onBack: () => void; onFinish: () => void }) {
   const { state } = useProtocolStore();
   const observations = totalObservations(state.diagnosis);
   const current = isDiagnosisCurrent(state);
@@ -1225,8 +1275,9 @@ function InfoCard({
 
 /* ---------------- Início ---------------- */
 
-function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
+function InicioTab({ actorId, setTab }: { actorId: string; setTab: (t: Tab) => void }) {
   const { state, setCurrentDay } = useProtocolStore();
+
   const day = state.currentDay;
   const phase = phaseOf(day);
   const isApplicationDay = APPLICATION_DAYS.includes(day);
@@ -1334,7 +1385,7 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
             <button
               key={d}
               onClick={() => {
-                setCurrentDay(d);
+                setCurrentDay(d, actorId);
                 setTab("plano");
               }}
               className="rounded-xl border border-border bg-secondary/40 p-3 text-left transition-colors hover:border-primary/40"
@@ -1383,7 +1434,7 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
           {[1, 7, 14, 21].map((d) => (
             <button
               key={d}
-              onClick={() => setCurrentDay(d)}
+              onClick={() => setCurrentDay(d, actorId)}
               className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
                 day === d
                   ? "bg-primary text-primary-foreground"
@@ -1402,12 +1453,15 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
 /* ---------------- Plano ---------------- */
 
 type PlanoTabProps = {
+  actorId: string;
   setTab: (tab: Tab) => void;
 };
 
-function PlanoTab({ setTab }: PlanoTabProps) {
+
+function PlanoTab({ actorId, setTab }: PlanoTabProps) {
   const { state, setCurrentDay, updateDay, toggleChecklist, toggleDayCompleted } =
     useProtocolStore();
+
   const day = state.currentDay;
   const [showMethod, setShowMethod] = useState(false);
   const meta = getProtocolDay(day);
@@ -1455,10 +1509,10 @@ function PlanoTab({ setTab }: PlanoTabProps) {
         currentWeek={week}
         onSelect={(w) => {
           const firstDay = w === 1 ? 1 : w === 2 ? 8 : 15;
-          setCurrentDay(firstDay);
+          setCurrentDay(firstDay, actorId);
         }}
         currentDay={day}
-        onSelectDay={setCurrentDay}
+        onSelectDay={(d) => setCurrentDay(d, actorId)}
         weekDays={activeWeek.days}
       />
 
@@ -1468,8 +1522,8 @@ function PlanoTab({ setTab }: PlanoTabProps) {
         <DayContentCard
           meta={meta}
           entry={entry}
-          onToggleChecklist={(item) => toggleChecklist(day, item)}
-          onUpdate={(patch) => updateDay(day, patch)}
+          onToggleChecklist={(item) => toggleChecklist(day, item, actorId)}
+          onUpdate={(patch) => updateDay(day, patch, actorId)}
           diagnosisFresh={diagnosisFresh}
           trackingPoints={trackingPoints}
         />
@@ -1495,7 +1549,7 @@ function PlanoTab({ setTab }: PlanoTabProps) {
             return (
               <button
                 key={item}
-                onClick={() => toggleChecklist(day, item)}
+                onClick={() => toggleChecklist(day, item, actorId)}
                 aria-pressed={checked}
                 className={`flex w-full items-start gap-3 rounded-xl border px-4 py-3 text-left text-sm transition-colors ${
                   checked
@@ -1514,10 +1568,10 @@ function PlanoTab({ setTab }: PlanoTabProps) {
           })}
         </div>
 
-        <RegisterField meta={meta} entry={entry} onChange={(note) => updateDay(day, { note })} />
+        <RegisterField meta={meta} entry={entry} onChange={(note) => updateDay(day, { note }, actorId)} />
 
         <button
-          onClick={() => toggleDayCompleted(day)}
+          onClick={() => toggleDayCompleted(day, actorId)}
           aria-pressed={entry.completed}
           className={`mt-4 w-full rounded-full px-4 py-3 text-sm font-semibold active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
             entry.completed
@@ -1548,9 +1602,10 @@ function PlanoTab({ setTab }: PlanoTabProps) {
         )}
       </div>
 
-      {day === 21 && <FinalEvaluation />}
+      {day === 21 && <FinalEvaluation actorId={actorId} />}
 
-      {showMethod && <MethodDrawer day={day} onClose={() => setShowMethod(false)} />}
+      {showMethod && <MethodDrawer actorId={actorId} day={day} onClose={() => setShowMethod(false)} />}
+
     </div>
   );
 }
@@ -1940,8 +1995,9 @@ function RegisterField({
   );
 }
 
-function MethodDrawer({ day, onClose }: { day: number; onClose: () => void }) {
+function MethodDrawer({ actorId, day, onClose }: { actorId: string; day: number; onClose: () => void }) {
   const { registerApplication, state } = useProtocolStore();
+
   const applicationsForDay = state.applications.filter((a) => a.day === day);
   const entry = state.days[day] ?? { checklist: {}, note: "", completed: false };
   const checklist = getProtocolDay(day).checklist;
@@ -2033,7 +2089,7 @@ function MethodDrawer({ day, onClose }: { day: number; onClose: () => void }) {
         <button
           disabled={!canRegister}
           onClick={() => {
-            registerApplication(day);
+            registerApplication(day, actorId);
             onClose();
           }}
           className="w-full rounded-full bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-all active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
@@ -2049,14 +2105,9 @@ function MethodDrawer({ day, onClose }: { day: number; onClose: () => void }) {
 
 /* ---------------- Diagnóstico Tab ---------------- */
 
-function DiagnosticoTab({
-  onRedo,
-  setTab,
-}: {
-  onRedo: () => void;
-  setTab: (tab: Tab) => void;
-}) {
+function DiagnosticoTab({ actorId, onRedo, setTab }: { actorId: string; onRedo: () => void; setTab: (tab: Tab) => void }) {
   const { state } = useProtocolStore();
+
   const items: Array<{ key: DiagnosisCategory; label: string; values: string[] }> = (
     Object.keys(CATEGORY_LABEL) as DiagnosisCategory[]
   ).map((k) => ({ key: k, label: CATEGORY_LABEL[k], values: state.diagnosis[k] }));
@@ -2140,15 +2191,16 @@ function DiagnosticoTab({
 
 /* ---------------- Diário ---------------- */
 
-function DiarioTab() {
+function DiarioTab({ actorId }: { actorId: string }) {
   const { state, updateDay } = useProtocolStore();
+
 
   const handlePhoto = async (day: number, e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
     try {
       const dataUrl = await compressImage(file);
-      updateDay(day, { photo: dataUrl });
+      updateDay(day, { photo: dataUrl }, actorId);
     } catch {
       alert(PHOTO_ERROR_MESSAGE);
     }
@@ -2223,7 +2275,7 @@ function DiarioTab() {
 
               <input
                 value={entry.photoCaption ?? ""}
-                onChange={(e) => updateDay(d, { photoCaption: e.target.value })}
+                onChange={(e) => updateDay(d, { photoCaption: e.target.value }, actorId)}
                 placeholder="Legenda"
                 className="mt-3 w-full rounded-xl border border-input bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               />
@@ -2232,22 +2284,22 @@ function DiarioTab() {
                 <FieldSmall
                   label="Raízes"
                   value={entry.roots ?? ""}
-                  onChange={(v) => updateDay(d, { roots: v })}
+                  onChange={(v) => updateDay(d, { roots: v }, actorId)}
                 />
                 <FieldSmall
                   label="Folhas"
                   value={entry.leavesObs ?? ""}
-                  onChange={(v) => updateDay(d, { leavesObs: v })}
+                  onChange={(v) => updateDay(d, { leavesObs: v }, actorId)}
                 />
                 <FieldSmall
                   label="Brotos/hastes"
                   value={entry.shoots ?? ""}
-                  onChange={(v) => updateDay(d, { shoots: v })}
+                  onChange={(v) => updateDay(d, { shoots: v }, actorId)}
                 />
                 <FieldSmall
                   label="Observações"
                   value={entry.observations ?? ""}
-                  onChange={(v) => updateDay(d, { observations: v })}
+                  onChange={(v) => updateDay(d, { observations: v }, actorId)}
                 />
               </div>
               </div>
@@ -2284,8 +2336,9 @@ function FieldSmall({
 
 /* ---------------- Final Evaluation ---------------- */
 
-function FinalEvaluation() {
+function FinalEvaluation({ actorId }: { actorId: string }) {
   const { state, updateFinalEval } = useProtocolStore();
+
   const fe = state.finalEval;
 
   const paths: Array<{
@@ -2358,7 +2411,7 @@ function FinalEvaluation() {
             </span>
             <textarea
               value={fe[q.key as keyof typeof fe] as string}
-              onChange={(e) => updateFinalEval({ [q.key]: e.target.value } as Partial<typeof fe>)}
+              onChange={(e) => updateFinalEval({ [q.key]: e.target.value } as Partial<typeof fe>, actorId)}
               rows={2}
               className="w-full rounded-xl border border-input bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
             />
@@ -2376,7 +2429,7 @@ function FinalEvaluation() {
             return (
               <button
                 key={p.id}
-                onClick={() => updateFinalEval({ path: p.id })}
+                onClick={() => updateFinalEval({ path: p.id }, actorId)}
                 className={`rounded-2xl border p-3 text-left text-sm transition-colors ${
                   active
                     ? p.tone === "warn"
