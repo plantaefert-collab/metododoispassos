@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState, type ReactNode, type ChangeEvent, useEffect } from "react";
+import { useMemo, useState, type ReactNode, type ChangeEvent, useEffect, useRef } from "react";
+import { toast, Toaster } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -184,6 +185,7 @@ function ProtocoloPage() {
 
   return (
     <div className="font-sans text-foreground antialiased selection:bg-accent/20">
+      <Toaster position="top-center" richColors />
       <AnimatePresence mode="wait">
         {status === "signed_out" && !guestMode && (
           <motion.div
@@ -1397,6 +1399,14 @@ function InfoCard({
 /* ---------------- Início ---------------- */
 
 function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t: Tab) => void; setStatus: (s: AuthBootstrapStatus) => void }) {
+  const handleRedirectToPlan = () => {
+    setTab("plano");
+    toast.success("Abrindo seu plano de 21 dias", {
+      description: "Confira as tarefas para hoje.",
+      duration: 3000,
+    });
+  };
+
   const { state, setCurrentDay } = useProtocolStore();
   const day = state.currentDay;
   const phase = phaseOf(day);
@@ -1431,7 +1441,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
               <Stethoscope size={18} /> Fazer diagnóstico
             </button>
             <button
-              onClick={() => setTab("plano")}
+              onClick={handleRedirectToPlan}
               className="rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground"
             >
               Registrar aplicação
@@ -1441,7 +1451,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
       )}
 
       <div 
-        onClick={() => setTab("plano")}
+        onClick={handleRedirectToPlan}
         className="cursor-pointer rounded-2xl border border-border bg-plantae-cream/40 p-5 transition-colors hover:border-primary/30 active:scale-[0.99]"
       >
         <div className="flex items-center gap-3">
@@ -1717,6 +1727,15 @@ type PlanoTabProps = {
 
 
 function PlanoTab({ actorId, setTab }: PlanoTabProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  
+  useEffect(() => {
+    // Ao entrar na aba plano via redirecionamento (ou tab change), foca no topo
+    if (containerRef.current) {
+      containerRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  }, []);
+
   const { state, setCurrentDay, updateDay, toggleChecklist, toggleDayCompleted } =
     useProtocolStore();
 
@@ -1732,7 +1751,7 @@ function PlanoTab({ actorId, setTab }: PlanoTabProps) {
   const activeWeek = WEEKS.find((w) => w.id === week) ?? WEEKS[0];
 
   return (
-    <div className="space-y-4">
+    <div ref={containerRef} className="space-y-4">
       <div className="relative overflow-hidden rounded-2xl border border-border bg-card p-6">
         <div className="absolute -right-4 -top-4 opacity-[0.08] text-primary rotate-12">
           <Flower2 size={120} />
