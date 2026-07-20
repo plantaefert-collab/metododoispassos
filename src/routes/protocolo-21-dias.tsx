@@ -209,7 +209,7 @@ function ProtocoloPage() {
           </motion.div>
         )}
 
-        {status === "signing_in" && (
+        {status === "loading_remote_data" && (
           <div className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#F8F5EE]/90 backdrop-blur-sm">
             <motion.div 
               animate={{ rotate: 360 }} 
