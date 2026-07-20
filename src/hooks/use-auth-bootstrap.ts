@@ -94,11 +94,10 @@ export function useAuthBootstrap() {
 
       if (!hasPlant) {
         setStatus("needs_plant_registration");
-      } else if (!diagnosisReady && !hasObservations) {
-        setStatus("needs_diagnosis");
-      } else if (!diagnosisReady && hasObservations) {
-        setStatus("reviewing_diagnosis_result");
       } else {
+        // Agora sempre redireciona para "ready" se tiver a planta,
+        // A lógica de forçar diagnóstico foi movida para o componente (opcional)
+        // ou permitimos que o usuário veja o Início primeiro.
         setStatus("ready");
       }
     } catch (err: any) {
