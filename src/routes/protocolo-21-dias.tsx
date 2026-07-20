@@ -100,7 +100,7 @@ export const Route = createFileRoute("/protocolo-21-dias")({
   component: ProtocoloPage,
 });
 
-type Tab = "inicio" | "plano" | "diagnostico" | "diario" | "aprender" | "resumo";
+type Tab = "inicio" | "plano" | "diagnostico" | "diario" | "aprender" | "resumo" | "metodo";
 
 function phaseOf(day: number) {
   const phase = getProtocolPhase(day);
@@ -367,6 +367,7 @@ function ProtocoloPage() {
                   {tab === "diario" && <DiarioTab actorId={actorId} />}
                   {tab === "aprender" && <AprenderTab />}
                   {tab === "resumo" && <ResumoTab actorId={actorId} />}
+                  {tab === "metodo" && <MetodoTab />}
                 </motion.div>
               </AnimatePresence>
             </AppShell>
@@ -1640,6 +1641,30 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
               </div>
             );
           })}
+        </div>
+      </div>
+
+      {/* Seção Método de 2 Passos */}
+      <div className="group relative overflow-hidden rounded-2xl border border-primary/10 bg-gradient-to-br from-primary/[0.05] to-transparent p-5 transition-all hover:border-primary/30">
+        <div className="absolute -right-6 -top-6 text-primary/10 transition-transform group-hover:scale-110">
+          <Sparkles size={100} />
+        </div>
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 text-primary">
+            <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary/10">
+              <Sprout size={16} />
+            </div>
+            <h3 className="font-display text-lg">Método de 2 Passos</h3>
+          </div>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            Entenda como funciona o protocolo de Enraizar e Nutrir para sua orquídea florescer.
+          </p>
+          <button
+            onClick={() => setTab("metodo")}
+            className="mt-4 flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-xs font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:brightness-110 active:scale-[0.98]"
+          >
+            Ver explicação <ChevronRight size={14} />
+          </button>
         </div>
       </div>
 
@@ -3097,6 +3122,105 @@ function AprenderTab() {
 }
 
 /* ---------------- Drawer & Modal ---------------- */
+
+/* ---------------- Método Tab ---------------- */
+
+function MetodoTab() {
+  return (
+    <div className="space-y-6">
+      <div className="relative overflow-hidden rounded-[2rem] border border-primary/10 bg-gradient-to-br from-primary/[0.03] to-transparent p-8">
+        <div className="absolute -right-8 -top-8 opacity-[0.05] text-primary rotate-12">
+          <Sparkles size={160} />
+        </div>
+        <div className="relative z-10">
+          <div className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-primary">
+            <Info size={12} /> Conhecimento Técnico
+          </div>
+          <h1 className="mt-4 font-display text-3xl leading-tight tracking-tight text-primary">
+            O Método <br />
+            <span className="text-accent">2 Passos</span>
+          </h1>
+          <p className="mt-3 max-w-[240px] text-sm leading-relaxed text-muted-foreground">
+            A ciência por trás do sucesso das suas orquídeas.
+          </p>
+        </div>
+      </div>
+
+      <div className="space-y-4">
+        <div className="rounded-3xl border border-primary/20 bg-card p-6 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
+              <Sprout size={28} />
+            </div>
+            <div>
+              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent">Passo 01</div>
+              <h2 className="font-display text-2xl text-primary">Enraizar</h2>
+            </div>
+          </div>
+          <div className="mt-6 space-y-4">
+            <p className="text-[15px] leading-relaxed text-foreground/80">
+              O segredo de uma orquídea florida começa onde ninguém vê: nas <span className="font-bold text-primary">raízes</span>. Sem um sistema radicular forte, a planta não consegue absorver os nutrientes necessários para florescer.
+            </p>
+            <div className="rounded-2xl bg-primary/5 p-4 border border-primary/10">
+              <h4 className="text-sm font-bold text-primary">O que acontece:</h4>
+              <ul className="mt-2 space-y-2">
+                {[
+                  "Estimula o surgimento de novas raízes",
+                  "Aumenta a área de absorção de água",
+                  "Fortalece a planta contra períodos de seca",
+                  "Prepara a base para receber a nutrição"
+                ].map((item, i) => (
+                  <li key={i} className="flex gap-2 text-sm text-foreground/70">
+                    <CheckCircle2 size={14} className="mt-0.5 shrink-0 text-primary" /> {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div className="rounded-3xl border border-accent/20 bg-card p-6 shadow-sm">
+          <div className="flex items-center gap-4">
+            <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-accent/10 text-accent">
+              <Leaf size={28} />
+            </div>
+            <div>
+              <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Passo 02</div>
+              <h2 className="font-display text-2xl text-accent">Nutrir</h2>
+            </div>
+          </div>
+          <div className="mt-6 space-y-4">
+            <p className="text-[15px] leading-relaxed text-foreground/80">
+              Com as raízes prontas, entramos com a <span className="font-bold text-accent">nutrição premium</span>. O Bokashi Orquídeas fornece os elementos exatos que a planta precisa para o vigor vegetativo e a futura floração.
+            </p>
+            <div className="rounded-2xl bg-accent/5 p-4 border border-accent/10">
+              <h4 className="text-sm font-bold text-accent">O que acontece:</h4>
+              <ul className="mt-2 space-y-2">
+                {[
+                  "Aumenta a imunidade natural da planta",
+                  "Proporciona folhas mais verdes e firmes",
+                  "Apoia o surgimento de novos brotos e hastes",
+                  "Garante energia para ciclos de flores duradouras"
+                ].map((item, i) => (
+                  <li key={i} className="flex gap-2 text-sm text-foreground/70">
+                    <CheckCircle2 size={14} className="mt-0.5 shrink-0 text-accent" /> {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="rounded-2xl border border-border bg-secondary/30 p-5">
+        <h3 className="text-sm font-bold text-primary">Por que em 21 dias?</h3>
+        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          As orquídeas têm um metabolismo lento. 21 dias é o tempo ideal para que a planta processe os estímulos do enraizamento e comece a responder visualmente à nutrição, criando uma base sólida para o desenvolvimento contínuo.
+        </p>
+      </div>
+    </div>
+  );
+}
 
 function Drawer({
   title,
