@@ -1,53 +1,84 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { useProtocolStore, isDiagnosisCurrent } from "@/lib/protocol-store";
-import { AuthBootstrapStatus } from "@/lib/auth/types";
-import { loadFromCache } from "@/lib/protocol-cache";
-import { fetchUserProfile, fetchUserProgress } from "@/lib/protocol-cloud";
+import { hydrateStore, clearStore, defaultState, ProtocolState } from "@/lib/protocol-store";
+import { AuthBootstrapStatus, UserProfile } from "@/lib/auth/types";
+import { loadFromCache, saveToCache, getCacheTimestamp } from "@/lib/protocol-cache";
+import { fetchUserProfile, fetchUserProgress, saveProgressRemote } from "@/lib/protocol-cloud";
+import { isDiagnosisCurrent } from "@/lib/protocol-store";
 
 export function useAuthBootstrap() {
-  const store = useProtocolStore();
   const [status, setStatus] = useState<AuthBootstrapStatus>("booting");
   const [user, setUser] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  
+  const activeUserIdRef = useRef<string | null>(null);
+  const bootstrapGenerationRef = useRef(0);
 
   const bootstrap = useCallback(async (userId: string | null) => {
+    const generation = ++bootstrapGenerationRef.current;
+    activeUserIdRef.current = userId;
+
+    // Se o usuário mudou, limpa o store primeiro
+    clearStore();
+
     if (!userId) {
-      // Carrega estado de visitante
-      const guestState = loadFromCache("guest");
-      if (guestState) {
-        store.setState(() => guestState);
-      } else {
-        store.reset();
-      }
+      const guestState = loadFromCache("guest") || defaultState;
+      hydrateStore(guestState);
       setStatus("signed_out");
       return;
     }
 
     setStatus("loading_remote_data");
     try {
-      // 1. Carregar Perfil e Progresso em paralelo
       const [profileRes, progressRes] = await Promise.all([
         fetchUserProfile(userId),
         fetchUserProgress(userId),
       ]);
 
-      if (profileRes.error || progressRes.error) {
-        throw new Error("Erro ao carregar dados remotos");
+      // Verifica se ainda somos a geração atual e o mesmo usuário
+      if (generation !== bootstrapGenerationRef.current || userId !== activeUserIdRef.current) {
+        return;
       }
 
-      // 2. Reconciliar com cache local
-      // const localCached = loadFromCache(userId);
+      if (profileRes.error) throw new Error("Erro ao carregar perfil");
       
-      if (progressRes.data) {
-        store.mergeRemoteProgressState(progressRes.data);
+      const remoteProgress = progressRes.data;
+      const remoteTimestamp = remoteProgress?.updated_at || null;
+      const cachedState = loadFromCache(userId);
+      const cachedTimestamp = getCacheTimestamp(userId);
+
+      let finalState = defaultState;
+
+      // Reconciliação Determinística
+      if (remoteProgress && cachedState) {
+        if (remoteTimestamp && cachedTimestamp && new Date(remoteTimestamp) > new Date(cachedTimestamp)) {
+          // Banco vence
+          finalState = { ...defaultState, ...remoteProgress }; // Necessário mapear corretamente se os nomes diferirem
+          // TODO: Implementar normalizeRemoteProgress para mapear campos do banco para o estado
+        } else {
+          // Cache vence ou são iguais
+          finalState = cachedState;
+          // Sincroniza cache com o banco se for mais recente
+          if (cachedTimestamp && (!remoteTimestamp || new Date(cachedTimestamp) > new Date(remoteTimestamp))) {
+            await saveProgressRemote(userId, cachedState);
+          }
+        }
+      } else if (remoteProgress) {
+        // Apenas banco
+        finalState = { ...defaultState, ...remoteProgress };
+      } else if (cachedState) {
+        // Apenas cache
+        finalState = cachedState;
+        await saveProgressRemote(userId, cachedState);
       }
 
-      // 3. Determinar próximo estado
-      const hasPlant = profileRes.data?.plant_name && profileRes.data.plant_name !== "Minha Orquídea";
-      const diagnosisReady = isDiagnosisCurrent(store.state);
+      hydrateStore(finalState);
 
-      if (!hasPlant && !store.state.plant.name) {
+      // Determinar destino
+      const hasPlant = profileRes.data?.plant_registered_at !== null;
+      const diagnosisReady = isDiagnosisCurrent(finalState);
+
+      if (!hasPlant) {
         setStatus("needs_plant_registration");
       } else if (!diagnosisReady) {
         setStatus("needs_diagnosis");
@@ -55,40 +86,32 @@ export function useAuthBootstrap() {
         setStatus("ready");
       }
     } catch (err: any) {
-      setError(err.message);
-      setStatus("auth_error");
+      if (generation === bootstrapGenerationRef.current) {
+        setError(err.message);
+        setStatus("auth_error");
+      }
     }
-  }, [store]);
+  }, []);
 
   useEffect(() => {
-    // Escuta mudanças na sessão
-    const initSession = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        console.log("Bootstrap init session:", !!session);
-        setUser(session?.user ?? null);
-        bootstrap(session?.user?.id ?? null);
-      } catch (err) {
-        console.error("Bootstrap init session error:", err);
-        bootstrap(null);
-      }
+    const init = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const userId = session?.user?.id ?? null;
+      setUser(session?.user ?? null);
+      bootstrap(userId);
     };
-
-    initSession();
+    init();
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      console.log("Auth event change:", event, !!session);
-      
-      // Se o usuário mudou, re-bootstrap
       const newUser = session?.user ?? null;
-      if (newUser?.id !== user?.id) {
+      if (newUser?.id !== activeUserIdRef.current) {
         setUser(newUser);
-        await bootstrap(newUser?.id ?? null);
+        bootstrap(newUser?.id ?? null);
       }
     });
 
     return () => subscription.unsubscribe();
-  }, [bootstrap, user?.id]);
+  }, [bootstrap]);
 
   return { status, user, error, setStatus };
 }
