@@ -2335,8 +2335,9 @@ function FieldSmall({
 
 /* ---------------- Final Evaluation ---------------- */
 
-function FinalEvaluation() {
+function FinalEvaluation({ actorId }: { actorId: string }) {
   const { state, updateFinalEval } = useProtocolStore();
+
   const fe = state.finalEval;
 
   const paths: Array<{
