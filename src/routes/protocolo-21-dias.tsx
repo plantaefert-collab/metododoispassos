@@ -1834,10 +1834,10 @@ type PlanoTabProps = {
   actorId: string;
   setTab: (tab: Tab) => void;
   onPreviewDay: (day: number) => void;
+  setStatus: (status: AuthBootstrapStatus) => void;
 };
 
-
-function PlanoTab({ actorId, setTab, onPreviewDay }: PlanoTabProps) {
+function PlanoTab({ actorId, setTab, onPreviewDay, setStatus }: PlanoTabProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   
