@@ -1476,7 +1476,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
                 onClick={() => setStatus("needs_diagnosis")}
                 className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-accent-foreground shadow-lg shadow-accent/20 transition-all hover:brightness-110 active:scale-[0.98]"
               >
-                Começar agora <ChevronRight size={16} />
+                Fazer diagnóstico <ChevronRight size={16} />
               </button>
               <div className="flex items-center justify-center gap-4 text-[10px] font-bold tracking-widest text-accent/60 uppercase">
                 <span className="flex items-center gap-1"><CheckCircle2 size={10} /> 5 Áreas</span>
