@@ -212,17 +212,7 @@ function ProtocoloPage() {
         {/* Overlay "Sincronizando..." é gerenciado pelo estado de carregamento
             inicial (booting/loading_remote_data) no early return acima. */}
 
-        {status === "needs_plant_registration" && (
-          <motion.div
-            key="signup"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -20 }}
-            transition={{ duration: 0.3 }}
-          >
-            <SignupScreen actorId={actorId} onNext={() => setStatus("ready")} />
-          </motion.div>
-        )}
+        {/* O cadastro da planta agora é acessível via aba Início se o usuário desejar */}
 
         {((guestMode && !isDiagnosisCurrent(store.state) && tab !== "aprender")) && (
           <motion.div
@@ -1476,17 +1466,17 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           <div className="relative z-10">
             <div className="flex items-center gap-2 text-accent">
               <Sparkles size={18} className="animate-pulse" />
-              <div className="font-display text-lg font-bold">Inicie seu Diagnóstico</div>
+              <div className="font-display text-lg font-bold">Diagnóstico Opcional</div>
             </div>
             <p className="mt-2 text-sm leading-relaxed text-primary/80">
-              Para liberar seu <strong>Plano de 21 Dias</strong> personalizado, precisamos entender o estado atual da sua orquídea.
+              Para receber orientações específicas para a sua planta, complete o diagnóstico opcional.
             </p>
             <div className="mt-5 flex flex-col gap-3">
               <button
                 onClick={() => setStatus("needs_diagnosis")}
                 className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-accent-foreground shadow-lg shadow-accent/20 transition-all hover:brightness-110 active:scale-[0.98]"
               >
-                Começar agora <ChevronRight size={16} />
+                Fazer diagnóstico <ChevronRight size={16} />
               </button>
               <div className="flex items-center justify-center gap-4 text-[10px] font-bold tracking-widest text-accent/60 uppercase">
                 <span className="flex items-center gap-1"><CheckCircle2 size={10} /> 5 Áreas</span>
@@ -1591,13 +1581,13 @@ function PlanoTab({ actorId, setTab }: PlanoTabProps) {
             <Info className="mt-0.5 shrink-0 text-primary" size={18} />
             <div className="flex-1">
               <p className="text-[14px] font-medium leading-relaxed text-primary/90">
-                Seu diagnóstico precisa ser atualizado para mostrar orientações personalizadas.
+                Você pode fazer o diagnóstico para receber orientações personalizadas para sua planta.
               </p>
               <button
                 onClick={() => setTab("diagnostico")}
                 className="mt-3 inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-[13px] font-semibold text-primary-foreground shadow-sm transition-transform active:scale-95"
               >
-                Atualizar diagnóstico
+                Fazer diagnóstico
                 <ChevronRight size={14} />
               </button>
             </div>
