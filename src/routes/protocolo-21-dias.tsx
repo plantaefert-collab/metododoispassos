@@ -2402,6 +2402,7 @@ function DetailAccordions({
   attention,
   personalizedTracking,
   customObserveTitle,
+  setStatus,
 }: {
   howTo?: string[];
   observe?: string[];
@@ -2410,6 +2411,7 @@ function DetailAccordions({
   attention?: string[];
   personalizedTracking: string[];
   customObserveTitle?: string;
+  setStatus?: (s: AuthBootstrapStatus) => void;
 }) {
   const sections: Array<{ id: string; title: string; content: ReactNode }> = [];
 
