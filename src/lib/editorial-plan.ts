@@ -17,8 +17,7 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
       "Registrar o ponto de partida, compreender as condições da planta e iniciar o Método de 2 Passos quando a aplicação estiver indicada.",
     mainAction:
       "Realize as quatro etapas do Dia 1 na ordem sugerida. Você pode parar e continuar depois de qualquer etapa.",
-    recordPrompt:
-      "Registre o que observou hoje em cada etapa e conclua com a primeira aplicação.",
+    recordPrompt: "Registre o que observou hoje em cada etapa e conclua com a primeira aplicação.",
     checklist: [
       "Concluí a Etapa 1 — Registrar a orquídea",
       "Concluí a Etapa 2 — Fazer o diagnóstico guiado",
@@ -31,8 +30,7 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
       {
         id: "etapa-1-registrar",
         title: "Etapa 1 — Registrar a orquídea",
-        mainAction:
-          "Preencher as informações básicas e adicionar a fotografia inicial.",
+        mainAction: "Preencher as informações básicas e adicionar a fotografia inicial.",
         howTo: [
           "Fotografe a planta inteira, as folhas e as raízes visíveis em um ambiente claro.",
           "Procure usar um ângulo que possa ser repetido nos Dias 7, 14 e 21.",
@@ -74,14 +72,12 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
           "Interpretar um sinal isolado como diagnóstico definitivo",
           "Fazer várias mudanças antes de concluir a observação",
         ],
-        registerText:
-          "Resultado personalizado e até três pontos prioritários para acompanhamento.",
+        registerText: "Resultado personalizado e até três pontos prioritários para acompanhamento.",
       },
       {
         id: "etapa-3-ambiente",
         title: "Etapa 3 — Avaliar ambiente, vaso e substrato",
-        mainAction:
-          "Conferir se as condições de cultivo estão adequadas.",
+        mainAction: "Conferir se as condições de cultivo estão adequadas.",
         howTo: [
           "Observe o local em diferentes horários.",
           "Confira vaso, drenagem, umidade e estabilidade da planta.",
@@ -103,23 +99,14 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
           "Regar novamente quando o substrato ainda estiver muito úmido",
           "Realizar várias correções simultâneas",
         ],
-        registerText:
-          "Condição da luz, ventilação, drenagem e substrato.",
+        registerText: "Condição da luz, ventilação, drenagem e substrato.",
       },
       {
         id: "etapa-4-aplicacao",
         title: "Etapa 4 — Primeira aplicação",
-        mainAction:
-          "Realizar o Método de 2 Passos conforme a orientação técnica oficial.",
-        howTo: [
-          "Abra a seção Método de 2 Passos abaixo e siga as duas etapas na ordem indicada.",
-        ],
-        observe: [
-          "Raízes",
-          "Firmeza das folhas",
-          "Tempo de secagem",
-          "Alterações inesperadas",
-        ],
+        mainAction: "Realizar o Método de 2 Passos conforme a orientação técnica oficial.",
+        howTo: ["Abra a seção Método de 2 Passos abaixo e siga as duas etapas na ordem indicada."],
+        observe: ["Raízes", "Firmeza das folhas", "Tempo de secagem", "Alterações inesperadas"],
         avoid: [
           "Misturar produtos não previstos",
           "Repetir a aplicação por engano",
@@ -143,9 +130,7 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     title: "Observar a resposta inicial",
     objective: "Acompanhar a planta sem realizar novas intervenções.",
     mainAction: "Observar raízes, folhas, substrato e ambiente.",
-    howTo: [
-      "Compare com o registro do Dia 1 e anote somente alterações visíveis.",
-    ],
+    howTo: ["Compare com o registro do Dia 1 e anote somente alterações visíveis."],
     observe: [
       "Firmeza das folhas",
       "Alteração na aparência das raízes",
@@ -197,8 +182,7 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
       "Considerar somente a superfície do substrato",
       "Aumentar a frequência sem observar a planta",
     ],
-    registerText:
-      "Escolha a opção que descreve o dia e, se quiser, anote o critério que utilizou.",
+    registerText: "Escolha a opção que descreve o dia e, se quiser, anote o critério que utilizou.",
     registerOptions: [
       { value: "reguei", label: "Reguei" },
       { value: "nao-foi-necessario", label: "Não foi necessário regar" },
@@ -219,9 +203,7 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     title: "Avaliar vaso e substrato",
     objective: "Verificar se as raízes possuem drenagem, estabilidade e aeração.",
     mainAction: "Observar o estado do vaso e do substrato sem desmontar a planta.",
-    howTo: [
-      "Confira furos, escoamento, compactação, cheiro e estabilidade.",
-    ],
+    howTo: ["Confira furos, escoamento, compactação, cheiro e estabilidade."],
     observe: [
       "Vaso com drenagem",
       "Água acumulada",
@@ -242,8 +224,7 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
       { value: "acompanhamento", label: "Precisa de acompanhamento" },
       { value: "avaliacao-especializada", label: "Precisa de avaliação especializada" },
     ],
-    recordPrompt:
-      "Favorável, precisa de acompanhamento ou precisa de avaliação especializada?",
+    recordPrompt: "Favorável, precisa de acompanhamento ou precisa de avaliação especializada?",
     checklist: [
       "Verifiquei a drenagem",
       "Observei a compactação",
@@ -256,12 +237,9 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     day: 5,
     phase: 1,
     title: "Observar as raízes",
-    objective:
-      "Acompanhar sinais de atividade e possíveis alterações no sistema radicular.",
+    objective: "Acompanhar sinais de atividade e possíveis alterações no sistema radicular.",
     mainAction: "Observar as raízes visíveis.",
-    howTo: [
-      "Veja raízes aéreas e raízes próximas à parede do vaso, quando ele for transparente.",
-    ],
+    howTo: ["Veja raízes aéreas e raízes próximas à parede do vaso, quando ele for transparente."],
     observe: [
       "Firmeza",
       "Cor",
@@ -277,8 +255,7 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
       "Manipular raízes novas",
       "Concluir que a planta está melhor apenas pela mudança de cor após a rega",
     ],
-    registerText:
-      "Selecione o que representa o que observou nas raízes hoje.",
+    registerText: "Selecione o que representa o que observou nas raízes hoje.",
     registerOptions: [
       { value: "sem-alteracoes", label: "Sem alterações" },
       { value: "pontas-novas", label: "Pontas novas" },
@@ -304,9 +281,7 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     title: "Observar folhas, brotos e hastes",
     objective: "Acompanhar o vigor visível da planta.",
     mainAction: "Verificar firmeza, coloração e novos crescimentos.",
-    howTo: [
-      "Observe folhas antigas e novas separadamente e compare com a fotografia inicial.",
-    ],
+    howTo: ["Observe folhas antigas e novas separadamente e compare com a fotografia inicial."],
     observe: [
       "Firmeza",
       "Enrugamento",
@@ -383,9 +358,7 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     title: "Revisar o diagnóstico",
     objective: "Retomar os pontos identificados no início do plano.",
     mainAction: "Revisar as prioridades e os ajustes do diagnóstico.",
-    howTo: [
-      "Compare as orientações iniciais com os registros dos últimos dias.",
-    ],
+    howTo: ["Compare as orientações iniciais com os registros dos últimos dias."],
     observe: [
       "Pontos que continuam presentes",
       "Sinais que desapareceram",
@@ -397,8 +370,7 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
       "Ignorar um resultado desatualizado",
       "Tentar corrigir todos os itens ao mesmo tempo",
     ],
-    registerText:
-      "Registre até três pontos que continuarão sendo acompanhados.",
+    registerText: "Registre até três pontos que continuarão sendo acompanhados.",
     recordPrompt: "Quais três pontos continuarei acompanhando?",
     checklist: [
       "Revisei o diagnóstico inicial",
@@ -415,9 +387,7 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     title: "Revisar a consistência da rotina",
     objective: "Identificar excessos e mudanças desnecessárias.",
     mainAction: "Revisar tudo o que foi realizado desde o Dia 1.",
-    howTo: [
-      "Consulte aplicações, regas, mudanças de local e anotações.",
-    ],
+    howTo: ["Consulte aplicações, regas, mudanças de local e anotações."],
     observe: [
       "Rega sem verificação",
       "Uso simultâneo de produtos",
@@ -489,9 +459,7 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     title: "Comparar as raízes",
     objective: "Verificar mudanças desde os Dias 1 e 5.",
     mainAction: "Observar novamente o sistema radicular visível.",
-    howTo: [
-      "Compare posição, firmeza e pontas novas com fotografias ou anotações anteriores.",
-    ],
+    howTo: ["Compare posição, firmeza e pontas novas com fotografias ou anotações anteriores."],
     observe: [
       "Surgimento de pontas",
       "Manutenção da firmeza",
@@ -526,17 +494,8 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     title: "Comparar folhas e brotações",
     objective: "Identificar mudanças visíveis no vigor da planta.",
     mainAction: "Comparar folhas e novos crescimentos com os registros anteriores.",
-    howTo: [
-      "Observe separadamente folhas antigas, folhas novas, brotos e hastes.",
-    ],
-    observe: [
-      "Firmeza",
-      "Coloração",
-      "Evolução de manchas",
-      "Folhas novas",
-      "Brotos",
-      "Hastes",
-    ],
+    howTo: ["Observe separadamente folhas antigas, folhas novas, brotos e hastes."],
+    observe: ["Firmeza", "Coloração", "Evolução de manchas", "Folhas novas", "Brotos", "Hastes"],
     avoid: [
       "Usar apenas a floração como indicador",
       "Ignorar manchas em expansão",
@@ -559,8 +518,7 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     title: "Corrigir apenas o necessário",
     observeTitle: "Possíveis ajustes",
     objective: "Evitar excesso de intervenções.",
-    mainAction:
-      "Escolher no máximo um ajuste simples, quando houver necessidade clara.",
+    mainAction: "Escolher no máximo um ajuste simples, quando houver necessidade clara.",
     howTo: [
       "Use os registros para identificar qual fator está mais relacionado ao problema observado.",
     ],
@@ -592,8 +550,7 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     day: 14,
     phase: 2,
     title: "Avaliação intermediária e terceira aplicação",
-    objective:
-      "Comparar os Dias 1, 7 e 14 e realizar a terceira aplicação do Método de 2 Passos.",
+    objective: "Comparar os Dias 1, 7 e 14 e realizar a terceira aplicação do Método de 2 Passos.",
     mainAction:
       "Adicionar fotografia, comparar com os Dias 1 e 7, registrar a melhor evolução, conferir as condições da planta e realizar a terceira aplicação.",
     howTo: [
@@ -616,8 +573,7 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     ],
     registerText:
       "Registre a melhor evolução, o principal ponto ainda pendente e o cuidado que será mantido.",
-    recordPrompt:
-      "Melhor evolução, principal ponto pendente e cuidado que será mantido?",
+    recordPrompt: "Melhor evolução, principal ponto pendente e cuidado que será mantido?",
     checklist: [
       "Registrei a foto do Dia 14",
       "Comparei com os Dias 1 e 7",
@@ -638,13 +594,9 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     day: 15,
     phase: 3,
     title: "Identificar o que está funcionando",
-    objective:
-      "Reconhecer os cuidados que contribuíram para a estabilidade da planta.",
-    mainAction:
-      "Revisar as anotações e escolher os hábitos mais consistentes.",
-    howTo: [
-      "Procure relações entre as ações realizadas e os sinais observados.",
-    ],
+    objective: "Reconhecer os cuidados que contribuíram para a estabilidade da planta.",
+    mainAction: "Revisar as anotações e escolher os hábitos mais consistentes.",
+    howTo: ["Procure relações entre as ações realizadas e os sinais observados."],
     observe: [
       "Melhor critério de rega",
       "Local mais estável",
@@ -672,8 +624,7 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     day: 16,
     phase: 3,
     title: "Revisar as condições antes da fase final",
-    objective:
-      "Verificar se a planta permanece estável antes dos últimos registros do plano.",
+    objective: "Verificar se a planta permanece estável antes dos últimos registros do plano.",
     mainAction:
       "Revisar raízes, folhas, umidade, drenagem, ambiente e histórico das últimas semanas.",
     howTo: [
@@ -722,8 +673,7 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     phase: 3,
     title: "Comparar novamente as raízes",
     objective: "Acompanhar o sistema radicular antes da avaliação final.",
-    mainAction:
-      "Observar as raízes visíveis e compará-las com os registros anteriores.",
+    mainAction: "Observar as raízes visíveis e compará-las com os registros anteriores.",
     howTo: [
       "Observar as mesmas regiões avaliadas anteriormente",
       "Comparar firmeza",
@@ -748,10 +698,8 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
       "Forçar a visualização",
       "Fazer conclusões por um único sinal",
     ],
-    registerText:
-      "Qual foi a principal mudança observada nas raízes desde o início do plano?",
-    recordPrompt:
-      "Qual foi a principal mudança observada nas raízes desde o início do plano?",
+    registerText: "Qual foi a principal mudança observada nas raízes desde o início do plano?",
+    recordPrompt: "Qual foi a principal mudança observada nas raízes desde o início do plano?",
     checklist: [
       "Observei as mesmas regiões avaliadas antes",
       "Comparei firmeza e coloração",
@@ -766,17 +714,8 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     title: "Observar sem interferir",
     objective: "Acompanhar a planta durante a fase final sem realizar novas mudanças.",
     mainAction: "Observar sem realizar novas mudanças.",
-    howTo: [
-      "Confira os mesmos pontos avaliados nos Dias 2 e 4.",
-    ],
-    observe: [
-      "Raízes",
-      "Folhas",
-      "Brotos",
-      "Umidade",
-      "Tempo de secagem",
-      "Reações inesperadas",
-    ],
+    howTo: ["Confira os mesmos pontos avaliados nos Dias 2 e 4."],
+    observe: ["Raízes", "Folhas", "Brotos", "Umidade", "Tempo de secagem", "Reações inesperadas"],
     avoid: [
       "Fazer nova aplicação",
       "Fazer nova correção sem necessidade",
@@ -829,9 +768,7 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     title: "Preparar a comparação final",
     objective: "Organizar os registros antes da conclusão.",
     mainAction: "Revisar fotos, anotações, tarefas e aplicações.",
-    howTo: [
-      "Consulte os Dias 1, 7, 14 e os registros de aplicação.",
-    ],
+    howTo: ["Consulte os Dias 1, 7, 14 e os registros de aplicação."],
     observe: [
       "Mudanças consistentes",
       "Pontos sem alteração",
@@ -845,8 +782,7 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
       "Escolher apenas a fotografia mais favorável",
       "Considerar somente flores",
     ],
-    registerText:
-      "Escolha três aspectos principais que deseja comparar no Dia 21.",
+    registerText: "Escolha três aspectos principais que deseja comparar no Dia 21.",
     recordPrompt: "Quais três aspectos você quer comparar amanhã?",
     checklist: [
       "Revisei todas as fotos",
@@ -885,8 +821,7 @@ export const EDITORIAL_PLAN: Record<number, ProtocolDay> = {
     ],
     registerText:
       "Registre o que melhorou, o que permaneceu igual, o que ainda precisa de atenção, qual cuidado será mantido, a foto final e a classificação da evolução.",
-    recordPrompt:
-      "O que melhorou, o que permaneceu igual e o que ainda precisa de atenção?",
+    recordPrompt: "O que melhorou, o que permaneceu igual e o que ainda precisa de atenção?",
     attention: [
       "Possíveis resultados:",
       "Apresentou evolução — Foram observados sinais favoráveis. Mantenha os cuidados que contribuíram para a estabilidade.",
