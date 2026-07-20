@@ -38,14 +38,22 @@ export function AuthScreen({ onBack, onSuccess }: AuthScreenProps) {
 
   const handleGoogleAuth = async () => {
     try {
+      console.log("Initiating Google Auth with Lovable adapter...");
       const { lovable } = await import("@/integrations/lovable/index");
-      // Uso de extraParams conforme solicitado, removendo options e as any
-      await lovable.auth.signInWithOAuth("google", {
+      
+      const result = await lovable.auth.signInWithOAuth("google", {
         redirect_uri: window.location.origin + "/protocolo-21-dias",
         extraParams: { prompt: "select_account" }
       });
-    } catch (err) {
-      setError("Erro ao iniciar login com Google");
+
+      if (result?.error) {
+        throw result.error;
+      }
+      
+      console.log("OAuth flow result:", result);
+    } catch (err: any) {
+      console.error("OAuth error:", err);
+      setError("Erro ao iniciar login com Google: " + (err.message || "desconhecido"));
     }
   };
 

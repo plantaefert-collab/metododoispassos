@@ -63,19 +63,27 @@ export function useAuthBootstrap() {
   useEffect(() => {
     // Escuta mudanças na sessão
     const initSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
-      bootstrap(session?.user?.id ?? null);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        console.log("Bootstrap init session:", !!session);
+        setUser(session?.user ?? null);
+        bootstrap(session?.user?.id ?? null);
+      } catch (err) {
+        console.error("Bootstrap init session error:", err);
+        bootstrap(null);
+      }
     };
 
     initSession();
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log("Auth event:", event);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      console.log("Auth event change:", event, !!session);
+      
+      // Se o usuário mudou, re-bootstrap
       const newUser = session?.user ?? null;
       if (newUser?.id !== user?.id) {
         setUser(newUser);
-        bootstrap(newUser?.id ?? null);
+        await bootstrap(newUser?.id ?? null);
       }
     });
 
