@@ -2014,7 +2014,11 @@ function DiarioTab() {
         {PHOTO_DAYS.map((d: number) => {
           const entry = state.days[d] ?? { checklist: {}, note: "", completed: false };
           return (
-            <div key={d} className="rounded-3xl border border-border bg-card p-4">
+            <div key={d} className="relative overflow-hidden rounded-2xl border border-border bg-card p-4">
+              <div className="absolute -right-6 -top-6 opacity-[0.03] text-primary rotate-12">
+                <Camera size={80} />
+              </div>
+              <div className="relative z-10">
               <div className="flex items-center justify-between">
                 <div>
                   <div className="text-[11px] font-bold uppercase tracking-wider text-accent">
@@ -2046,7 +2050,8 @@ function DiarioTab() {
                       <Camera size={22} />
                       <span className="text-xs font-medium">Adicionar foto</span>
                     </div>
-                  </div>
+              </div>
+            </div>
                 )}
                 <input
                   type="file"
