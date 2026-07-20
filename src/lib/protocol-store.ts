@@ -995,6 +995,11 @@ export function useProtocolStore() {
     updateFinalEval,
     reset,
     clearSaveError: clearSaveErrorCb,
+    setState: wrapSetState,
+    mergeRemoteProgressState: (progress: any) => {
+      wrapSetState((s) => mergeRemoteProgressState(s, progress));
+    },
   };
 }
+
 
