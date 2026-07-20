@@ -1717,22 +1717,26 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
       )}
 
       <div className="rounded-2xl border border-border bg-card p-5">
-        <div className="text-sm font-bold text-primary">Explorar dias do plano</div>
+        <div className="flex items-center gap-2 text-sm font-bold text-primary">
+          <CalendarCheck size={16} className="text-accent" />
+          Acesso Rápido ao Protocolo
+        </div>
         <p className="mt-1 text-xs text-muted-foreground">
-          Escolha uma semana e um dia para consultar.
+          Consulte as tarefas e orientações de dias específicos do plano de 21 dias.
         </p>
-        <div className="mt-3 flex flex-wrap gap-1.5">
+        <div className="mt-4 flex flex-wrap gap-2">
           {[1, 7, 14, 21].map((d) => (
             <button
               key={d}
-              onClick={() => setCurrentDay(d, actorId)}
-              className={`rounded-full px-3 py-1.5 text-xs font-semibold ${
-                day === d
-                  ? "bg-primary text-primary-foreground"
-                  : "border border-border bg-card text-foreground"
-              }`}
+              onClick={() => {
+                setCurrentDay(d, actorId);
+                setTab("plano");
+                toast.info(`Navegando para o Dia ${d}`);
+              }}
+              className="flex items-center gap-1.5 rounded-xl border border-border bg-card px-3.5 py-2 text-xs font-semibold text-foreground transition-all hover:border-primary/40 hover:bg-muted active:scale-95"
             >
               Dia {d}
+              <ChevronRight size={12} className="text-muted-foreground/40" />
             </button>
           ))}
         </div>
