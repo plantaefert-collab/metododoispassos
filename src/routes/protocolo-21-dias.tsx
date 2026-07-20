@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState, type ReactNode, type ChangeEvent } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Sprout,
   Leaf,
