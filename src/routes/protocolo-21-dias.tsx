@@ -2268,6 +2268,7 @@ function DayContentCard({
   onUpdate: _onUpdate,
   diagnosisFresh,
   trackingPoints,
+  setStatus,
 }: {
   meta: ProtocolDay;
   entry: { checklist: Record<string, boolean>; note: string; completed: boolean };
