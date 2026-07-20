@@ -1155,20 +1155,20 @@ function DiagnosisResultScreen({ onBack, onFinish }: { onBack: () => void; onFin
           resultado orienta o acompanhamento — não é um diagnóstico definitivo.
         </div>
 
-        {current && result ? (
-          <ResultBlocks result={result} />
-        ) : result && observations > 0 ? (
+        {result ? (
           <div className="space-y-4">
-            <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
-              As respostas foram alteradas. Este resultado pode estar desatualizado, mas você ainda pode visualizá-lo abaixo.
-            </InfoCard>
+            {!current && (
+              <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
+                As respostas foram alteradas. Este resultado pode estar desatualizado, mas você ainda pode visualizá-lo abaixo.
+              </InfoCard>
+            )}
             <ResultBlocks result={result} />
           </div>
         ) : (
           <div className="mt-5">
             <InfoCard tone="lilac" icon={<Info size={16} />}>
-              Nenhuma alternativa foi marcada. Volte e selecione o que você observa para receber
-              orientações personalizadas.
+              O resultado está sendo preparado. Revise as respostas e toque em “Ver resultado” para
+              gerar as orientações personalizadas.
             </InfoCard>
           </div>
         )}
@@ -1212,8 +1212,8 @@ function ResultBlocks({
     <div className="mt-5 space-y-3">
       {!hasAny && (
         <InfoCard tone="lilac" icon={<Info size={16} />}>
-          Nenhuma alternativa foi marcada. Volte e selecione o que você observa para receber
-          orientações personalizadas.
+          Ainda há poucas informações registradas. Use os pontos abaixo como roteiro de observação
+          para completar o diagnóstico com mais segurança.
         </InfoCard>
       )}
       {priorities.length > 0 && (

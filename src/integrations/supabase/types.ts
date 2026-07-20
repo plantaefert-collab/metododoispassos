@@ -43,33 +43,42 @@ export type Database = {
       }
       protocol_progress: {
         Row: {
+          answers_version: number
           applications: Json
           completed_tasks: Json
           created_at: string
           current_day: number
+          diagnosis_answers: Json
           diagnosis_result: Json | null
+          diagnosis_status: string
           id: string
           photos: Json
           updated_at: string
           user_id: string
         }
         Insert: {
+          answers_version?: number
           applications?: Json
           completed_tasks?: Json
           created_at?: string
           current_day?: number
+          diagnosis_answers?: Json
           diagnosis_result?: Json | null
+          diagnosis_status?: string
           id?: string
           photos?: Json
           updated_at?: string
           user_id: string
         }
         Update: {
+          answers_version?: number
           applications?: Json
           completed_tasks?: Json
           created_at?: string
           current_day?: number
+          diagnosis_answers?: Json
           diagnosis_result?: Json | null
+          diagnosis_status?: string
           id?: string
           photos?: Json
           updated_at?: string

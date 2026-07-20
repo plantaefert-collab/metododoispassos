@@ -644,6 +644,64 @@ const PRIORITY_ORDER = [
   "Uso vários fertilizantes ou produtos ao mesmo tempo",
 ];
 
+const EMPTY_OBSERVATION_GUIDANCE: DiagnosisGuidance[] = [
+  {
+    id: "roots:observacao-ainda-nao-registrada",
+    category: "roots",
+    answer: "Observação ainda não registrada",
+    title: "Raízes ainda não avaliadas",
+    classification: "insufficient",
+    explanation:
+      "Sem observar as raízes, ainda não é possível entender com segurança como está a absorção de água e nutrientes.",
+    action: "Nos próximos dias, observe cor, firmeza e presença de pontas novas nas raízes.",
+    tracking: ["Cor das raízes", "Firmeza das raízes", "Pontas novas"],
+  },
+  {
+    id: "leaves:observacao-ainda-nao-registrada",
+    category: "leaves",
+    answer: "Observação ainda não registrada",
+    title: "Folhas ainda não avaliadas",
+    classification: "insufficient",
+    explanation:
+      "As folhas ajudam a acompanhar hidratação, vigor e resposta ao ambiente ao longo do protocolo.",
+    action: "Observe firmeza, cor, manchas e surgimento de folhas ou brotações novas.",
+    tracking: ["Firmeza das folhas", "Cor das folhas", "Novas brotações"],
+  },
+  {
+    id: "environment:observacao-ainda-nao-registrada",
+    category: "environment",
+    answer: "Observação ainda não registrada",
+    title: "Ambiente ainda não avaliado",
+    classification: "insufficient",
+    explanation:
+      "Luz, ventilação e mudanças de local influenciam diretamente a leitura dos sinais da orquídea.",
+    action: "Observe a luminosidade indireta, a circulação de ar e se a planta sofreu mudanças recentes.",
+    tracking: ["Luminosidade", "Ventilação", "Estabilidade do local"],
+  },
+  {
+    id: "potAndSubstrate:observacao-ainda-nao-registrada",
+    category: "potAndSubstrate",
+    answer: "Observação ainda não registrada",
+    title: "Vaso e substrato ainda não avaliados",
+    classification: "insufficient",
+    explanation:
+      "Drenagem, estrutura do substrato e firmeza da planta ajudam a decidir se a rotina deve ser ajustada.",
+    action: "Verifique se há furos, acúmulo de água, substrato compactado ou planta solta no vaso.",
+    tracking: ["Escoamento", "Tempo de secagem", "Firmeza da planta"],
+  },
+  {
+    id: "wateringAndRoutine:observacao-ainda-nao-registrada",
+    category: "wateringAndRoutine",
+    answer: "Observação ainda não registrada",
+    title: "Rotina ainda não avaliada",
+    classification: "insufficient",
+    explanation:
+      "A rotina de rega e aplicação precisa ser observada para evitar excesso de água ou intervenções simultâneas.",
+    action: "Antes de regar, verifique umidade, peso do vaso e escoamento; registre as aplicações feitas.",
+    tracking: ["Umidade antes da rega", "Escoamento", "Histórico de aplicações"],
+  },
+];
+
 export type DiagnosisAnswers = Record<DiagnosisCategory, string[]>;
 
 export type DiagnosisResult = {
@@ -665,6 +723,11 @@ export function computeDiagnosisResult(
   const adjustments: DiagnosisGuidance[] = [];
   const priorities: DiagnosisGuidance[] = [];
   const insufficient: DiagnosisGuidance[] = [];
+  const observations = totalObservations(answers);
+
+  if (observations === 0) {
+    insufficient.push(...EMPTY_OBSERVATION_GUIDANCE);
+  }
 
   (Object.keys(answers) as DiagnosisCategory[]).forEach((cat) => {
     for (const ans of answers[cat]) {

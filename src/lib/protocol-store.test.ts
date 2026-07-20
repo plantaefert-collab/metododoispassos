@@ -13,6 +13,7 @@ import {
   SAVE_ERROR_MESSAGE,
   normalizeAnswersVersion,
   reconcileDiagnosisResultState,
+  mergeRemoteProgressState,
   isDiagnosisCurrent,
   ensureStoreInitialized,
   type ProtocolState,
@@ -758,6 +759,88 @@ describe("saveDiagnosisResult", () => {
     expect(st.saveError).toBe(SAVE_ERROR_MESSAGE);
     // resultado antigo não passa a ser considerado atual
     expect(isDiagnosisCurrent(st)).toBe(false);
+  });
+});
+
+describe("computeDiagnosisResult — diagnóstico sem marcações", () => {
+  it("gera blocos educativos de informação insuficiente em vez de resultado vazio", () => {
+    const result = computeDiagnosisResult(
+      {
+        roots: [],
+        leaves: [],
+        environment: [],
+        potAndSubstrate: [],
+        wateringAndRoutine: [],
+      },
+      0,
+      "2026-07-20T00:00:00.000Z",
+    );
+
+    expect(result.insufficientInformation).toHaveLength(5);
+    expect(result.insufficientInformation.map((item) => item.category)).toEqual([
+      "roots",
+      "leaves",
+      "environment",
+      "potAndSubstrate",
+      "wateringAndRoutine",
+    ]);
+    expect(result.completedAt).toBe("2026-07-20T00:00:00.000Z");
+  });
+});
+
+describe("mergeRemoteProgressState", () => {
+  it("não apaga diagnóstico local quando o progresso remoto ainda está sem resultado", () => {
+    const local: ProtocolState = {
+      ...getState(),
+      currentDay: 4,
+      diagnosis: {
+        roots: ["Firmes, verdes ou prateadas"],
+        leaves: [],
+        environment: [],
+        potAndSubstrate: [],
+        wateringAndRoutine: [],
+      },
+      diagnosisResult: buildResult(7),
+      diagnosisStatus: "fresh",
+      answersVersion: 7,
+    };
+
+    const merged = mergeRemoteProgressState(local, {
+      current_day: 4,
+      completed_tasks: {},
+      applications: [],
+      diagnosis_result: null,
+      diagnosis_answers: {},
+      diagnosis_status: "none",
+      answers_version: 0,
+    });
+
+    expect(merged.diagnosisResult).toBe(local.diagnosisResult);
+    expect(merged.diagnosisStatus).toBe("fresh");
+    expect(merged.answersVersion).toBe(7);
+    expect(isDiagnosisCurrent(merged)).toBe(true);
+  });
+
+  it("aplica diagnóstico remoto válido com respostas, status e versão reconciliados", () => {
+    const remoteResult = buildResult(3);
+    const merged = mergeRemoteProgressState(getState(), {
+      current_day: 8,
+      completed_tasks: { 8: { note: "observação" } },
+      applications: [],
+      diagnosis_answers: {
+        roots: ["Firmes, verdes ou prateadas"],
+      },
+      diagnosis_result: remoteResult,
+      diagnosis_status: "fresh",
+      answers_version: 3,
+    });
+
+    expect(merged.currentDay).toBe(8);
+    expect(merged.days[8].note).toBe("observação");
+    expect(merged.diagnosis.roots).toEqual(["Firmes, verdes ou prateadas"]);
+    expect(merged.diagnosisResult).toEqual(remoteResult);
+    expect(merged.diagnosisStatus).toBe("fresh");
+    expect(merged.answersVersion).toBe(3);
   });
 });
 
