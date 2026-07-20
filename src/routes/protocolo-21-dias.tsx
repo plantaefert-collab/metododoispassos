@@ -2353,6 +2353,7 @@ function StagesList({
               <StageBody
                 stage={stage}
                 onOpenMethod={isApplicationStage ? onOpenMethod : undefined}
+                setStatus={setStatus}
               />
             </AccordionContent>
           </AccordionItem>
