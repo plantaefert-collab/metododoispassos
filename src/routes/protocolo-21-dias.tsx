@@ -2938,27 +2938,28 @@ function AprenderTab() {
         </div>
         <div className="relative z-10">
           <div className="text-xs font-bold uppercase tracking-wider text-accent">Aprender</div>
-          <h1 className="text-2xl font-display tracking-tight text-primary">Biblioteca educativa</h1>
+          <h1 className="text-2xl font-display tracking-tight text-primary">Biblioteca de Cuidado</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            Conteúdo curto e prático para consultar quando precisar.
+            Fundamentos e orientações práticas para sua orquídea florescer.
           </p>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {LIBRARY.map((l) => (
           <button
             key={l.id}
             onClick={() => setOpen(l.id)}
-            className="flex h-full flex-col items-start gap-2 rounded-2xl border border-border bg-card p-4 text-left transition-colors hover:border-primary/40"
+            className="group relative flex items-center gap-4 overflow-hidden rounded-2xl border border-border bg-card p-4 transition-all hover:border-primary/40 hover:shadow-md active:scale-[0.98]"
           >
-            <span className="grid h-9 w-9 place-items-center rounded-full bg-secondary text-primary">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-secondary text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
               {l.icon}
-            </span>
-            <div className="text-sm font-bold text-primary">{l.title}</div>
-            <div className="mt-auto flex items-center gap-1 text-[11px] font-semibold text-accent">
-              Ler <ChevronRight size={12} />
             </div>
+            <div className="flex-1 pr-6">
+              <div className="text-sm font-bold text-primary">{l.title}</div>
+              <div className="text-[11px] text-muted-foreground line-clamp-1">{l.body}</div>
+            </div>
+            <ChevronRight size={16} className="absolute right-4 text-muted-foreground/40 transition-transform group-hover:translate-x-1 group-hover:text-primary" />
           </button>
         ))}
       </div>
