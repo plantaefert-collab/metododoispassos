@@ -126,8 +126,12 @@ function ProtocoloPage() {
   useEffect(() => {
     if (status === "ready") {
       const state = getState();
+      // Se não tiver completado o diagnóstico nem registrado a planta, deixa no Início
+      // Caso contrário, pode ir para o Plano.
       if (state.onboarded) {
         setTab("plano");
+      } else {
+        setTab("inicio");
       }
     }
   }, [status]);

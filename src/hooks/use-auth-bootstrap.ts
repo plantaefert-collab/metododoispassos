@@ -91,7 +91,8 @@ export function useAuthBootstrap() {
 
       // Determinar destino
       // O diagnóstico e o cadastro da planta agora são opcionais.
-      // Sempre redirecionamos para "ready" (Início) após o login.
+      // Se for um novo usuário sem perfil, ele será criado via upsert em saveProfileRemote em chamadas subsequentes
+      // mas aqui garantimos que o status seja 'ready' para liberar a UI.
       setStatus("ready");
     } catch (err: any) {
       if (generation === bootstrapGenerationRef.current) {
