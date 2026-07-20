@@ -145,7 +145,15 @@ function ProtocoloPage() {
           >
             <AuthScreen
               onBack={() => setScreen("welcome")}
-              onSuccess={() => setScreen("signup")}
+              onSuccess={() => {
+                const hasDiagnosis = isDiagnosisCurrent(store.state);
+                if (hasDiagnosis) {
+                  setScreen("app");
+                  setTab("plano");
+                } else {
+                  setScreen("signup");
+                }
+              }}
             />
           </motion.div>
         )}
@@ -193,7 +201,7 @@ function ProtocoloPage() {
               onFinish={() => {
                 store.setOnboarded(true);
                 setScreen("app");
-                setTab("inicio");
+                setTab("plano");
               }}
             />
           </motion.div>
