@@ -1,99 +1,68 @@
 ## Escopo
 
-Refatoração funcional profunda do app **sem tocar visualmente na tela de boas-vindas** e sem publicar. Persistência continua 100% local (localStorage). Nenhum Supabase/backend.
+Etapa editorial e de UI. Sem novas validações, sem alterar tela de boas-vindas, sem publicar. Transcrição fiel do arquivo `Plano_editorial_21_dias.md` (866 linhas) para uma estrutura TypeScript rica, com adaptações autorizadas para as aplicações dos Dias 1, 7, 14 e 21.
 
 ## Arquivos
 
-**Alterar**
-- `src/lib/protocol-store.ts` — novo schema, migração versionada, ações de diagnóstico/resultado/aplicações, compressão de fotos, guestMode em memória.
-- `src/routes/protocolo-21-dias.tsx` — fluxo de onboarding em 3 passos, novas etapas do diagnóstico (5), tela de resultado, integração no painel, aplicações com histórico, toggle de conclusão, aria-*, focus trap básico.
-- `src/routes/__root.tsx` — `lang="pt-BR"`, 404/erro em português.
+**Substituir integralmente**
+- `src/lib/editorial-plan.ts` — nova estrutura tipada com `stages`, `howTo`, `observe`, `avoid`, `registerText`, `registerOptions`, `tip`, `attention`, `personalizedContext`. Transcrição fiel do arquivo anexado (sem resumir listas, sem substituir orientações).
 
-**Criar**
-- `src/lib/diagnosis-matrix.ts` — todas as alternativas + matriz de classificação (favorable/adjustment/priority/insufficient) com título, explicação, ação, tracking, avoid e warning quando aplicável.
-- `src/lib/image-compress.ts` — canvas resize (max 1280 px), JPEG q≈0.78, tratamento de erro/quota.
+**Atualizar**
+- `src/lib/protocol-plan.ts` — expandir `ProtocolDay` com os campos novos + tipos `EditorialSection`, `RegisterOption`, `DayStage`. `APPLICATION_DAYS = [1, 7, 14, 21]`, `PHOTO_DAYS = [1, 7, 14, 21]` (já corretos).
+- `src/routes/protocolo-21-dias.tsx`:
+  - Remover navegação horizontal contínua dos 21 dias.
+  - Adicionar seletor de semana (Semana 1/2/3) + grade responsiva de 7 dias (4+3 em 320 px), sem scroll horizontal, destacando dia atual e discretamente dias de aplicação.
+  - Renderizar tela do dia com: cabeçalho (Dia, Fase, Título), Objetivo, O que fazer, Dica, Checklist, campo/opções de registro (usando `recordPrompt` e `registerOptions`).
+  - Acordeões (`Accordion` shadcn já disponível) para: Como fazer, Observe, Evite, Registre, Atenção, No seu caso.
+  - Dia 1: renderizar as 4 etapas (`stages`) como acordeões independentes.
+  - Método de 2 Passos: novo conteúdo oficial (texto integral abaixo), exibido nos Dias 1, 7, 14 e 21. Remover `ProductPlaceholder` e frases "Inserir imagem real do produto", "Sem indicação de quantidade nesta versão.", "Siga sempre o rótulo do produto.".
+  - Textos de demonstração renomeados ("Explorar dias do plano", "Escolha uma semana e um dia para consultar", "Reiniciar meu plano") + `aria-label` atualizados.
+  - Bloco "No seu caso": acordeão exibindo até 3 `trackingPoints` quando diagnóstico atual; aviso curto + CTA quando `outdated`.
 
-## Modelo de estado (v2)
+**Não alterar**
+- `WelcomeScreen`, imagem, textos, cards, CTAs da boas-vindas.
+- `protocol-store.ts` além do mínimo indispensável (armazenar `registerValue` estruturado do dia, se necessário — reaproveitar o `note` existente).
+- Testes existentes; nenhum novo teste editorial.
 
-```ts
-schemaVersion: 2
-onboarded: boolean
-guestMode: never persistido (memória)
-plant: PlantInfo
-diagnosis: {
-  roots, leaves, environment,
-  potAndSubstrate, wateringAndRoutine: string[]
-}
-diagnosisStatus: "not_started" | "in_progress" | "completed" | "outdated"
-diagnosisAnswersVersion: number
-diagnosisResult: DiagnosisResult | null
-days: Record<number, DayEntry>  // agora com applications: ApplicationRecord[]
-finalEval, currentDay
+## Adaptações editoriais autorizadas
+
+- **Dia 1**: 4 stages independentes (Registrar, Diagnóstico guiado, Ambiente/vaso/substrato, Primeira aplicação). Preserva todos os textos do arquivo por etapa.
+- **Dia 7**: título "Primeira avaliação e segunda aplicação"; conteúdo integral da avaliação + seção "Segunda aplicação" com ordem editorial (fotografar → comparar → registrar → conferir → Método 2 Passos → registrar aplicação).
+- **Dia 10**: título "Acompanhar a resposta e revisar a rotina" + conteúdo novo (transcrito do prompt), **sem aplicação**.
+- **Dia 14**: título "Avaliação intermediária e terceira aplicação"; avaliação intermediária integral + seção "Terceira aplicação".
+- **Dia 16**: título "Revisar as condições antes da fase final" + conteúdo novo (transcrito do prompt), sem preparação de aplicação.
+- **Dia 17**: título "Comparar novamente as raízes" + conteúdo novo, **`isApplicationDay: false`**.
+- **Dia 18**: preserva tema "Observar sem interferir"; remove qualquer menção a "após a última aplicação" / "aplicação do Dia 17".
+- **Dia 21**: título "Avaliação final, próximo caminho e quarta aplicação" + conteúdo integral da avaliação final + seção "Quarta aplicação" (usar "Quarta aplicação do plano", nunca "aplicação de manutenção").
+- Demais dias (2–6, 8, 9, 11–13, 15, 19, 20): transcrição fiel do arquivo, sem resumo.
+
+## Método de 2 Passos (conteúdo oficial)
+
+Título, introdução, Passo 1 (Enraizar), Passo 2 (Nutrir) e lista de "Cuidados" exatamente conforme o prompt. Frequência: "Uma vez por semana." Componente sem placeholder de imagem: apenas ícone + nome da etapa + nome do produto + texto educativo.
+
+## Navegação por semanas
+
+```text
+[ Semana 1 ] [ Semana 2 ] [ Semana 3 ]
+[ 1 ][ 2 ][ 3 ][ 4 ]
+[ 5 ][ 6 ][ 7 ]
 ```
 
-## Migração (v1 → v2)
+Sem rolagem horizontal. Botões ≥44 px. Dia atual em destaque; dias de aplicação com marcador discreto (ponto magenta). Trocar de semana não muda `currentDay`.
 
-`migrateProtocolState(saved)`:
-- Se `schemaVersion` ausente: assumir v1.
-- Copiar `roots/leaves/environment` como estão.
-- Dividir `routine` antigo: itens de água acumulada/substrato/vaso → `potAndSubstrate`; demais → `wateringAndRoutine`.
-- Criar `diagnosisStatus="not_started"`, `diagnosisAnswersVersion=0`, `diagnosisResult=null` se ausentes.
-- `days[n].applicationDone: true` → sintetiza um `ApplicationRecord` com `completedAt` desconhecido (marcado como "registro anterior").
-- Preservar plant, fotos, notas, finalEval, currentDay.
-- Nunca lança; em erro retorna estado seguro mesclado com default.
+## Acordeões
 
-## Regras de invalidação
-
-Ao togglar uma alternativa:
-1. `diagnosisAnswersVersion++`
-2. Se havia `completed`, muda para `outdated` (mantém `diagnosisResult` para leitura interna, mas UI mostra banner).
-3. Painel e "Meu plano" trocam o card "Seus pontos para acompanhar" pelo card "Seu diagnóstico foi alterado" com CTA **ATUALIZAR DIAGNÓSTICO**.
-
-Ao concluir novamente: recomputa via matriz, seta `completed`, `completedAt`, atualiza `answersVersion` para o valor atual.
-
-## Fluxos de tela
-
-- **Boas-vindas (inalterada visualmente)**: "COMEÇAR MEU PLANO" → Cadastro (Passo 1/3). "Explorar o conteúdo" → seta `guestMode=true` (memória), abre aba Aprender; refresh volta para boas-vindas. Botão claro "Começar meu plano" visível no header em modo visitante.
-- **Cadastro** Passo 1/3.
-- **Diagnóstico** Passo 2/3 com 5 etapas + aviso educativo quando etapa vazia (não bloqueia).
-- **Resultado** Passo 3/3: cabeçalho + 5 blocos (prioritárias aberto, ajustes/favoráveis/insuficientes em accordion) + CTA "COMEÇAR O PLANO DE 21 DIAS" no topo e no rodapé.
-- **Painel/Meu plano**: card "Seus pontos para acompanhar" (3–5, derivados de `trackingPoints`) com link **VER ORIENTAÇÕES COMPLETAS** → reabre a tela de resultado.
-- **Dia**: `CONCLUIR TAREFA` ↔ `TAREFA CONCLUÍDA` + ação `DESMARCAR CONCLUSÃO`. Sem apagar checklist/nota/aplicações.
-- **Aplicações**: histórico com data/hora, cooldown de 10 s contra duplo clique, exibe último registro.
-
-## Fotos
-
-- `compressImage(file)`: redimensiona lado maior a 1280 px, JPEG 0.78; falha → mensagem "Não foi possível salvar esta fotografia no navegador. Tente utilizar uma imagem menor."
-- Estado "processando" durante o resize.
-- Captura `QuotaExceededError` ao salvar e reverte a foto sem afetar outros campos.
-
-## Conteúdo
-
-- Substituição de frases categóricas por linguagem educativa conforme item 17.
-- Nomes de produtos mantidos + comentário `[VALIDAR COM A PLANTAEFERT]`.
-- Cabeçalho textual/ícone botânico mantidos + comentário sobre logotipo oficial.
-
-## Acessibilidade
-
-- `<html lang="pt-BR">`, 404/erro traduzidos.
-- `id`/`htmlFor` em todos os inputs.
-- `aria-pressed` nas alternativas, `aria-current="step"` na progress, `role="dialog" aria-modal="true"` no drawer do Método de 2 Passos, Escape fecha, foco retorna ao trigger.
-- `aria-label` em botões só-ícone; `focus-visible` global no CSS já existente.
-- Alvos ≥44 px, textos essenciais ≥12 px.
-
-## Preservação
-
-Boas-vindas (imagem, tipografia, paleta, espaçamentos, cards, selo, CTAs, responsividade 360/390/430) permanece byte-a-byte no JSX. Nenhuma classe/token/asset dela é alterado. Rotas e redirecionamento `/` → `/protocolo-21-dias` preservados. Nenhum dado antigo do localStorage é apagado — apenas migrado.
+Componente `@/components/ui/accordion` (Radix) já disponível — usar `type="multiple"`. Títulos exatos: "Como fazer", "Observe", "Evite", "Registre", "Atenção", "No seu caso". Renderizados apenas quando o dado existe.
 
 ## Verificação
 
-- `tsgo` limpo.
-- Playwright headless: 360/390/430 — sem scroll horizontal em boas-vindas, cadastro, diagnóstico, resultado, painel.
-- Testes manuais dos 5 fluxos descritos no pedido.
+- `bunx tsgo --noEmit`, `bun run lint`, `bun run build`.
+- Inspeção visual em 360 px (sem scroll horizontal, textos legíveis).
 
 ## Fora de escopo
 
-- Redesenho visual das telas internas (aguarda próxima etapa).
-- Publicação.
-- Backend / Supabase / auth.
-- Novo logotipo ou novas embalagens.
+Bloqueios de aplicação, proteção contra duplicidade, migração v2→v3, novos testes, publicação, alteração da boas-vindas.
+
+## Observação
+
+Esta é uma reescrita grande (≈2500 linhas de conteúdo editorial + refactor de UI). Se aprovar, executo em um único ciclo e reporto typecheck/lint/build reais ao final.
