@@ -2815,7 +2815,7 @@ function FinalEvaluation({ actorId }: { actorId: string }) {
   return (
     <div className="rounded-3xl border border-border bg-card p-5">
       <div className="text-xs font-bold uppercase tracking-wider text-accent">Avaliação final</div>
-      <h2 className="mt-1 text-lg font-bold text-primary">Comparação e reflexão</h2>
+      <h2 className="mt-1 text-lg font-bold text-primary">Reflexão <span className="font-display text-2xl text-accent">Final</span></h2>
 
       <div className="mt-4 grid grid-cols-4 gap-2">
         {PHOTO_DAYS.map((d: number) => {
@@ -2829,7 +2829,7 @@ function FinalEvaluation({ actorId }: { actorId: string }) {
                 <img src={p} alt={`Dia ${d}`} className="h-full w-full object-cover" />
               ) : (
                 <div className="grid h-full place-items-center text-[10px] font-semibold text-muted-foreground">
-                  Dia {d}
+                  Dia <span className="font-display text-xs">{d}</span>
                 </div>
               )}
             </div>
@@ -3196,7 +3196,7 @@ function ResumoTab({ actorId }: { actorId: string }) {
             <FileText size={20} />
           </div>
           <div>
-            <h2 className="font-display text-xl text-primary">Resumo da Jornada</h2>
+            <h2 className="font-display text-xl text-primary">Resumo da Jornada <span className="text-2xl text-accent">21</span></h2>
             <p className="text-xs text-muted-foreground">Visão geral do seu progresso de 21 dias.</p>
           </div>
         </div>
