@@ -87,8 +87,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "Guia Prático Orquídeas Floridas — PlantaeFert" },
       {
         property: "og:description",
-        content:
-          "Plano guiado de 21 dias com o Método de 2 Passos: Enraizar e Nutrir.",
+        content: "Plano guiado de 21 dias com o Método de 2 Passos: Enraizar e Nutrir.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

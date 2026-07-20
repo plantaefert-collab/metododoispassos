@@ -1575,7 +1575,7 @@ function StageBody({ stage, onOpenMethod }: { stage: DayStage; onOpenMethod?: ()
         registerText={stage.registerText}
         attention={stage.attention}
         personalizedTracking={[]}
-        customObserveTitle={(stage as any).observeTitle}
+        customObserveTitle={(stage as any).observeTitle as string | undefined}
       />
       {onOpenMethod && (
         <button
