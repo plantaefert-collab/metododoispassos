@@ -35,9 +35,12 @@ import {
   getProtocolPhase,
   APPLICATION_DAYS,
   PHOTO_DAYS,
-  PROTOCOL_DAYS,
   PROTOCOL_PHASES,
+  WEEKS,
+  getWeekForDay,
   type ProtocolDay,
+  type DayStage,
+  type RegisterOption,
 } from "@/lib/protocol-plan";
 import {
   CATEGORY_LABEL,
