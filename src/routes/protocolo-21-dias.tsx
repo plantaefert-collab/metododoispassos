@@ -1157,7 +1157,7 @@ function DiagnosisResultScreen({ onBack, onFinish }: { onBack: () => void; onFin
 
         {current && result ? (
           <ResultBlocks result={result} />
-        ) : result ? (
+        ) : result && observations > 0 ? (
           <div className="space-y-4">
             <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
               As respostas foram alteradas. Este resultado pode estar desatualizado, mas você ainda pode visualizá-lo abaixo.
@@ -1165,9 +1165,12 @@ function DiagnosisResultScreen({ onBack, onFinish }: { onBack: () => void; onFin
             <ResultBlocks result={result} />
           </div>
         ) : (
-          <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
-            Nenhum diagnóstico encontrado. Por favor, realize o exame para ver as orientações.
-          </InfoCard>
+          <div className="mt-5">
+            <InfoCard tone="lilac" icon={<Info size={16} />}>
+              Nenhuma alternativa foi marcada. Volte e selecione o que você observa para receber
+              orientações personalizadas.
+            </InfoCard>
+          </div>
         )}
 
         <div className="mt-6 flex gap-2">
