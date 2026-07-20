@@ -1074,7 +1074,7 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
 
   return (
     <div className="space-y-4">
-      <div className="rounded-3xl border border-border bg-gradient-to-br from-secondary to-lilac/60 p-5">
+      <div className="rounded-2xl border border-border bg-plantae-cream/40 p-5">
         <div className="flex items-center gap-3">
           <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-2xl bg-card">
             {state.plant.photo ? (
@@ -1104,12 +1104,12 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
       </div>
 
       {isApplicationDay ? (
-        <div className="rounded-3xl border border-accent/30 bg-accent/10 p-5">
+        <div className="rounded-2xl border border-accent/20 bg-accent/5 p-5">
           <div className="flex items-center gap-2 text-accent">
             <Sparkles size={16} />
             <span className="text-xs font-bold uppercase tracking-wider">Dia de aplicação</span>
           </div>
-          <h2 className="mt-2 text-xl font-black text-primary">
+          <h2 className="mt-2 text-xl font-display text-primary">
             Hoje é dia de aplicar o Método de 2 Passos
           </h2>
           <p className="mt-1 text-sm text-primary/80">
@@ -1143,7 +1143,7 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
           </div>
         </div>
       ) : (
-        <div className="rounded-3xl border border-border bg-card p-5">
+        <div className="rounded-2xl border border-border bg-card p-5">
           <div className="text-xs font-bold uppercase tracking-wider text-primary">
             Tarefa do dia
           </div>
@@ -1158,7 +1158,7 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
         </div>
       )}
 
-      <div className="rounded-3xl border border-border bg-card p-5">
+      <div className="rounded-2xl border border-border bg-card p-5">
         <div className="mb-3 flex items-center justify-between">
           <div className="text-sm font-bold text-primary">Próximos marcos</div>
           <button
@@ -1176,7 +1176,7 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
                 setCurrentDay(d);
                 setTab("plano");
               }}
-              className="rounded-2xl border border-border bg-secondary/40 p-3 text-left transition-colors hover:border-primary/40"
+              className="rounded-xl border border-border bg-secondary/40 p-3 text-left transition-colors hover:border-primary/40"
             >
               <div className="text-[10px] font-semibold uppercase tracking-wider text-accent">
                 {d === 7 ? "1ª avaliação" : d === 14 ? "Intermediária" : "Final"}
@@ -1192,7 +1192,7 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
       </InfoCard>
 
       {diagnosisFresh && trackingPoints.length > 0 && (
-        <div className="rounded-3xl border border-primary/20 bg-secondary/40 p-5">
+        <div className="rounded-2xl border border-primary/20 bg-secondary/40 p-5">
           <div className="flex items-center gap-2 text-primary">
             <Info size={16} />
             <div className="text-sm font-bold">Pontos do seu diagnóstico para acompanhar</div>
@@ -1213,7 +1213,7 @@ function InicioTab({ setTab }: { setTab: (t: Tab) => void }) {
         </div>
       )}
 
-      <div className="rounded-3xl border border-border bg-card p-5">
+      <div className="rounded-2xl border border-border bg-card p-5">
         <div className="text-sm font-bold text-primary">Explorar dias do plano</div>
         <p className="mt-1 text-xs text-muted-foreground">
           Escolha uma semana e um dia para consultar.
@@ -1262,11 +1262,11 @@ function PlanoTab({ setTab }: PlanoTabProps) {
     <div className="space-y-4">
       <div>
         <div className="text-xs font-bold uppercase tracking-wider text-accent">Meu plano</div>
-        <h1 className="text-2xl font-black tracking-tight text-primary">Plano de 21 dias</h1>
+        <h1 className="text-2xl font-display tracking-tight text-primary">Plano de 21 dias</h1>
       </div>
 
       {!diagnosisFresh && state.diagnosisResult && (
-        <div className="mb-2 rounded-2xl border border-primary/20 bg-primary/5 p-4">
+        <div className="mb-2 rounded-xl border border-primary/20 bg-primary/5 p-4">
           <div className="flex items-start gap-3">
             <Info className="mt-0.5 shrink-0 text-primary" size={18} />
             <div className="flex-1">
@@ -1322,7 +1322,7 @@ function PlanoTab({ setTab }: PlanoTabProps) {
         </button>
       )}
 
-      <div className="rounded-3xl border border-border bg-card p-5">
+      <div className="rounded-2xl border border-border bg-card p-5">
         <div className="grid gap-2">
           {meta.checklist.map((item) => {
             const checked = !!entry.checklist[item];
@@ -1331,7 +1331,7 @@ function PlanoTab({ setTab }: PlanoTabProps) {
                 key={item}
                 onClick={() => toggleChecklist(day, item)}
                 aria-pressed={checked}
-                className={`flex w-full items-start gap-3 rounded-2xl border px-4 py-3 text-left text-sm transition-colors ${
+                className={`flex w-full items-start gap-3 rounded-xl border px-4 py-3 text-left text-sm transition-colors ${
                   checked
                     ? "border-primary bg-primary/5 text-primary"
                     : "border-border bg-card text-foreground"
@@ -1366,14 +1366,14 @@ function PlanoTab({ setTab }: PlanoTabProps) {
           <div className="mt-3 grid grid-cols-2 gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
             <button
               onClick={() => setTab("inicio")}
-              className="flex items-center justify-center gap-1.5 rounded-2xl border border-primary/20 bg-primary/5 py-3 text-[12px] font-bold text-primary transition-colors hover:bg-primary/10"
+              className="flex items-center justify-center gap-1.5 rounded-xl border border-primary/20 bg-primary/5 py-3 text-[12px] font-bold text-primary transition-colors hover:bg-primary/10"
             >
               <Home size={14} />
               Início
             </button>
             <button
               onClick={() => setTab("diagnostico")}
-              className="flex items-center justify-center gap-1.5 rounded-2xl border border-accent/20 bg-accent/5 py-3 text-[12px] font-bold text-accent transition-colors hover:bg-accent/10"
+              className="flex items-center justify-center gap-1.5 rounded-xl border border-accent/20 bg-accent/5 py-3 text-[12px] font-bold text-accent transition-colors hover:bg-accent/10"
             >
               <Stethoscope size={14} />
               Diagnóstico
@@ -1442,7 +1442,7 @@ function WeekPicker({
               onClick={() => onSelectDay(d)}
               aria-current={active ? "step" : undefined}
               aria-label={isApp ? `Dia ${d}, dia de aplicação` : `Dia ${d}`}
-              className={`relative min-h-[44px] rounded-2xl border px-2 py-2 text-[13px] font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+              className={`relative min-h-[44px] rounded-xl border px-2 py-2 text-[13px] font-semibold transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
                 active
                   ? "border-primary bg-primary text-primary-foreground"
                   : "border-border bg-card text-foreground hover:border-primary/40"
