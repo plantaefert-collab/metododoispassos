@@ -748,7 +748,15 @@ function StepCard({
 
 
 
-function SignupScreen({ actorId, onNext }: { actorId: string; onNext: () => void }) {
+function SignupScreen({
+  actorId,
+  onNext,
+  onBack,
+}: {
+  actorId: string;
+  onNext: () => void;
+  onBack?: () => void;
+}) {
   const { state, updatePlant } = useProtocolStore();
 
   const plant = state.plant;
@@ -769,12 +777,23 @@ function SignupScreen({ actorId, onNext }: { actorId: string; onNext: () => void
   return (
     <div className="min-h-screen overflow-y-auto bg-background">
       <div className="mx-auto flex min-h-screen max-w-[440px] flex-col px-5 py-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card sm:shadow-[0_15px_50px_-30px_rgba(23,61,50,0.25)]">
-        <StepHeader
-          step={1}
-          total={3}
-          title="Cadastro da orquídea"
-          subtitle="Conte um pouco sobre sua planta."
-        />
+        <div className="flex items-start justify-between">
+          <StepHeader
+            step={1}
+            total={3}
+            title="Cadastro da orquídea"
+            subtitle="Conte um pouco sobre sua planta."
+          />
+          {onBack && (
+            <button
+              onClick={onBack}
+              className="mt-1 rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+              aria-label="Voltar para o início"
+            >
+              <X size={20} />
+            </button>
+          )}
+        </div>
 
         <div className="mt-6 space-y-5">
           <Field label="Nome da planta *">
