@@ -71,6 +71,7 @@ export type ProtocolState = {
   applications: ApplicationRecord[];
   finalEval: FinalEvaluation;
   onboarded: boolean;
+  tourCompleted?: boolean;
   remindersCompleted?: Record<number, boolean>;
   /** Non-persisted transient flag set when the last localStorage write failed. */
   saveError?: string;
@@ -122,6 +123,7 @@ export const defaultState: ProtocolState = {
   applications: [],
   finalEval: { improved: "", same: "", attention: "", keep: "", path: "" },
   onboarded: false,
+  tourCompleted: false,
   remindersCompleted: {},
 };
 
@@ -287,6 +289,10 @@ export function useProtocolStore() {
     }), actorId);
   }, [wrapSetState]);
 
+  const setTourCompleted = useCallback((v: boolean, actorId: string | "guest") => {
+    wrapSetState((s) => ({ ...s, tourCompleted: v }), actorId);
+  }, [wrapSetState]);
+
   const updateFinalEval = useCallback((patch: Partial<FinalEvaluation>, actorId: string | "guest") => {
     wrapSetState((s) => ({ ...s, finalEval: { ...s.finalEval, ...patch } }), actorId);
   }, [wrapSetState]);
@@ -302,6 +308,7 @@ export function useProtocolStore() {
     registerApplication,
     setCurrentDay,
     setOnboarded,
+    setTourCompleted,
     toggleReminder,
     updateFinalEval,
     hydrateStore, // Adicionado para facilitar uso em componentes quando necessário

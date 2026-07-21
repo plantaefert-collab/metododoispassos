@@ -82,6 +82,7 @@ import {
 } from "@/lib/protocol-cache";
 import { saveProgressRemote } from "@/lib/protocol-cloud";
 import welcomeOrchid from "@/assets/welcome-orchid.jpg";
+import { QuickTour } from "@/components/QuickTour";
 
 
 
@@ -246,6 +247,7 @@ function ProtocoloPage() {
                 setGuestMode(true);
                 setTab("aprender");
               }}
+              setStatus={setStatus}
             />
           </motion.div>
         )}
@@ -486,6 +488,8 @@ function AppShell({
   children: ReactNode;
 }) {
   const { state, clearSaveError } = useProtocolStore();
+  const { user } = useAuthBootstrap();
+  const actorId = user?.id || "guest";
   const diagnosisFresh = isDiagnosisCurrent(state);
   return (
     <div className="min-h-screen bg-background font-sans selection:bg-primary/10">
@@ -544,6 +548,7 @@ function AppShell({
           </div>
         )}
 
+        <QuickTour actorId={actorId} />
         <main className="flex-1 overflow-y-auto px-4 pb-28 pt-4">
           <div className="relative space-y-6">
             {tab === "inicio" && userEmail && (
@@ -570,7 +575,7 @@ function AppShell({
             <TabBtn
               active={tab === "plano"}
               onClick={() => setTab("plano")}
-              icon={<CalendarCheck size={20} />}
+              icon={<CalendarCheck size={20} id="nav-plano" />}
               label="Plano"
             />
             <TabBtn
@@ -656,7 +661,7 @@ function TabBtn({
 
 /* ---------------- Welcome ---------------- */
 
-function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore: () => void }) {
+function WelcomeScreen({ onStart, onExplore, setStatus }: { onStart: () => void; onExplore: () => void; setStatus: (s: AuthBootstrapStatus) => void }) {
   const { state } = useProtocolStore();
   const day = state.currentDay;
   const phase = getProtocolPhase(day);
@@ -859,7 +864,7 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
           </button>
           
           <button
-            onClick={onStart}
+            onClick={() => setStatus("needs_diagnosis")}
             className="flex items-center justify-center gap-2 rounded-full border border-[#173D32]/10 px-6 py-3.5 text-[14px] font-medium transition-colors hover:bg-white/40"
             style={{ color: "var(--color-plantae-green)" }}
           >
@@ -1897,6 +1902,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             </p>
             <div className="mt-5 flex flex-col gap-3">
               <button
+                id="btn-diag"
                 onClick={() => setStatus("needs_diagnosis")}
                 className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-accent-foreground shadow-lg shadow-accent/20 transition-all hover:brightness-110 active:scale-[0.98]"
               >
@@ -2550,6 +2556,7 @@ function StageBody({ stage, onOpenMethod, setStatus, day }: { stage: DayStage; o
       />
       {day === 1 && stage.id === "etapa-1-registrar" && setStatus && (
         <button
+          id="btn-signup"
           onClick={() => setStatus("needs_diagnosis")}
           className="mt-2 flex w-full items-center justify-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-3 text-sm font-semibold text-primary transition-all hover:bg-primary/10 active:scale-[0.98]"
         >
