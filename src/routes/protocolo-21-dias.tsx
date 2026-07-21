@@ -1731,41 +1731,8 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         </div>
       )}
 
-      {/* Método de 2 Passos - Card Rápido */}
-      <div 
-        onClick={() => setTab("metodo")}
-        className="group relative cursor-pointer overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/[0.05] to-transparent p-5 transition-all hover:border-primary/40 active:scale-[0.99]"
-      >
-        <div className="absolute -right-6 -top-6 opacity-[0.05] text-primary rotate-12 transition-transform group-hover:rotate-45">
-          <Sparkles size={100} />
-        </div>
-        <div className="relative z-10 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="grid h-12 w-12 place-items-center rounded-xl bg-primary/10 text-primary">
-              <Info size={22} />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-primary uppercase tracking-wider">O Método de 2 Passos</h3>
-              <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Enraizar & Nutrir</p>
-            </div>
-          </div>
-          <ChevronRight size={18} className="text-primary/50" />
-        </div>
-        <div className="mt-4 flex gap-2">
-          <div className="flex-1 rounded-xl bg-white/40 p-2.5 backdrop-blur-sm">
-            <div className="flex items-center gap-2 text-[11px] font-bold text-primary">
-              <div className="grid h-4 w-4 place-items-center rounded-full bg-primary/20 text-[9px]">1</div>
-              Enraizar
-            </div>
-          </div>
-          <div className="flex-1 rounded-xl bg-white/40 p-2.5 backdrop-blur-sm">
-            <div className="flex items-center gap-2 text-[11px] font-bold text-accent">
-              <div className="grid h-4 w-4 place-items-center rounded-full bg-accent/20 text-[9px]">2</div>
-              Nutrir
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Método de 2 Passos - Seção Completa */}
+      <MetodoContent />
 
       <div 
         onClick={handleRedirectToPlan}
