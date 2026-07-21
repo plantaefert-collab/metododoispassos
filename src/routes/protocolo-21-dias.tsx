@@ -484,10 +484,10 @@ function AppShell({
   onReset: () => void;
   userEmail?: string;
   setStatus?: (s: AuthBootstrapStatus) => void;
-  tourStep?: number | null;
   children: ReactNode;
 }) {
   const { state, clearSaveError } = useProtocolStore();
+  const actorId = state.plant.user_id || "guest";
   const diagnosisFresh = isDiagnosisCurrent(state);
   return (
     <div className="min-h-screen bg-background font-sans selection:bg-primary/10">
