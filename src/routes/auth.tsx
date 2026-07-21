@@ -22,7 +22,7 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const navigate = useNavigate();
   const { redirect } = useSearch({ from: "/auth" });
-  const target = redirect && redirect.startsWith("/") ? redirect : "/inicio";
+  const target = redirect && redirect.startsWith("/") && !redirect.startsWith("//") ? redirect : "/inicio";
 
   useEffect(() => {
     let mounted = true;
