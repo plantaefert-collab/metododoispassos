@@ -1682,7 +1682,6 @@ function InfoCard({
 /* ---------------- Início ---------------- */
 
 function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t: Tab) => void; setStatus: (s: AuthBootstrapStatus) => void }) {
-  const planTitleRef = useRef<HTMLDivElement>(null);
   const handleRedirectToPlan = () => {
     setTab("plano");
     toast.success("Abrindo seu plano de 21 dias", {
