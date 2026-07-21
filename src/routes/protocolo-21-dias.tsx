@@ -1696,6 +1696,15 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
   const isApplicationDay = APPLICATION_DAYS.includes(day);
   const diagnosisFresh = isDiagnosisCurrent(state);
 
+  // Mantém state.currentDay sincronizado com o foco real do usuário
+  // para que ao abrir o plano ele já esteja no dia correto.
+  useEffect(() => {
+    if (state.currentDay !== focusDay) {
+      setCurrentDay(focusDay, actorId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [focusDay]);
+
   const completedDays = Array.from({ length: 21 }, (_, i) => i + 1).filter(isDayFullyDone).length;
   const totalApplications = state.applications.length;
   const totalNotes = Object.values(state.days).filter((d) => d.note?.trim()).length;
