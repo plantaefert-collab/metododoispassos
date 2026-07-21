@@ -1499,8 +1499,54 @@ function ResultBlocks({
   const { priorities, adjustments, favorable, insufficientInformation, trackingPoints } = result;
   const hasAny =
     priorities.length + adjustments.length + favorable.length + insufficientInformation.length > 0;
+
+  const nextSteps = [...priorities, ...adjustments].slice(0, 3);
+  const overall =
+    priorities.length > 0
+      ? { label: "Requer atenção imediata", tone: "warn" as const }
+      : adjustments.length > 0
+        ? { label: "Ajustes recomendados", tone: "accent" as const }
+        : favorable.length > 0
+          ? { label: "Condições favoráveis", tone: "green" as const }
+          : { label: "Observação inicial", tone: "muted" as const };
+  const overallCls =
+    overall.tone === "warn"
+      ? "border-accent/40 bg-accent/10 text-accent"
+      : overall.tone === "accent"
+        ? "border-primary/20 bg-lilac/50 text-primary"
+        : overall.tone === "green"
+          ? "border-primary/20 bg-secondary/60 text-primary"
+          : "border-border bg-muted text-muted-foreground";
+
   return (
     <div className="mt-5 space-y-3">
+      {hasAny && (
+        <div className={`rounded-2xl border p-4 ${overallCls}`}>
+          <div className="text-xs font-bold uppercase tracking-wider opacity-80">Resumo automático</div>
+          <div className="mt-1 font-display text-lg">{overall.label}</div>
+          <p className="mt-2 text-sm text-foreground/80">
+            Encontramos <strong>{priorities.length}</strong> prioridade(s), <strong>{adjustments.length}</strong> ajuste(s) e{" "}
+            <strong>{favorable.length}</strong> sinal(is) favorável(is) nas suas observações.
+          </p>
+          {nextSteps.length > 0 && (
+            <div className="mt-3 rounded-xl border border-border/60 bg-card/70 p-3">
+              <div className="text-xs font-bold uppercase tracking-wider text-primary">Próximos passos</div>
+              <ol className="mt-2 space-y-2 text-sm text-foreground">
+                {nextSteps.map((s, i) => (
+                  <li key={s.id} className="flex gap-2">
+                    <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-primary text-[11px] font-bold text-primary-foreground">
+                      {i + 1}
+                    </span>
+                    <span>
+                      <strong>{s.title}.</strong> {s.action}
+                    </span>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          )}
+        </div>
+      )}
       {!hasAny && (
         <InfoCard tone="lilac" icon={<Info size={16} />}>
           Ainda há poucas informações registradas. Use os pontos abaixo como roteiro de observação
