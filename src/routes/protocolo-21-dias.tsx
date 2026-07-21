@@ -657,6 +657,47 @@ function TabBtn({
 /* ---------------- Welcome ---------------- */
 
 function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore: () => void }) {
+  const { state } = useProtocolStore();
+  const day = state.currentDay;
+  const phase = getProtocolPhase(day);
+  const phaseIndex = phase.id === "fase-1" ? 0 : phase.id === "fase-2" ? 1 : 2;
+
+  // Botanical line illustrations for each phase
+  const PhaseIllustration = () => {
+    if (phaseIndex === 0) {
+      // Diagnosticar - Magnifying glass over a leaf/sprout
+      return (
+        <svg viewBox="0 0 100 100" className="h-full w-full p-8 opacity-40 text-primary-foreground">
+          <path d="M50 80 Q30 80 20 60 Q10 40 30 20 Q50 0 70 20 Q90 40 80 60 Q70 80 50 80 Z" fill="none" stroke="currentColor" strokeWidth="1.5" />
+          <circle cx="65" cy="35" r="20" fill="none" stroke="currentColor" strokeWidth="2" />
+          <line x1="79" y1="49" x2="90" y2="60" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+        </svg>
+      );
+    }
+    if (phaseIndex === 1) {
+      // Manter - Watering or steady growth
+      return (
+        <svg viewBox="0 0 100 100" className="h-full w-full p-8 opacity-40 text-primary-foreground">
+          <path d="M50 90 L50 40 M50 70 Q70 60 80 40 M50 60 Q30 50 20 30" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          <path d="M50 40 Q70 30 70 10 Q50 0 30 10 Q30 30 50 40" fill="none" stroke="currentColor" strokeWidth="1.5" />
+        </svg>
+      );
+    }
+    // Consolidar - Flowering
+    return (
+      <svg viewBox="0 0 100 100" className="h-full w-full p-8 opacity-40 text-primary-foreground">
+        <circle cx="50" cy="40" r="8" fill="none" stroke="currentColor" strokeWidth="1.5" />
+        {[0, 72, 144, 216, 288].map(deg => (
+          <path key={deg} d="M50 40 Q70 20 50 5 Q30 20 50 40" fill="none" stroke="currentColor" strokeWidth="1.5" transform={`rotate(${deg}, 50, 40)`} />
+        ))}
+        <path d="M50 90 L50 48" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+      </svg>
+    );
+  };
+
+  const phaseLabels = ["Diagnosticar", "Manter", "Consolidar"];
+  const currentPhaseLabel = phaseLabels[phaseIndex];
+
   return (
     <div
       className="min-h-screen font-sans"
@@ -689,18 +730,36 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
           className="relative mt-5 overflow-hidden rounded-[28px] border border-white/20 shadow-xl"
           style={{ backgroundColor: "var(--color-plantae-lilac)" }}
         >
-          <img
-            src={welcomeOrchid}
-            alt="Orquídea Phalaenopsis saudável em vaso, com folhas verdes e raízes aéreas visíveis em ambiente doméstico claro."
-            width={1024}
-            height={1024}
-            className="h-[220px] w-full object-cover sm:h-[240px]"
-          />
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={phase.id}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 1.05 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="relative h-[220px] w-full sm:h-[240px]"
+            >
+              <img
+                src={welcomeOrchid}
+                alt="Orquídea Phalaenopsis saudável em vaso, com folhas verdes e raízes aéreas visíveis em ambiente doméstico claro."
+                width={1024}
+                height={1024}
+                className="h-full w-full object-cover transition-transform duration-700 hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+              
+              {/* Contextual Illustration Overlay */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <PhaseIllustration />
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
           <span
             className="absolute left-3 top-3 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em] backdrop-blur-md"
             style={{ backgroundColor: "var(--color-plantae-rose)", color: "var(--color-plantae-magenta)" }}
           >
-            <Sparkles size={11} /> Método de 2 passos
+            <Sparkles size={11} /> Fase: {currentPhaseLabel}
           </span>
         </figure>
 
@@ -722,11 +781,10 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
 
         {/* Promise */}
         <p className="mt-4 text-[15px] font-semibold" style={{ color: "var(--color-plantae-green)" }}>
-          Seu plano guiado de 21 dias
+          Seu plano guiado • {phase.range}
         </p>
         <p className="mt-1.5 text-[14px] leading-relaxed" style={{ color: "var(--color-plantae-mute)" }}>
-          Observe sua orquídea, fortaleça a base e acompanhe os sinais da planta com uma rotina
-          simples.
+          {phase.description}
         </p>
 
         {/* Two-step method */}
