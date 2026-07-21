@@ -5,6 +5,8 @@ import confetti from "canvas-confetti";
 import { motion, AnimatePresence } from "framer-motion";
 import raizAsset from "@/assets/raiz-500ml.png";
 import orkAsset from "@/assets/ork-500ml.png";
+import bgEnraizar from "@/assets/bg-enraizar.jpg";
+import bgNutrir from "@/assets/bg-nutrir.jpg";
 import { playSuccessSound, playPopSound } from "@/lib/audio-feedback";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -3505,7 +3507,17 @@ function MetodoTab() {
           </div>
 
           <div className="relative z-10 flex flex-col items-center gap-4">
-            <div className="relative flex h-56 w-full items-end justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-primary/10 via-primary/5 to-transparent">
+            <div className="relative flex h-56 w-full items-end justify-center overflow-hidden rounded-2xl">
+              <img
+                src={bgEnraizar}
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+                width={1024}
+                height={768}
+                className="absolute inset-0 h-full w-full object-cover opacity-70"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-card via-card/40 to-transparent" />
               <motion.img
                 src={raizAsset}
                 alt="Enraizador Forte"
@@ -3575,7 +3587,17 @@ function MetodoTab() {
           </div>
 
           <div className="relative z-10 flex flex-col items-center gap-4">
-            <div className="relative flex h-56 w-full items-end justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-accent/10 via-accent/5 to-transparent">
+            <div className="relative flex h-56 w-full items-end justify-center overflow-hidden rounded-2xl">
+              <img
+                src={bgNutrir}
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+                width={1024}
+                height={768}
+                className="absolute inset-0 h-full w-full object-cover opacity-60"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-card via-card/40 to-transparent" />
               <motion.img
                 src={orkAsset}
                 alt="Bokashi Orquídeas"
