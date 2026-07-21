@@ -42,7 +42,7 @@ export function AuthScreen({ onBack, onSuccess }: AuthScreenProps) {
       const { lovable } = await import("@/integrations/lovable/index");
       
       const result = await lovable.auth.signInWithOAuth("google", {
-        redirect_uri: window.location.origin + "/protocolo-21-dias",
+        redirect_uri: window.location.origin,
         extraParams: { prompt: "select_account" }
       });
 
