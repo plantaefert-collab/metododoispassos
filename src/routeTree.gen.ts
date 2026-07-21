@@ -10,7 +10,12 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as Protocolo21DiasRouteImport } from './routes/protocolo-21-dias'
+import { Route as PlanoRouteImport } from './routes/plano'
+import { Route as InicioRouteImport } from './routes/inicio'
+import { Route as DiarioRouteImport } from './routes/diario'
+import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
 import { Route as BemVindoRouteImport } from './routes/bem-vindo'
+import { Route as AprenderRouteImport } from './routes/aprender'
 import { Route as IndexRouteImport } from './routes/index'
 
 const Protocolo21DiasRoute = Protocolo21DiasRouteImport.update({
@@ -18,9 +23,34 @@ const Protocolo21DiasRoute = Protocolo21DiasRouteImport.update({
   path: '/protocolo-21-dias',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlanoRoute = PlanoRouteImport.update({
+  id: '/plano',
+  path: '/plano',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InicioRoute = InicioRouteImport.update({
+  id: '/inicio',
+  path: '/inicio',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiarioRoute = DiarioRouteImport.update({
+  id: '/diario',
+  path: '/diario',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiagnosticoRoute = DiagnosticoRouteImport.update({
+  id: '/diagnostico',
+  path: '/diagnostico',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BemVindoRoute = BemVindoRouteImport.update({
   id: '/bem-vindo',
   path: '/bem-vindo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AprenderRoute = AprenderRouteImport.update({
+  id: '/aprender',
+  path: '/aprender',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -31,31 +61,76 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/aprender': typeof AprenderRoute
   '/bem-vindo': typeof BemVindoRoute
+  '/diagnostico': typeof DiagnosticoRoute
+  '/diario': typeof DiarioRoute
+  '/inicio': typeof InicioRoute
+  '/plano': typeof PlanoRoute
   '/protocolo-21-dias': typeof Protocolo21DiasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/aprender': typeof AprenderRoute
   '/bem-vindo': typeof BemVindoRoute
+  '/diagnostico': typeof DiagnosticoRoute
+  '/diario': typeof DiarioRoute
+  '/inicio': typeof InicioRoute
+  '/plano': typeof PlanoRoute
   '/protocolo-21-dias': typeof Protocolo21DiasRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/aprender': typeof AprenderRoute
   '/bem-vindo': typeof BemVindoRoute
+  '/diagnostico': typeof DiagnosticoRoute
+  '/diario': typeof DiarioRoute
+  '/inicio': typeof InicioRoute
+  '/plano': typeof PlanoRoute
   '/protocolo-21-dias': typeof Protocolo21DiasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/bem-vindo' | '/protocolo-21-dias'
+  fullPaths:
+    | '/'
+    | '/aprender'
+    | '/bem-vindo'
+    | '/diagnostico'
+    | '/diario'
+    | '/inicio'
+    | '/plano'
+    | '/protocolo-21-dias'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/bem-vindo' | '/protocolo-21-dias'
-  id: '__root__' | '/' | '/bem-vindo' | '/protocolo-21-dias'
+  to:
+    | '/'
+    | '/aprender'
+    | '/bem-vindo'
+    | '/diagnostico'
+    | '/diario'
+    | '/inicio'
+    | '/plano'
+    | '/protocolo-21-dias'
+  id:
+    | '__root__'
+    | '/'
+    | '/aprender'
+    | '/bem-vindo'
+    | '/diagnostico'
+    | '/diario'
+    | '/inicio'
+    | '/plano'
+    | '/protocolo-21-dias'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AprenderRoute: typeof AprenderRoute
   BemVindoRoute: typeof BemVindoRoute
+  DiagnosticoRoute: typeof DiagnosticoRoute
+  DiarioRoute: typeof DiarioRoute
+  InicioRoute: typeof InicioRoute
+  PlanoRoute: typeof PlanoRoute
   Protocolo21DiasRoute: typeof Protocolo21DiasRoute
 }
 
@@ -68,11 +143,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Protocolo21DiasRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/plano': {
+      id: '/plano'
+      path: '/plano'
+      fullPath: '/plano'
+      preLoaderRoute: typeof PlanoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/inicio': {
+      id: '/inicio'
+      path: '/inicio'
+      fullPath: '/inicio'
+      preLoaderRoute: typeof InicioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/diario': {
+      id: '/diario'
+      path: '/diario'
+      fullPath: '/diario'
+      preLoaderRoute: typeof DiarioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/diagnostico': {
+      id: '/diagnostico'
+      path: '/diagnostico'
+      fullPath: '/diagnostico'
+      preLoaderRoute: typeof DiagnosticoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/bem-vindo': {
       id: '/bem-vindo'
       path: '/bem-vindo'
       fullPath: '/bem-vindo'
       preLoaderRoute: typeof BemVindoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aprender': {
+      id: '/aprender'
+      path: '/aprender'
+      fullPath: '/aprender'
+      preLoaderRoute: typeof AprenderRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -87,7 +197,12 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AprenderRoute: AprenderRoute,
   BemVindoRoute: BemVindoRoute,
+  DiagnosticoRoute: DiagnosticoRoute,
+  DiarioRoute: DiarioRoute,
+  InicioRoute: InicioRoute,
+  PlanoRoute: PlanoRoute,
   Protocolo21DiasRoute: Protocolo21DiasRoute,
 }
 export const routeTree = rootRouteImport
