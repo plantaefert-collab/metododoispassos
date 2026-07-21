@@ -72,6 +72,9 @@ const BENEFITS = [
 ];
 
 function HomePage() {
+  const { user } = useAuthBootstrap();
+  const isLoggedIn = !!user;
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Nav */}
