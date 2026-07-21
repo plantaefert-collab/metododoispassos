@@ -90,22 +90,14 @@ export function WelcomeScreen({
         transition={{ duration: 1.2, ease: "easeInOut" }}
         className="mx-auto flex min-h-screen w-full max-w-[440px] flex-col px-5 pb-8 pt-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-[28px] sm:px-6 sm:shadow-[0_20px_70px_-40px_rgba(23,61,50,0.35)] border-x border-border/10 sm:border"
       >
-        <header className="flex items-center gap-2.5">
-          <div
-            className="grid h-9 w-9 place-items-center rounded-xl"
-            style={{ backgroundColor: "var(--color-plantae-green)", color: "var(--color-plantae-cream)" }}
-          >
-            <Leaf size={18} strokeWidth={2} />
-          </div>
-          <div className="leading-tight">
-            <div className="text-[13px] font-semibold tracking-tight" style={{ color: "var(--color-plantae-green)" }}>
-              PlantaeFert
-            </div>
-            <div className="text-[10px] uppercase tracking-[0.14em]" style={{ color: "var(--color-plantae-mute)" }}>
-              Nutrição Vegetal
-            </div>
-          </div>
+        <header className="flex items-center">
+          <img
+            src={logoPlantaefert}
+            alt="PlantaeFert — Nutrição Vegetal"
+            className="h-9 w-auto"
+          />
         </header>
+
 
         <figure
           className="relative mt-5 overflow-hidden rounded-[28px] border border-white/20 shadow-xl transition-colors duration-1000"
