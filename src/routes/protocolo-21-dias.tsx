@@ -84,6 +84,7 @@ import {
 import { saveProgressRemote } from "@/lib/protocol-cloud";
 import welcomeOrchid from "@/assets/welcome-orchid.jpg";
 import { QuickTour } from "@/components/QuickTour";
+import { exportProtocolPDF } from "@/lib/pdf-export";
 
 
 
