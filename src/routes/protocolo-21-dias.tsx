@@ -50,7 +50,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { useProtocolStore, isDiagnosisCurrent, defaultState, getState } from "@/lib/protocol-store";
+import { useProtocolStore, isDiagnosisCurrent, defaultState, getState, computeFocusDay, isDayFullyDone } from "@/lib/protocol-store";
 import { compressImage, PHOTO_ERROR_MESSAGE } from "@/lib/image-compress";
 import {
   getProtocolDay,
@@ -1676,21 +1676,8 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
   const { state, setCurrentDay, toggleReminder } = useProtocolStore();
 
 
-  // Foco do dia é derivado da conclusão real do checklist,
-  // para refletir automaticamente o progresso do usuário.
-  const isDayFullyDone = (d: number) => {
-    const meta = getProtocolDay(d);
-    const entry = state.days[d];
-    if (!entry) return false;
-    if (!meta.checklist || meta.checklist.length === 0) return !!entry.completed;
-    return meta.checklist.every((label) => !!entry.checklist?.[label]);
-  };
-  const focusDay = (() => {
-    for (let d = 1; d <= 21; d++) {
-      if (!isDayFullyDone(d)) return d;
-    }
-    return 21;
-  })();
+  // Foco do dia = fonte única compartilhada (Início, Minha Orquídea, Plano).
+  const focusDay = computeFocusDay(state, (d) => getProtocolDay(d).checklist);
   const day = focusDay;
   const phase = phaseOf(day);
   const isApplicationDay = APPLICATION_DAYS.includes(day);
@@ -1705,7 +1692,9 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusDay]);
 
-  const completedDays = Array.from({ length: 21 }, (_, i) => i + 1).filter(isDayFullyDone).length;
+  const completedDays = Array.from({ length: 21 }, (_, i) => i + 1).filter((d) =>
+    isDayFullyDone(state, d, getProtocolDay(d).checklist),
+  ).length;
   const totalApplications = state.applications.length;
   const totalNotes = Object.values(state.days).filter((d) => d.note?.trim()).length;
   const totalPhotos = Object.values(state.days).filter((d) => d.photo).length;
