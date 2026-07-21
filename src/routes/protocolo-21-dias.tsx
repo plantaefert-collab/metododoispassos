@@ -1729,6 +1729,13 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
 
   return (
     <div className="space-y-4">
+      {/* ─────────── BLOCO 1 · FOCO DO DIA ─────────── */}
+      <SectionHeader
+        eyebrow="Bloco 1"
+        title="Foco do dia"
+        hint="O que você precisa fazer agora"
+      />
+
       {upcomingReminders.length > 0 && (
         <div className="rounded-2xl border border-primary/20 bg-primary/[0.02] p-4">
           <div className="flex items-center justify-between">
@@ -1798,8 +1805,57 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         </div>
       )}
 
-      {/* Método de 2 Passos - Seção Completa */}
-      <MetodoContent />
+      {/* Próximo passo recomendado — CTA principal */}
+      {(() => {
+        const meta = getProtocolDay(day);
+        const today = state.days[day] ?? { checklist: {}, note: "", completed: false };
+        const checklistState = today.checklist ?? {};
+        const pendingChecklist = meta.checklist
+          .map((label, i) => ({ label, i, done: !!checklistState[i] }))
+          .filter((c) => !c.done);
+        const nextItems = pendingChecklist.slice(0, 3);
+        const allDone = pendingChecklist.length === 0;
+        return (
+          <button
+            onClick={handleRedirectToPlan}
+            className="group relative w-full overflow-hidden rounded-2xl border-2 border-accent/30 bg-gradient-to-br from-accent/[0.06] to-primary/[0.04] p-5 text-left shadow-sm transition-all hover:border-accent/50 active:scale-[0.99]"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-accent">
+                <Sparkles size={14} />
+                <span className="text-[10px] font-bold uppercase tracking-widest">Próximo passo · Dia {day}</span>
+              </div>
+              <ChevronRight size={16} className="text-accent/60 transition-transform group-hover:translate-x-1" />
+            </div>
+            <h3 className="mt-2 font-display text-xl leading-tight text-primary">
+              {allDone ? "Você concluiu tudo do dia" : meta.title}
+            </h3>
+            <p className="mt-1.5 text-sm text-primary/75">
+              {allDone
+                ? "Registre uma observação final ou avance para o próximo dia."
+                : meta.mainAction}
+            </p>
+            {!allDone && nextItems.length > 0 && (
+              <div className="mt-3 space-y-1.5 rounded-xl bg-card/60 p-3">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                  Checklist pendente
+                </div>
+                {nextItems.map((c) => (
+                  <div key={c.i} className="flex items-start gap-2 text-xs text-primary/85">
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                    <span className="leading-snug">{c.label}</span>
+                  </div>
+                ))}
+                {pendingChecklist.length > nextItems.length && (
+                  <div className="pt-1 text-[10px] italic text-muted-foreground">
+                    +{pendingChecklist.length - nextItems.length} item(ns) no plano
+                  </div>
+                )}
+              </div>
+            )}
+          </button>
+        );
+      })()}
 
       {/* Resumo Rápido do Dia Atual */}
       {(() => {
@@ -1934,58 +1990,6 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         );
       })()}
 
-      {/* Próximo passo recomendado — baseado no progresso salvo */}
-      {(() => {
-        const meta = getProtocolDay(day);
-        const today = state.days[day] ?? { checklist: {}, note: "", completed: false };
-        const checklistState = today.checklist ?? {};
-        const pendingChecklist = meta.checklist
-          .map((label, i) => ({ label, i, done: !!checklistState[i] }))
-          .filter((c) => !c.done);
-        const nextItems = pendingChecklist.slice(0, 3);
-        const allDone = pendingChecklist.length === 0;
-        return (
-          <button
-            onClick={handleRedirectToPlan}
-            className="group relative w-full overflow-hidden rounded-2xl border-2 border-accent/30 bg-gradient-to-br from-accent/[0.06] to-primary/[0.04] p-5 text-left shadow-sm transition-all hover:border-accent/50 active:scale-[0.99]"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-accent">
-                <Sparkles size={14} />
-                <span className="text-[10px] font-bold uppercase tracking-widest">Próximo passo · Dia {day}</span>
-              </div>
-              <ChevronRight size={16} className="text-accent/60 transition-transform group-hover:translate-x-1" />
-            </div>
-            <h3 className="mt-2 font-display text-xl leading-tight text-primary">
-              {allDone ? "Você concluiu tudo do dia" : meta.title}
-            </h3>
-            <p className="mt-1.5 text-sm text-primary/75">
-              {allDone
-                ? "Registre uma observação final ou avance para o próximo dia."
-                : meta.mainAction}
-            </p>
-            {!allDone && nextItems.length > 0 && (
-              <div className="mt-3 space-y-1.5 rounded-xl bg-card/60 p-3">
-                <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                  Checklist pendente
-                </div>
-                {nextItems.map((c) => (
-                  <div key={c.i} className="flex items-start gap-2 text-xs text-primary/85">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
-                    <span className="leading-snug">{c.label}</span>
-                  </div>
-                ))}
-                {pendingChecklist.length > nextItems.length && (
-                  <div className="pt-1 text-[10px] italic text-muted-foreground">
-                    +{pendingChecklist.length - nextItems.length} item(ns) no plano
-                  </div>
-                )}
-              </div>
-            )}
-          </button>
-        );
-      })()}
-
       {/* CTA - Começar plano de 21 dias */}
       {(() => {
         const hasProgress = completedDays > 0 || totalApplications > 0 || day > 1;
@@ -2018,24 +2022,88 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         );
       })()}
 
-      {/* Exportar progresso em PDF */}
-      <button
-        onClick={handleExportPDF}
-        disabled={exportingPDF}
-        className="flex w-full items-center justify-center gap-2 rounded-full border-2 border-primary/25 bg-card px-6 py-3.5 text-sm font-bold text-primary transition-all hover:bg-primary/[0.06] active:scale-[0.98] disabled:opacity-60"
-      >
-        {exportingPDF ? (
-          <>
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
-            Gerando PDF...
-          </>
-        ) : (
-          <>
-            <FileText size={16} />
-            Exportar meu progresso em PDF
-          </>
-        )}
-      </button>
+      {!isApplicationDay && (
+        <div className="rounded-2xl border border-border bg-card p-5">
+          <div className="text-xs font-bold uppercase tracking-wider text-primary">
+            Tarefa do dia
+          </div>
+          <h2 className="mt-1 text-lg font-display text-foreground">{getProtocolDay(day).title}</h2>
+          <p className="mt-1 text-sm text-muted-foreground">{getProtocolDay(day).objective}</p>
+          <div className="mt-3 flex flex-wrap gap-2">
+            <button
+              onClick={() => setStatus("needs_diagnosis")}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-full border-2 border-primary/30 bg-primary/10 px-6 py-3.5 text-sm font-bold text-primary transition-all hover:bg-primary/20 active:scale-[0.98] sm:w-auto sm:py-3"
+            >
+              <Stethoscope size={18} /> Fazer diagnóstico
+            </button>
+          </div>
+        </div>
+      )}
+
+      {!diagnosisFresh && (
+        <div className="group relative overflow-hidden rounded-2xl border border-accent/20 bg-accent/5 p-6 shadow-sm transition-all hover:shadow-md">
+          <div className="absolute -right-4 -top-4 text-accent/10 transition-transform group-hover:scale-110">
+            <Stethoscope size={80} />
+          </div>
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 text-accent">
+              <Sparkles size={18} className="animate-pulse" />
+              <div className="font-display text-lg font-bold">Diagnóstico Opcional</div>
+            </div>
+            <p className="mt-2 text-sm leading-relaxed text-primary/80">
+              Para receber orientações específicas para a sua planta, complete o diagnóstico opcional.
+            </p>
+            <div className="mt-5 flex flex-col gap-3">
+              <button
+                id="btn-diag"
+                onClick={() => setStatus("needs_diagnosis")}
+                className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-accent-foreground shadow-lg shadow-accent/20 transition-all hover:brightness-110 active:scale-[0.98]"
+              >
+                Fazer diagnóstico <ChevronRight size={16} />
+              </button>
+              <div className="flex items-center justify-center gap-4 text-[10px] font-bold tracking-widest text-accent/60 uppercase">
+                <span className="flex items-center gap-1"><CheckCircle2 size={10} /> 5 Áreas</span>
+                <span className="flex items-center gap-1"><CheckCircle2 size={10} /> 2 Minutos</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {diagnosisFresh && (
+        <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary/10 text-primary">
+                <Stethoscope size={16} />
+              </div>
+              <div className="text-sm font-bold text-primary">Diagnóstico Concluído</div>
+            </div>
+            <button
+              onClick={() => setStatus("needs_diagnosis")}
+              className="text-xs font-medium text-muted-foreground hover:text-accent hover:underline"
+            >
+              Refazer
+            </button>
+          </div>
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+            Seu exame está atualizado. Você pode revisar os detalhes ou atualizar o estado da sua planta a qualquer momento.
+          </p>
+          <button
+            onClick={() => setTab("diagnostico")}
+            className="mt-4 inline-flex items-center gap-2 rounded-xl border border-border px-5 py-2.5 text-sm font-bold text-foreground transition-colors hover:bg-muted"
+          >
+            Ver detalhes <ChevronRight size={14} />
+          </button>
+        </div>
+      )}
+
+      {/* ─────────── BLOCO 2 · PROGRESSO ─────────── */}
+      <SectionHeader
+        eyebrow="Bloco 2"
+        title="Progresso"
+        hint="Onde você está na jornada"
+      />
 
       <div 
         onClick={handleRedirectToPlan}
@@ -2085,23 +2153,6 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           </button>
         </div>
       </div>
-      {!isApplicationDay && (
-        <div className="rounded-2xl border border-border bg-card p-5">
-          <div className="text-xs font-bold uppercase tracking-wider text-primary">
-            Tarefa do dia
-          </div>
-          <h2 className="mt-1 text-lg font-display text-foreground">{getProtocolDay(day).title}</h2>
-          <p className="mt-1 text-sm text-muted-foreground">{getProtocolDay(day).objective}</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <button
-              onClick={() => setStatus("needs_diagnosis")}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full border-2 border-primary/30 bg-primary/10 px-6 py-3.5 text-sm font-bold text-primary transition-all hover:bg-primary/20 active:scale-[0.98] sm:w-auto sm:py-3"
-            >
-              <Stethoscope size={18} /> Fazer diagnóstico
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Resumo da Jornada */}
       <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
@@ -2163,7 +2214,35 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         </div>
       </div>
 
-      {/* Seção Método de 2 Passos */}
+      {diagnosisFresh && trackingPoints.length > 0 && (
+        <div className="rounded-2xl border border-primary/20 bg-secondary/40 p-5">
+          <div className="flex items-center gap-2 text-primary">
+            <Info size={16} />
+            <div className="text-sm font-bold">Pontos do seu diagnóstico para acompanhar</div>
+          </div>
+          <ul className="mt-3 space-y-1.5">
+            {trackingPoints.map((p) => (
+              <li key={p} className="flex gap-2 text-sm text-foreground/85">
+                <ChevronRight size={16} className="mt-0.5 shrink-0 text-primary" /> {p}
+              </li>
+            ))}
+          </ul>
+          <button
+            onClick={() => setTab("diagnostico")}
+            className="mt-3 text-xs font-semibold text-accent hover:underline"
+          >
+            Ver diagnóstico completo
+          </button>
+        </div>
+      )}
+
+      {/* ─────────── BLOCO 3 · MÉTODO 2 PASSOS ─────────── */}
+      <SectionHeader
+        eyebrow="Bloco 3"
+        title="Método 2 Passos"
+        hint="Contexto e ciência do protocolo"
+      />
+
       <div className="group relative overflow-hidden rounded-2xl border border-primary/10 bg-gradient-to-br from-primary/[0.05] to-transparent p-5 transition-all hover:border-primary/30">
         <div className="absolute -right-6 -top-6 text-primary/10 transition-transform group-hover:scale-110">
           <Sparkles size={100} />
@@ -2186,6 +2265,13 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           </button>
         </div>
       </div>
+
+      {/* ─────────── BLOCO 4 · AÇÕES SECUNDÁRIAS ─────────── */}
+      <SectionHeader
+        eyebrow="Bloco 4"
+        title="Ações & atalhos"
+        hint="Marcos, exportação e navegação rápida"
+      />
 
       <div className="rounded-2xl border border-border bg-card p-5">
         <div className="mb-3 flex items-center justify-between">
@@ -2216,92 +2302,6 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         </div>
       </div>
 
-      <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
-        Aplique no horário fresco, evite sol forte e não atinja diretamente as flores.
-      </InfoCard>
-
-      {diagnosisFresh && trackingPoints.length > 0 && (
-        <div className="rounded-2xl border border-primary/20 bg-secondary/40 p-5">
-          <div className="flex items-center gap-2 text-primary">
-            <Info size={16} />
-            <div className="text-sm font-bold">Pontos do seu diagnóstico para acompanhar</div>
-          </div>
-          <ul className="mt-3 space-y-1.5">
-            {trackingPoints.map((p) => (
-              <li key={p} className="flex gap-2 text-sm text-foreground/85">
-                <ChevronRight size={16} className="mt-0.5 shrink-0 text-primary" /> {p}
-              </li>
-            ))}
-          </ul>
-          <button
-            onClick={() => setTab("diagnostico")}
-            className="mt-3 text-xs font-semibold text-accent hover:underline"
-          >
-            Ver diagnóstico completo
-          </button>
-        </div>
-      )}
-
-      {!diagnosisFresh && (
-        <div className="group relative overflow-hidden rounded-2xl border border-accent/20 bg-accent/5 p-6 shadow-sm transition-all hover:shadow-md">
-          {/* Decorative element */}
-          <div className="absolute -right-4 -top-4 text-accent/10 transition-transform group-hover:scale-110">
-            <Stethoscope size={80} />
-          </div>
-          
-          <div className="relative z-10">
-            <div className="flex items-center gap-2 text-accent">
-              <Sparkles size={18} className="animate-pulse" />
-              <div className="font-display text-lg font-bold">Diagnóstico Opcional</div>
-            </div>
-            <p className="mt-2 text-sm leading-relaxed text-primary/80">
-              Para receber orientações específicas para a sua planta, complete o diagnóstico opcional.
-            </p>
-            <div className="mt-5 flex flex-col gap-3">
-              <button
-                id="btn-diag"
-                onClick={() => setStatus("needs_diagnosis")}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-accent-foreground shadow-lg shadow-accent/20 transition-all hover:brightness-110 active:scale-[0.98]"
-              >
-                Fazer diagnóstico <ChevronRight size={16} />
-              </button>
-              <div className="flex items-center justify-center gap-4 text-[10px] font-bold tracking-widest text-accent/60 uppercase">
-                <span className="flex items-center gap-1"><CheckCircle2 size={10} /> 5 Áreas</span>
-                <span className="flex items-center gap-1"><CheckCircle2 size={10} /> 2 Minutos</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {diagnosisFresh && (
-        <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary/10 text-primary">
-                <Stethoscope size={16} />
-              </div>
-              <div className="text-sm font-bold text-primary">Diagnóstico Concluído</div>
-            </div>
-            <button
-              onClick={() => setStatus("needs_diagnosis")}
-              className="text-xs font-medium text-muted-foreground hover:text-accent hover:underline"
-            >
-              Refazer
-            </button>
-          </div>
-          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Seu exame está atualizado. Você pode revisar os detalhes ou atualizar o estado da sua planta a qualquer momento.
-          </p>
-          <button
-            onClick={() => setTab("diagnostico")}
-            className="mt-4 inline-flex items-center gap-2 rounded-xl border border-border px-5 py-2.5 text-sm font-bold text-foreground transition-colors hover:bg-muted"
-          >
-            Ver detalhes <ChevronRight size={14} />
-          </button>
-        </div>
-      )}
-
       <div className="rounded-2xl border border-border bg-card p-5">
         <div className="flex items-center gap-2 text-sm font-bold text-primary">
           <CalendarCheck size={16} className="text-accent" />
@@ -2328,6 +2328,28 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           ))}
         </div>
       </div>
+
+      <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
+        Aplique no horário fresco, evite sol forte e não atinja diretamente as flores.
+      </InfoCard>
+
+      <button
+        onClick={handleExportPDF}
+        disabled={exportingPDF}
+        className="flex w-full items-center justify-center gap-2 rounded-full border-2 border-primary/25 bg-card px-6 py-3.5 text-sm font-bold text-primary transition-all hover:bg-primary/[0.06] active:scale-[0.98] disabled:opacity-60"
+      >
+        {exportingPDF ? (
+          <>
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+            Gerando PDF...
+          </>
+        ) : (
+          <>
+            <FileText size={16} />
+            Exportar meu progresso em PDF
+          </>
+        )}
+      </button>
 
       <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <button
