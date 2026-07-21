@@ -2479,18 +2479,10 @@ function PlanoTab({ actorId, setTab, onPreviewDay, setStatus }: PlanoTabProps) {
 
         <button
           onClick={() => {
-            toggleDayCompleted(day, actorId);
-            if (!entry.completed) {
-              playSuccessSound();
-              if ([7, 14, 21].includes(day)) {
-                confetti({
-                  particleCount: 150,
-                  spread: 70,
-                  origin: { y: 0.6 },
-                  colors: ['#D946EF', '#173D32', '#F8F5EE', '#FDF2F8']
-                });
-                toast.success(day === 7 ? "Fase 1 Concluída!" : day === 14 ? "Fase 2 Concluída!" : "Protocolo Concluído!");
-              }
+            if (entry.completed) {
+              toggleDayCompleted(day, actorId);
+            } else {
+              setShowCompleteModal(true);
             }
           }}
           aria-pressed={entry.completed}
@@ -2500,8 +2492,44 @@ function PlanoTab({ actorId, setTab, onPreviewDay, setStatus }: PlanoTabProps) {
               : "bg-primary text-primary-foreground"
           }`}
         >
-          {entry.completed ? "Tarefa concluída ✓ · Desmarcar" : "Concluir tarefa"}
+          {entry.completed ? "Tarefa concluída ✓ · Desmarcar" : "Concluir dia"}
         </button>
+
+        {showCompleteModal && (
+          <DayCompleteModal
+            day={day}
+            meta={meta}
+            entry={entry}
+            applicationsForDay={state.applications.filter((a) => a.day === day).length}
+            canAdvance={day < 21}
+            onCancel={() => setShowCompleteModal(false)}
+            onConfirm={(advance) => {
+              toggleDayCompleted(day, actorId);
+              playSuccessSound();
+              if ([7, 14, 21].includes(day)) {
+                confetti({
+                  particleCount: 150,
+                  spread: 70,
+                  origin: { y: 0.6 },
+                  colors: ["#D946EF", "#173D32", "#F8F5EE", "#FDF2F8"],
+                });
+                toast.success(
+                  day === 7
+                    ? "Fase 1 Concluída!"
+                    : day === 14
+                    ? "Fase 2 Concluída!"
+                    : "Protocolo Concluído!"
+                );
+              } else {
+                toast.success(`Dia ${day} concluído!`);
+              }
+              setShowCompleteModal(false);
+              if (advance && day < 21) {
+                setCurrentDay(day + 1, actorId);
+              }
+            }}
+          />
+        )}
 
         {entry.completed && (
           <div className="mt-3 grid grid-cols-2 gap-2 animate-in fade-in slide-in-from-top-2 duration-300">
