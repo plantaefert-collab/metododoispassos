@@ -1796,6 +1796,36 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
                 ))}
               </div>
             )}
+            {needsNote && !today.completed && (
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setTab("plano");
+                  setTimeout(() => {
+                    const el = document.getElementById(`note-day-${day}`) as HTMLTextAreaElement | null;
+                    if (el) {
+                      el.scrollIntoView({ behavior: "smooth", block: "center" });
+                      el.focus();
+                    }
+                  }, 350);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    (e.currentTarget as HTMLDivElement).click();
+                  }
+                }}
+                className="mt-3 flex items-center justify-between gap-2 rounded-xl border border-primary/25 bg-primary/[0.06] px-3 py-2.5 text-left transition-colors hover:bg-primary/[0.1]"
+              >
+                <div className="flex items-center gap-2 text-primary">
+                  <FileText size={14} />
+                  <span className="text-xs font-semibold">Escrever registro do dia</span>
+                </div>
+                <ChevronRight size={14} className="text-primary/60" />
+              </div>
+            )}
           </button>
         );
       })()}
