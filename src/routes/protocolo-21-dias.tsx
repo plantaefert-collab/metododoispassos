@@ -371,7 +371,7 @@ function ProtocoloPage() {
                     <DiagnosticoTab actorId={actorId} onRedo={() => setStatus("needs_diagnosis")} setTab={setTab} />
                   )}
                   {tab === "diario" && <DiarioTab actorId={actorId} />}
-                  {tab === "aprender" && <AprenderTab />}
+                  {tab === "aprender" && <AprenderTab setTab={setTab} />}
                   {tab === "resumo" && <ResumoTab actorId={actorId} />}
                   {tab === "metodo" && <MetodoTab />}
                 </motion.div>
@@ -1535,6 +1535,42 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           </div>
         </div>
       )}
+
+      {/* Método de 2 Passos - Card Rápido */}
+      <div 
+        onClick={() => setTab("metodo")}
+        className="group relative cursor-pointer overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/[0.05] to-transparent p-5 transition-all hover:border-primary/40 active:scale-[0.99]"
+      >
+        <div className="absolute -right-6 -top-6 opacity-[0.05] text-primary rotate-12 transition-transform group-hover:rotate-45">
+          <Sparkles size={100} />
+        </div>
+        <div className="relative z-10 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="grid h-12 w-12 place-items-center rounded-xl bg-primary/10 text-primary">
+              <Info size={22} />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-primary uppercase tracking-wider">O Método de 2 Passos</h3>
+              <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Enraizar & Nutrir</p>
+            </div>
+          </div>
+          <ChevronRight size={18} className="text-primary/50" />
+        </div>
+        <div className="mt-4 flex gap-2">
+          <div className="flex-1 rounded-xl bg-white/40 p-2.5 backdrop-blur-sm">
+            <div className="flex items-center gap-2 text-[11px] font-bold text-primary">
+              <div className="grid h-4 w-4 place-items-center rounded-full bg-primary/20 text-[9px]">1</div>
+              Enraizar
+            </div>
+          </div>
+          <div className="flex-1 rounded-xl bg-white/40 p-2.5 backdrop-blur-sm">
+            <div className="flex items-center gap-2 text-[11px] font-bold text-accent">
+              <div className="grid h-4 w-4 place-items-center rounded-full bg-accent/20 text-[9px]">2</div>
+              Nutrir
+            </div>
+          </div>
+        </div>
+      </div>
 
       <div 
         onClick={handleRedirectToPlan}
@@ -3125,7 +3161,7 @@ const LIBRARY: Array<{ id: string; title: string; icon: ReactNode; body: string 
   },
 ];
 
-function AprenderTab() {
+function AprenderTab({ setTab }: { setTab: (tab: any) => void }) {
   const [open, setOpen] = useState<string | null>(null);
   const current = LIBRARY.find((l) => l.id === open);
 
@@ -3168,6 +3204,27 @@ function AprenderTab() {
         ))}
       </div>
 
+      <div 
+        onClick={() => setTab("metodo")}
+        className="group relative cursor-pointer overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/[0.05] to-transparent p-5 transition-all hover:border-primary/40 active:scale-[0.99]"
+      >
+        <div className="flex items-center gap-3">
+          <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary transition-transform group-hover:scale-110">
+            <Info size={20} />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-primary">O Método de 2 Passos</h3>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Enraizar & Nutrir</p>
+          </div>
+        </div>
+        <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+          Entenda a ciência por trás do nosso protocolo de 21 dias e como aplicar corretamente os produtos.
+        </p>
+        <div className="mt-4 flex items-center gap-1 text-[11px] font-bold text-primary uppercase tracking-wider">
+          Ver detalhes <ChevronRight size={14} className="transition-transform group-hover:translate-x-1" />
+        </div>
+      </div>
+
       {current && (
         <Drawer onClose={() => setOpen(null)} title={current.title} icon={current.icon}>
           <p className="text-base leading-relaxed text-foreground/90">{current.body}</p>
@@ -3182,6 +3239,39 @@ function AprenderTab() {
 /* ---------------- Método Tab ---------------- */
 
 function MetodoTab() {
+  const [activeProduct, setActiveProduct] = useState<"enraizador" | "nutrir" | null>(null);
+
+  const productDetails = {
+    enraizador: {
+      title: "Enraizador Forte",
+      icon: <Sprout size={24} />,
+      color: "var(--color-plantae-green)",
+      badge: "Enraizar",
+      steps: [
+        "Dilua 5ml (1 tampa) em 1 litro de água filtrada ou descansada.",
+        "Aplique via rega no substrato, molhando bem as raízes.",
+        "Pode ser usado via foliar (borrifar) no final da tarde.",
+        "Frequência recomendada: 1x por semana na fase de enraizamento."
+      ],
+      doses: "5ml por litro de água.",
+      warnings: "Evite aplicar sob sol forte. Não aplicar diretamente nas flores abertas."
+    },
+    nutrir: {
+      title: "Bokashi Orquídeas",
+      icon: <Leaf size={24} />,
+      color: "var(--color-plantae-magenta)",
+      badge: "Nutrir",
+      steps: [
+        "Agite bem antes de usar.",
+        "Dilua 5ml em 1 litro de água.",
+        "Regue o substrato uniformemente ao redor da planta.",
+        "Use a cada 15 dias para manutenção ou 7 dias para estímulo."
+      ],
+      doses: "5ml por litro de água.",
+      warnings: "Mantenha em local fresco e escuro. Mantenha fora do alcance de crianças."
+    }
+  };
+
   return (
     <div className="space-y-6 pb-20">
       <div className="relative overflow-hidden rounded-[2rem] border border-primary/10 bg-gradient-to-br from-primary/[0.03] to-transparent p-8">
@@ -3253,6 +3343,13 @@ function MetodoTab() {
                 ))}
               </ul>
             </div>
+            
+            <button 
+              onClick={() => setActiveProduct("enraizador")}
+              className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-primary/10 bg-primary/5 py-3 text-[13px] font-bold text-primary transition-all active:scale-95 hover:bg-primary/10"
+            >
+              <Info size={16} /> Ver como usar
+            </button>
           </div>
         </div>
 
@@ -3305,6 +3402,13 @@ function MetodoTab() {
                 ))}
               </ul>
             </div>
+
+            <button 
+              onClick={() => setActiveProduct("nutrir")}
+              className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-accent/10 bg-accent/5 py-3 text-[13px] font-bold text-accent transition-all active:scale-95 hover:bg-accent/10"
+            >
+              <Info size={16} /> Ver como usar
+            </button>
           </div>
         </div>
       </div>
@@ -3315,6 +3419,57 @@ function MetodoTab() {
           As orquídeas têm um metabolismo lento. 21 dias é o tempo ideal para que a planta processe os estímulos do enraizamento e comece a responder visualmente à nutrição, criando uma base sólida para o desenvolvimento contínuo.
         </p>
       </div>
+
+      <AnimatePresence>
+        {activeProduct && (
+          <Drawer 
+            title={productDetails[activeProduct].title}
+            icon={productDetails[activeProduct].icon}
+            onClose={() => setActiveProduct(null)}
+          >
+            <div className="space-y-6">
+              <div>
+                <h4 className="mb-3 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+                  Passo a Passo
+                </h4>
+                <div className="space-y-3">
+                  {productDetails[activeProduct].steps.map((step, i) => (
+                    <div key={i} className="flex gap-3">
+                      <div 
+                        className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-[12px] font-bold"
+                        style={{ backgroundColor: `${productDetails[activeProduct].color}15`, color: productDetails[activeProduct].color }}
+                      >
+                        {i + 1}
+                      </div>
+                      <p className="text-[14px] leading-relaxed text-foreground/80">{step}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="rounded-2xl bg-primary/[0.03] p-4 border border-primary/5">
+                <div className="flex items-center gap-2 mb-2">
+                  <Droplets size={16} style={{ color: productDetails[activeProduct].color }} />
+                  <h4 className="text-sm font-bold text-primary">Dose Sugerida</h4>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  {productDetails[activeProduct].doses}
+                </p>
+              </div>
+
+              <div className="rounded-2xl bg-amber-500/[0.03] p-4 border border-amber-500/10">
+                <div className="flex items-center gap-2 mb-2">
+                  <AlertCircle size={16} className="text-amber-600" />
+                  <h4 className="text-sm font-bold text-amber-700">Cuidados</h4>
+                </div>
+                <p className="text-sm text-amber-600/80 leading-relaxed">
+                  {productDetails[activeProduct].warnings}
+                </p>
+              </div>
+            </div>
+          </Drawer>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
