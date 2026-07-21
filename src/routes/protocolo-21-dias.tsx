@@ -4032,7 +4032,7 @@ function MinhaOrquideaTab({ actorId, setTab }: { actorId: string; setTab: (t: Ta
   const { state, updatePlant, setCurrentDay } = useProtocolStore();
   const today = getProtocolDay(state.currentDay);
   const todayChecklist = today.checklist ?? [];
-  const todayTasks = state.days[state.currentDay]?.tasks ?? {};
+  const todayTasks = state.days[state.currentDay]?.checklist ?? {};
   const todayDoneCount = todayChecklist.filter((t) => todayTasks[t]).length;
   const upcomingDays = Array.from({ length: 3 }, (_, i) => state.currentDay + 1 + i).filter((d) => d <= 21);
   const goToDay = (d: number) => {
