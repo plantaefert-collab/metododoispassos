@@ -138,6 +138,7 @@ const TAB_TO_PATH: Record<Tab, string> = {
   aprender: "/aprender",
   resumo: "/resumo",
   metodo: "/metodo",
+  orquidea: "/minha-orquidea",
 };
 const PATH_TO_TAB: Record<string, Tab> = Object.fromEntries(
   Object.entries(TAB_TO_PATH).map(([t, p]) => [p, t as Tab]),
