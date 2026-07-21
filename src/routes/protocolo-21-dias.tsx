@@ -1285,6 +1285,14 @@ function ResultBlocks({
   return (
     <div className="mt-5 space-y-3">
       {hasAny && (
+        <DiagnosisSummaryChecklist
+          score={score}
+          statusLabel={scoreStatus.label}
+          priorities={priorities}
+          adjustments={adjustments}
+        />
+      )}
+      {hasAny && (
         <div className={`rounded-2xl border p-4 ${scoreBgCls}`}>
           <div className="flex items-center gap-4">
             <div className="relative grid h-20 w-20 shrink-0 place-items-center rounded-full bg-card shadow-inner">
