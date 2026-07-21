@@ -126,24 +126,29 @@ function phaseOf(day: number) {
 }
 
 function ProtocoloPage() {
+  return <ProtocoloShell />;
+}
+
+export function ProtocoloShell({ initialTab }: { initialTab?: Tab } = {}) {
   const store = useProtocolStore();
   const { status, user, error: authError, setStatus } = useAuthBootstrap();
-  const [tab, setTab] = useState<Tab>("inicio");
+  const [tab, setTab] = useState<Tab>(initialTab ?? "inicio");
   const [previewDay, setPreviewDay] = useState<number | null>(null);
+  const hasInitialTab = initialTab !== undefined;
 
   // Retomar automaticamente para a aba correta quando o status mudar para ready
   useEffect(() => {
+    if (hasInitialTab) return;
     if (status === "ready") {
       const state = getState();
-      // Se não tiver completado o diagnóstico nem registrado a planta, deixa no Início
-      // Caso contrário, pode ir para o Plano.
       if (state.onboarded) {
         setTab("plano");
       } else {
         setTab("inicio");
       }
     }
-  }, [status]);
+  }, [status, hasInitialTab]);
+
   const [guestMode, setGuestMode] = useState(false);
   const [showReset, setShowReset] = useState(false);
   const [showLegacyDialog, setShowLegacyDialog] = useState(false);
@@ -154,9 +159,10 @@ function ProtocoloPage() {
     // Modo visitante persistente
     if (status === "signed_out" && isGuestActive()) {
       setGuestMode(true);
-      setTab("aprender");
+      if (!hasInitialTab) setTab("aprender");
     }
-  }, [status]);
+  }, [status, hasInitialTab]);
+
 
   useEffect(() => {
     if (status === "loading_remote_data" && hasLegacyData()) {
