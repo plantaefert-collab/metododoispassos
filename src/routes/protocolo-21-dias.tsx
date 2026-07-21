@@ -41,6 +41,8 @@ import {
   Bell,
   Check,
   ArrowRight,
+  Share2,
+  HelpCircle,
 } from "lucide-react";
 import {
   Accordion,
