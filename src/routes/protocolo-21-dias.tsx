@@ -40,6 +40,7 @@ import {
   Download,
   Bell,
   Check,
+  ArrowRight,
 } from "lucide-react";
 import {
   Accordion,
