@@ -1718,7 +1718,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           eyebrow: string;
           title: string;
           desc: string;
-          cta: { label: string; icon: JSX.Element; onClick: () => void };
+          cta: { label: string; icon: React.ReactNode; onClick: () => void };
         };
 
         let ctx: Ctx | null = null;
