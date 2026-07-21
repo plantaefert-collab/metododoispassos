@@ -49,7 +49,7 @@ export function AuthScreen({ onBack, onSuccess }: AuthScreenProps) {
             password,
             options: { emailRedirectTo: window.location.origin },
           })
-        : await supabase.auth.signInWithPassword({ email, password });
+        : await supabase.auth.signInWithPassword({ email: trimmedEmail, password });
       
       if (error) throw error;
       if (data.session) {
@@ -107,8 +107,9 @@ export function AuthScreen({ onBack, onSuccess }: AuthScreenProps) {
 
         <form onSubmit={handleEmailAuth} className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-foreground px-1">E-mail</label>
+            <label htmlFor="auth-email" className="text-sm font-semibold text-foreground px-1">E-mail</label>
             <input
+              id="auth-email"
               type="email"
               required
               value={email}
@@ -118,8 +119,9 @@ export function AuthScreen({ onBack, onSuccess }: AuthScreenProps) {
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm font-semibold text-foreground px-1">Senha</label>
+            <label htmlFor="auth-password" className="text-sm font-semibold text-foreground px-1">Senha</label>
             <input
+              id="auth-password"
               type="password"
               required
               minLength={6}
