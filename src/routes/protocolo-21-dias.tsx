@@ -1810,53 +1810,29 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         );
       })()}
 
-      {upcomingReminders.length > 0 && (
-        <div className="rounded-2xl border border-primary/20 bg-primary/[0.02] p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-primary">
-              <Bell size={14} className="animate-pulse" />
-              <span className="text-[10px] font-bold uppercase tracking-widest">Lembretes Importantes</span>
-            </div>
-            <span className="text-[10px] text-muted-foreground">{upcomingReminders.length} pendente(s)</span>
-          </div>
-          <div className="mt-3 space-y-2">
-            {upcomingReminders.map(d => (
-              <div
-                key={d}
-                className="flex items-center justify-between rounded-xl border border-border bg-card p-3 shadow-sm transition-all hover:border-primary/40 hover:shadow-md"
-              >
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCurrentDay(d, actorId);
-                    handleRedirectToPlan();
-                  }}
-                  className="flex flex-1 items-center gap-3 text-left"
-                >
-                  <div className={`grid h-8 w-8 place-items-center rounded-lg text-xs font-bold ${d === day ? 'bg-primary text-primary-foreground' : 'bg-secondary text-primary'}`}>
-                    {d}
-                  </div>
-                  <div>
-                    <div className="text-xs font-bold text-primary">Dia {d}: {d === 1 ? 'Início & Diagnóstico' : d === 21 ? 'Avaliação Final' : 'Manutenção Crítica'}</div>
-                    <div className="text-[10px] text-muted-foreground">Toque para abrir este dia</div>
-                  </div>
-                </button>
-                <button
-                  onClick={() => {
-                    toggleReminder(d, actorId);
-                    toast.success(`Lembrete do dia ${d} concluído!`, {
-                      icon: <CheckCircle2 size={16} className="text-primary" />
-                    });
-                  }}
-                  className="ml-2 shrink-0 rounded-lg bg-primary/10 p-2 text-primary transition-colors hover:bg-primary/20"
-                >
-                  <Check size={16} />
-                </button>
-              </div>
-            ))}
-          </div>
+      {/* Método 2 Passos (movido para logo abaixo do Próximo passo · Dia 1) */}
+      <div className="group relative overflow-hidden rounded-2xl border border-primary/10 bg-gradient-to-br from-primary/[0.05] to-transparent p-5 transition-all hover:border-primary/30">
+        <div className="absolute -right-6 -top-6 text-primary/10 transition-transform group-hover:scale-110">
+          <Sparkles size={100} />
         </div>
-      )}
+        <div className="relative z-10">
+          <div className="flex items-center gap-2 text-primary">
+            <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary/10">
+              <Sprout size={16} />
+            </div>
+            <h3 className="font-display text-lg">Método de 2 Passos</h3>
+          </div>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            Entenda como funciona o protocolo de Enraizar e Nutrir para sua orquídea florescer.
+          </p>
+          <button
+            onClick={() => setTab("metodo")}
+            className="mt-4 flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-xs font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:brightness-110 active:scale-[0.98]"
+          >
+            Ver explicação <ChevronRight size={14} />
+          </button>
+        </div>
+      </div>
 
       {/* Resumo Rápido do Dia Atual */}
       {(() => {
@@ -2266,39 +2242,9 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         </div>
       )}
 
-      {/* ─────────── BLOCO 3 · MÉTODO 2 PASSOS ─────────── */}
+      {/* ─────────── BLOCO 3 · AÇÕES & ATALHOS ─────────── */}
       <SectionHeader
         eyebrow="Bloco 3"
-        title="Método 2 Passos"
-        hint="Contexto e ciência do protocolo"
-      />
-
-      <div className="group relative overflow-hidden rounded-2xl border border-primary/10 bg-gradient-to-br from-primary/[0.05] to-transparent p-5 transition-all hover:border-primary/30">
-        <div className="absolute -right-6 -top-6 text-primary/10 transition-transform group-hover:scale-110">
-          <Sparkles size={100} />
-        </div>
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 text-primary">
-            <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary/10">
-              <Sprout size={16} />
-            </div>
-            <h3 className="font-display text-lg">Método de 2 Passos</h3>
-          </div>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-            Entenda como funciona o protocolo de Enraizar e Nutrir para sua orquídea florescer.
-          </p>
-          <button
-            onClick={() => setTab("metodo")}
-            className="mt-4 flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-xs font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:brightness-110 active:scale-[0.98]"
-          >
-            Ver explicação <ChevronRight size={14} />
-          </button>
-        </div>
-      </div>
-
-      {/* ─────────── BLOCO 4 · AÇÕES SECUNDÁRIAS ─────────── */}
-      <SectionHeader
-        eyebrow="Bloco 4"
         title="Ações & atalhos"
         hint="Marcos, exportação e navegação rápida"
       />
@@ -2358,6 +2304,55 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           ))}
         </div>
       </div>
+
+      {/* Lembretes Importantes (movidos para abaixo de Acesso Rápido) */}
+      {upcomingReminders.length > 0 && (
+        <div className="rounded-2xl border border-primary/20 bg-primary/[0.02] p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-primary">
+              <Bell size={14} className="animate-pulse" />
+              <span className="text-[10px] font-bold uppercase tracking-widest">Lembretes Importantes</span>
+            </div>
+            <span className="text-[10px] text-muted-foreground">{upcomingReminders.length} pendente(s)</span>
+          </div>
+          <div className="mt-3 space-y-2">
+            {upcomingReminders.map(d => (
+              <div
+                key={d}
+                className="flex items-center justify-between rounded-xl border border-border bg-card p-3 shadow-sm transition-all hover:border-primary/40 hover:shadow-md"
+              >
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCurrentDay(d, actorId);
+                    handleRedirectToPlan();
+                  }}
+                  className="flex flex-1 items-center gap-3 text-left"
+                >
+                  <div className={`grid h-8 w-8 place-items-center rounded-lg text-xs font-bold ${d === day ? 'bg-primary text-primary-foreground' : 'bg-secondary text-primary'}`}>
+                    {d}
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-primary">Dia {d}: {d === 1 ? 'Início & Diagnóstico' : d === 21 ? 'Avaliação Final' : 'Manutenção Crítica'}</div>
+                    <div className="text-[10px] text-muted-foreground">Toque para abrir este dia</div>
+                  </div>
+                </button>
+                <button
+                  onClick={() => {
+                    toggleReminder(d, actorId);
+                    toast.success(`Lembrete do dia ${d} concluído!`, {
+                      icon: <CheckCircle2 size={16} className="text-primary" />
+                    });
+                  }}
+                  className="ml-2 shrink-0 rounded-lg bg-primary/10 p-2 text-primary transition-colors hover:bg-primary/20"
+                >
+                  <Check size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
         Aplique no horário fresco, evite sol forte e não atinja diretamente as flores.
