@@ -1573,8 +1573,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
   const upcomingReminders = reminderDays.filter(d => d >= day && !state.remindersCompleted?.[d]);
 
   return (
-    <>
-      <div className="space-y-4">
+    <div className="space-y-4">
       {upcomingReminders.length > 0 && (
         <div className="rounded-2xl border border-primary/20 bg-primary/[0.02] p-4">
           <div className="flex items-center justify-between">
