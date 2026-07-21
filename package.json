@@ -10,7 +10,9 @@
     "preview": "vite preview",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "test": "bun test"
+    "test": "bun test",
+    "test:coverage": "bun test --coverage",
+    "ci": "bun test --coverage"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
