@@ -3,10 +3,8 @@ import { useMemo, useState, type ReactNode, type ChangeEvent, useEffect, useRef,
 import { toast, Toaster } from "sonner";
 import confetti from "canvas-confetti";
 import { motion, AnimatePresence } from "framer-motion";
-import raizAsset from "@/assets/raiz-500ml.png";
-import orkAsset from "@/assets/ork-500ml.png";
-import bgEnraizar from "@/assets/bg-enraizar.jpg";
-import bgNutrir from "@/assets/bg-nutrir.jpg";
+import sceneEnraizar from "@/assets/scene-enraizar.jpg";
+import sceneNutrir from "@/assets/scene-nutrir.jpg";
 import { playSuccessSound, playPopSound } from "@/lib/audio-feedback";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -3507,26 +3505,22 @@ function MetodoTab() {
           </div>
 
           <div className="relative z-10 flex flex-col items-center gap-4">
-            <div className="relative flex h-56 w-full items-end justify-center overflow-hidden rounded-2xl">
+            <motion.div
+              className="relative aspect-square w-full overflow-hidden rounded-2xl"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.7, ease: "easeOut" }}
+            >
               <img
-                src={bgEnraizar}
-                alt=""
-                aria-hidden="true"
+                src={sceneEnraizar}
+                alt="Enraizador Forte em cena botânica"
                 loading="lazy"
                 width={1024}
-                height={768}
-                className="absolute inset-0 h-full w-full object-cover opacity-70"
+                height={1024}
+                className="h-full w-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-card via-card/40 to-transparent" />
-              <motion.img
-                src={raizAsset}
-                alt="Enraizador Forte"
-                className="relative z-10 h-52 w-auto object-contain drop-shadow-xl"
-                initial={{ y: 10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-              />
-            </div>
+              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-card to-transparent" />
+            </motion.div>
             <div className="text-center">
               <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent">Passo 01</div>
               <h2 className="font-display text-3xl text-primary">Enraizar</h2>
@@ -3587,26 +3581,22 @@ function MetodoTab() {
           </div>
 
           <div className="relative z-10 flex flex-col items-center gap-4">
-            <div className="relative flex h-56 w-full items-end justify-center overflow-hidden rounded-2xl">
+            <motion.div
+              className="relative aspect-square w-full overflow-hidden rounded-2xl"
+              initial={{ opacity: 0, scale: 0.98 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.7, ease: "easeOut" }}
+            >
               <img
-                src={bgNutrir}
-                alt=""
-                aria-hidden="true"
+                src={sceneNutrir}
+                alt="Bokashi Orquídeas em cena botânica"
                 loading="lazy"
                 width={1024}
-                height={768}
-                className="absolute inset-0 h-full w-full object-cover opacity-60"
+                height={1024}
+                className="h-full w-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-card via-card/40 to-transparent" />
-              <motion.img
-                src={orkAsset}
-                alt="Bokashi Orquídeas"
-                className="relative z-10 h-52 w-auto object-contain drop-shadow-xl"
-                initial={{ y: 10, opacity: 0 }}
-                animate={{ y: 0, opacity: 1 }}
-                transition={{ duration: 0.8, ease: "easeOut" }}
-              />
-            </div>
+              <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-card to-transparent" />
+            </motion.div>
             <div className="text-center">
               <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Passo 02</div>
               <h2 className="font-display text-3xl text-accent">Nutrir</h2>
