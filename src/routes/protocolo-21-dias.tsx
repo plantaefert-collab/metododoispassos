@@ -1803,6 +1803,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
       {/* CTA - Começar plano de 21 dias */}
       {(() => {
         const hasProgress = completedDays > 0 || totalApplications > 0 || day > 1;
+        const percent = Math.round((completedDays / 21) * 100);
         return (
           <button
             onClick={() => setTab("plano")}
@@ -1810,6 +1811,11 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           >
             <Sparkles size={18} />
             {hasProgress ? `Continuar meu plano — Dia ${day}` : "Começar meu plano de 21 dias"}
+            {hasProgress && (
+              <span className="ml-1 rounded-full bg-primary-foreground/15 px-2 py-0.5 text-[10px] font-bold tracking-wider text-primary-foreground backdrop-blur-sm">
+                {percent}%
+              </span>
+            )}
             <ChevronRight size={18} className="transition-transform group-hover:translate-x-1" />
           </button>
         );
