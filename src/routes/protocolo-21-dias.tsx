@@ -3,8 +3,8 @@ import { useMemo, useState, type ReactNode, type ChangeEvent, useEffect, useRef,
 import { toast, Toaster } from "sonner";
 import confetti from "canvas-confetti";
 import { motion, AnimatePresence } from "framer-motion";
-import raizAsset from "@/assets/RAIZ-500ML.png.asset.json";
-import orkAsset from "@/assets/ORK-500ML.png.asset.json";
+import raizAsset from "@/assets/raiz-500ml.png";
+import orkAsset from "@/assets/ork-500ml.png";
 import { playSuccessSound, playPopSound } from "@/lib/audio-feedback";
 import { supabase } from "@/integrations/supabase/client";
 import {
