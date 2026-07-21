@@ -3600,8 +3600,12 @@ function Drawer({
       className="fixed inset-0 z-50 flex items-end justify-center bg-[var(--color-plantae-green)]/40 backdrop-blur-md sm:items-center"
       onClick={onClose}
     >
-      <div
-        className="max-h-[90vh] w-full max-w-[440px] overflow-hidden rounded-t-[32px] border-t border-white/20 bg-[var(--color-plantae-cream)] shadow-2xl animate-in slide-in-from-bottom duration-300 sm:rounded-[32px] sm:border"
+      <motion.div
+        initial={{ y: "100%" }}
+        animate={{ y: 0 }}
+        exit={{ y: "100%" }}
+        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+        className="max-h-[92vh] w-full max-w-[440px] overflow-y-auto rounded-t-[32px] border-t border-white/20 bg-[var(--color-plantae-cream)] shadow-2xl sm:rounded-[32px] sm:border"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Barra de arraste visual para mobile */}
