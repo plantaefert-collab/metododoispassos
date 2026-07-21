@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import type { ReactNode } from "react";
 import { useProtocolStore } from "@/lib/protocol-store";
+import logoPlantaefert from "@/assets/logo-plantaefert.png";
 import { getProtocolDay, getProtocolPhase } from "@/lib/protocol-plan";
 import welcomeOrchid from "@/assets/welcome-orchid.jpg";
 
