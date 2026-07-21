@@ -41,6 +41,8 @@ import {
   Bell,
   Check,
   ArrowRight,
+  Share2,
+  HelpCircle,
 } from "lucide-react";
 import {
   Accordion,
@@ -1146,7 +1148,7 @@ function DiagnosisResultScreen({ actorId, onBack, onFinish }: { actorId: string;
                 As respostas foram alteradas. Este resultado pode estar desatualizado, mas você ainda pode visualizá-lo abaixo.
               </InfoCard>
             )}
-            <ResultBlocks result={result} />
+            <ResultBlocks result={result} answers={state.diagnosis} />
           </div>
         ) : (
           <div className="mt-5">
@@ -1154,6 +1156,42 @@ function DiagnosisResultScreen({ actorId, onBack, onFinish }: { actorId: string;
               O resultado está sendo preparado. Revise as respostas e toque em “Ver resultado” para
               gerar as orientações personalizadas.
             </InfoCard>
+          </div>
+        )}
+
+        {result && (
+          <div className="mt-5 flex flex-wrap gap-2">
+            <button
+              onClick={async () => {
+                try {
+                  await exportProtocolPDF(state);
+                  toast.success("Diagnóstico exportado em PDF");
+                } catch {
+                  toast.error("Não foi possível gerar o PDF");
+                }
+              }}
+              className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <Download size={16} /> Baixar em PDF
+            </button>
+            <button
+              onClick={async () => {
+                const text = `Meu diagnóstico da orquídea${state.plant.name ? ` "${state.plant.name}"` : ""}: ${result.priorities.length} prioridade(s), ${result.adjustments.length} ajuste(s), ${result.favorable.length} sinal(is) favorável(is).`;
+                try {
+                  if (navigator.share) {
+                    await navigator.share({ title: "Diagnóstico da minha orquídea", text, url: window.location.href });
+                  } else {
+                    await navigator.clipboard.writeText(`${text}\n${window.location.href}`);
+                    toast.success("Resumo copiado para a área de transferência");
+                  }
+                } catch {
+                  /* usuário cancelou */
+                }
+              }}
+              className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <Share2 size={16} /> Compartilhar
+            </button>
           </div>
         )}
 
@@ -1180,6 +1218,7 @@ function DiagnosisResultScreen({ actorId, onBack, onFinish }: { actorId: string;
 
 function ResultBlocks({
   result,
+  answers,
 }: {
   result: {
     priorities: DiagnosisGuidance[];
@@ -1188,41 +1227,87 @@ function ResultBlocks({
     insufficientInformation: DiagnosisGuidance[];
     trackingPoints: string[];
   };
+  answers?: Record<DiagnosisCategory, string[]>;
 }) {
   const { priorities, adjustments, favorable, insufficientInformation, trackingPoints } = result;
   const hasAny =
     priorities.length + adjustments.length + favorable.length + insufficientInformation.length > 0;
 
   const nextSteps = [...priorities, ...adjustments].slice(0, 3);
-  const overall =
-    priorities.length > 0
-      ? { label: "Requer atenção imediata", tone: "warn" as const }
-      : adjustments.length > 0
-        ? { label: "Ajustes recomendados", tone: "accent" as const }
-        : favorable.length > 0
-          ? { label: "Condições favoráveis", tone: "green" as const }
-          : { label: "Observação inicial", tone: "muted" as const };
-  const overallCls =
-    overall.tone === "warn"
-      ? "border-accent/40 bg-accent/10 text-accent"
-      : overall.tone === "accent"
-        ? "border-primary/20 bg-lilac/50 text-primary"
-        : overall.tone === "green"
-          ? "border-primary/20 bg-secondary/60 text-primary"
-          : "border-border bg-muted text-muted-foreground";
+
+  // Health score (0-100): penaliza prioridades e ajustes, bonifica sinais favoráveis
+  const rawScore = 100 - priorities.length * 20 - adjustments.length * 10 + favorable.length * 5;
+  const score = Math.max(0, Math.min(100, rawScore));
+  const scoreStatus =
+    score >= 80
+      ? { label: "Saudável", tone: "green" as const, message: "Sua orquídea mostra sinais consistentes de saúde. Mantenha a rotina." }
+      : score >= 60
+        ? { label: "Estável com ajustes", tone: "accent" as const, message: "Boa base. Alguns ajustes vão elevar o desempenho." }
+        : score >= 40
+          ? { label: "Em recuperação", tone: "accent" as const, message: "Há pontos de atenção. Siga as prioridades para reverter." }
+          : { label: "Requer atenção imediata", tone: "warn" as const, message: "Foque nas prioridades desta semana. É reversível." };
+  const scoreColor =
+    scoreStatus.tone === "green"
+      ? "text-primary"
+      : scoreStatus.tone === "accent"
+        ? "text-primary"
+        : "text-accent";
+  const scoreBgCls =
+    scoreStatus.tone === "warn"
+      ? "border-accent/40 bg-gradient-to-br from-accent/10 to-accent/5"
+      : scoreStatus.tone === "green"
+        ? "border-primary/25 bg-gradient-to-br from-secondary/60 to-secondary/30"
+        : "border-primary/20 bg-gradient-to-br from-lilac/60 to-lilac/20";
 
   return (
     <div className="mt-5 space-y-3">
       {hasAny && (
-        <div className={`rounded-2xl border p-4 ${overallCls}`}>
-          <div className="text-xs font-bold uppercase tracking-wider opacity-80">Resumo automático</div>
-          <div className="mt-1 font-display text-lg">{overall.label}</div>
-          <p className="mt-2 text-sm text-foreground/80">
-            Encontramos <strong>{priorities.length}</strong> prioridade(s), <strong>{adjustments.length}</strong> ajuste(s) e{" "}
-            <strong>{favorable.length}</strong> sinal(is) favorável(is) nas suas observações.
-          </p>
+        <div className={`rounded-2xl border p-4 ${scoreBgCls}`}>
+          <div className="flex items-center gap-4">
+            <div className="relative grid h-20 w-20 shrink-0 place-items-center rounded-full bg-card shadow-inner">
+              <svg className="absolute inset-0 -rotate-90" viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="34" fill="none" stroke="currentColor" strokeWidth="6" className="text-muted opacity-40" />
+                <motion.circle
+                  cx="40"
+                  cy="40"
+                  r="34"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                  className={scoreColor}
+                  initial={{ strokeDasharray: "0 214", strokeDashoffset: 0 }}
+                  animate={{ strokeDasharray: `${(score / 100) * 214} 214` }}
+                  transition={{ duration: 1, ease: "circOut" }}
+                />
+              </svg>
+              <div className="text-center">
+                <div className={`font-display text-2xl leading-none ${scoreColor}`}>{score}</div>
+                <div className="text-[9px] uppercase tracking-wider text-muted-foreground">saúde</div>
+              </div>
+            </div>
+            <div className="min-w-0">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Veredito</div>
+              <div className={`font-display text-lg leading-tight ${scoreColor}`}>{scoreStatus.label}</div>
+              <p className="mt-1 text-xs text-foreground/80">{scoreStatus.message}</p>
+            </div>
+          </div>
+          <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+            <div className="rounded-lg bg-card/70 py-2">
+              <div className="text-lg font-bold text-accent">{priorities.length}</div>
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">prioridades</div>
+            </div>
+            <div className="rounded-lg bg-card/70 py-2">
+              <div className="text-lg font-bold text-primary">{adjustments.length}</div>
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">ajustes</div>
+            </div>
+            <div className="rounded-lg bg-card/70 py-2">
+              <div className="text-lg font-bold text-primary">{favorable.length}</div>
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">favoráveis</div>
+            </div>
+          </div>
           {nextSteps.length > 0 && (
-            <div className="mt-3 rounded-xl border border-border/60 bg-card/70 p-3">
+            <div className="mt-3 rounded-xl border border-border/60 bg-card/80 p-3">
               <div className="text-xs font-bold uppercase tracking-wider text-primary">Próximos passos</div>
               <ol className="mt-2 space-y-2 text-sm text-foreground">
                 {nextSteps.map((s, i) => (
@@ -1269,6 +1354,46 @@ function ResultBlocks({
             ))}
           </ul>
         </div>
+      )}
+      {answers && (
+        <Accordion type="single" collapsible className="rounded-2xl border border-border bg-card">
+          <AccordionItem value="why" className="border-none">
+            <AccordionTrigger className="px-4 py-3 hover:no-underline">
+              <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+                <HelpCircle size={16} /> Como chegamos nesse diagnóstico
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4 pb-4">
+              <p className="text-xs text-muted-foreground">
+                Este resultado combina as respostas por categoria. Categorias com mais sinais têm maior peso no veredito.
+              </p>
+              <ul className="mt-3 space-y-2">
+                {(Object.keys(CATEGORY_LABEL) as DiagnosisCategory[]).map((cat) => {
+                  const values = answers[cat] ?? [];
+                  return (
+                    <li key={cat} className="rounded-lg border border-border/60 bg-muted/40 p-2.5">
+                      <div className="flex items-center justify-between">
+                        <div className="text-xs font-bold uppercase tracking-wider text-primary">{CATEGORY_LABEL[cat]}</div>
+                        <div className="text-[10px] text-muted-foreground">{values.length} sinal(is)</div>
+                      </div>
+                      {values.length > 0 ? (
+                        <div className="mt-1.5 flex flex-wrap gap-1.5">
+                          {values.map((v) => (
+                            <span key={v} className="rounded-full bg-card px-2 py-0.5 text-[11px] text-foreground/80 border border-border/60">
+                              {v}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="mt-1 text-[11px] italic text-muted-foreground">Nenhum sinal marcado.</div>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       )}
       <InfoCard tone="lilac" icon={<Info size={16} />}>
         Um sinal isolado não fecha um diagnóstico. Utilize estas orientações como apoio à
