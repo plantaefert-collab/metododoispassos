@@ -2163,32 +2163,6 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
       )}
 
 
-      <div className="rounded-2xl border border-border bg-card p-5">
-        <div className="flex items-center gap-2 text-sm font-bold text-primary">
-          <CalendarCheck size={16} className="text-accent" />
-          Acesso Rápido ao Protocolo
-        </div>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Consulte as tarefas e orientações de dias específicos do plano de 21 dias.
-        </p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {[1, 7, 14, 21].map((d) => (
-            <button
-              key={d}
-              onClick={() => {
-                setCurrentDay(d, actorId);
-                setTab("plano");
-                toast.info(`Navegando para o Dia ${d}`);
-              }}
-              className="flex flex-col items-center justify-center min-w-[60px] gap-1 rounded-xl border border-border bg-card px-3 py-3 text-xs font-semibold text-foreground transition-all hover:border-primary/40 hover:bg-muted active:scale-95"
-            >
-              <span className="text-[10px] text-muted-foreground/60 uppercase">Dia</span>
-              <span className="font-display text-2xl text-primary leading-none">{d}</span>
-              <ChevronRight size={10} className="text-muted-foreground/40 mt-1" />
-            </button>
-          ))}
-        </div>
-      </div>
 
       {/* Lembretes Importantes (movidos para abaixo de Acesso Rápido) */}
       {upcomingReminders.length > 0 && (
