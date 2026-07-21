@@ -249,7 +249,7 @@ function ProtocoloPage() {
               onExplore={() => {
                 setGuestActive(true);
                 setGuestMode(true);
-                setTab("aprender");
+                setTab("inicio");
               }}
               onRegisterOrchid={() => setStatus("needs_diagnosis")}
               onQuickAction={(t) => {
