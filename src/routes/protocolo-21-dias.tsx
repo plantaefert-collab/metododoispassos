@@ -1747,9 +1747,12 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         const nextItems = pendingChecklist.slice(0, 3);
         const allDone = pendingChecklist.length === 0;
         return (
-          <button
+          <div
+            role="button"
+            tabIndex={0}
             onClick={handleRedirectToPlan}
-            className="group relative w-full overflow-hidden rounded-2xl border-2 border-accent/30 bg-gradient-to-br from-accent/[0.06] to-primary/[0.04] p-5 text-left shadow-sm transition-all hover:border-accent/50 active:scale-[0.99]"
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") handleRedirectToPlan(); }}
+            className="group relative w-full cursor-pointer overflow-hidden rounded-2xl border-2 border-accent/30 bg-gradient-to-br from-accent/[0.06] to-primary/[0.04] p-5 text-left shadow-sm transition-all hover:border-accent/50 active:scale-[0.99]"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-accent">
@@ -1784,7 +1787,18 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
                 )}
               </div>
             )}
-          </button>
+            {day === 1 && (
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setStatus("needs_diagnosis");
+                }}
+                className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-accent-foreground shadow-sm transition-all hover:brightness-110 active:scale-[0.98]"
+              >
+                <Stethoscope size={16} /> Fazer diagnóstico
+              </button>
+            )}
+          </div>
         );
       })()}
 
