@@ -1676,12 +1676,27 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
   const { state, setCurrentDay, toggleReminder } = useProtocolStore();
 
 
-  const day = state.currentDay;
+  // Foco do dia é derivado da conclusão real do checklist,
+  // para refletir automaticamente o progresso do usuário.
+  const isDayFullyDone = (d: number) => {
+    const meta = getProtocolDay(d);
+    const entry = state.days[d];
+    if (!entry) return false;
+    if (!meta.checklist || meta.checklist.length === 0) return !!entry.completed;
+    return meta.checklist.every((label) => !!entry.checklist?.[label]);
+  };
+  const focusDay = (() => {
+    for (let d = 1; d <= 21; d++) {
+      if (!isDayFullyDone(d)) return d;
+    }
+    return 21;
+  })();
+  const day = focusDay;
   const phase = phaseOf(day);
   const isApplicationDay = APPLICATION_DAYS.includes(day);
   const diagnosisFresh = isDiagnosisCurrent(state);
 
-  const completedDays = Object.values(state.days).filter((d) => d.completed).length;
+  const completedDays = Array.from({ length: 21 }, (_, i) => i + 1).filter(isDayFullyDone).length;
   const totalApplications = state.applications.length;
   const totalNotes = Object.values(state.days).filter((d) => d.note?.trim()).length;
   const totalPhotos = Object.values(state.days).filter((d) => d.photo).length;
@@ -1704,7 +1719,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         const today = state.days[day] ?? { checklist: {}, note: "", completed: false };
         const checklistState = today.checklist ?? {};
         const pendingChecklist = meta.checklist
-          .map((label, i) => ({ label, i, done: !!checklistState[i] }))
+          .map((label, i) => ({ label, i, done: !!checklistState[label] }))
           .filter((c) => !c.done);
         const nextItems = pendingChecklist.slice(0, 3);
         const allDone = pendingChecklist.length === 0;
