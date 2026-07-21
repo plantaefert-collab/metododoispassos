@@ -665,6 +665,7 @@ function WelcomeScreen({ onStart, onExplore, setStatus }: { onStart: () => void;
   const { state } = useProtocolStore();
   const day = state.currentDay;
   const phase = getProtocolPhase(day);
+  const protocolDay = getProtocolDay(day);
   const phaseIndex = phase.id === "fase-1" ? 0 : phase.id === "fase-2" ? 1 : 2;
 
   // Botanical line illustrations for each phase
