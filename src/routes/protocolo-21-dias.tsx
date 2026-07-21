@@ -1418,10 +1418,150 @@ function ResultBlocks({
           </AccordionItem>
         </Accordion>
       )}
+      {hasAny && (
+        <DiagnosisSummaryChecklist
+          score={score}
+          statusLabel={scoreStatus.label}
+          priorities={priorities}
+          adjustments={adjustments}
+        />
+      )}
       <InfoCard tone="lilac" icon={<Info size={16} />}>
         Um sinal isolado não fecha um diagnóstico. Utilize estas orientações como apoio à
         observação.
       </InfoCard>
+    </div>
+  );
+}
+
+function DiagnosisSummaryChecklist({
+  score,
+  statusLabel,
+  priorities,
+  adjustments,
+}: {
+  score: number;
+  statusLabel: string;
+  priorities: DiagnosisGuidance[];
+  adjustments: DiagnosisGuidance[];
+}) {
+  const steps = useMemo(
+    () => [...priorities, ...adjustments].slice(0, 6),
+    [priorities, adjustments]
+  );
+  const storageKey = useMemo(
+    () => `diagnosis-summary-checks:${steps.map((s) => s.id).join("|")}`,
+    [steps]
+  );
+  const [checked, setChecked] = useState<Record<string, boolean>>(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      const raw = window.localStorage.getItem(storageKey);
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {};
+    }
+  });
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(storageKey, JSON.stringify(checked));
+    } catch {
+      /* ignore */
+    }
+  }, [checked, storageKey]);
+
+  const affected = useMemo(() => {
+    const counts = new Map<DiagnosisCategory, number>();
+    [...priorities, ...adjustments].forEach((g) => {
+      counts.set(g.category, (counts.get(g.category) ?? 0) + 1);
+    });
+    return Array.from(counts.entries())
+      .sort((a, b) => b[1] - a[1])
+      .slice(0, 3);
+  }, [priorities, adjustments]);
+
+  const doneCount = steps.filter((s) => checked[s.id]).length;
+  const progressPct = steps.length ? Math.round((doneCount / steps.length) * 100) : 0;
+
+  return (
+    <div className="rounded-2xl border border-primary/30 bg-gradient-to-br from-secondary/70 to-secondary/30 p-4">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <div className="text-[11px] font-bold uppercase tracking-wider text-primary">
+            Resumo do diagnóstico
+          </div>
+          <div className="font-display text-base text-primary">
+            {statusLabel} · saúde {score}/100
+          </div>
+        </div>
+        <div className="text-right">
+          <div className="text-lg font-bold text-primary">
+            {doneCount}/{steps.length}
+          </div>
+          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+            concluídos
+          </div>
+        </div>
+      </div>
+
+      {affected.length > 0 && (
+        <div className="mt-3">
+          <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+            Categorias mais afetadas
+          </div>
+          <div className="mt-1.5 flex flex-wrap gap-1.5">
+            {affected.map(([cat, n]) => (
+              <span
+                key={cat}
+                className="rounded-full border border-primary/25 bg-card px-2.5 py-0.5 text-[11px] font-medium text-primary"
+              >
+                {CATEGORY_LABEL[cat]} · {n}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {steps.length > 0 && (
+        <div className="mt-4">
+          <div className="mb-2 flex items-center justify-between">
+            <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+              Próximos passos
+            </div>
+            <div className="text-[10px] text-muted-foreground">{progressPct}%</div>
+          </div>
+          <div className="h-1.5 w-full overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-primary transition-all"
+              style={{ width: `${progressPct}%` }}
+            />
+          </div>
+          <ul className="mt-3 space-y-2">
+            {steps.map((s) => {
+              const isDone = !!checked[s.id];
+              return (
+                <li key={s.id}>
+                  <label className="flex cursor-pointer items-start gap-2.5 rounded-lg border border-border/60 bg-card/80 p-2.5 hover:bg-card">
+                    <input
+                      type="checkbox"
+                      checked={isDone}
+                      onChange={(e) =>
+                        setChecked((prev) => ({ ...prev, [s.id]: e.target.checked }))
+                      }
+                      className="mt-0.5 h-4 w-4 shrink-0 accent-primary"
+                    />
+                    <span
+                      className={`text-sm ${isDone ? "text-muted-foreground line-through" : "text-foreground"}`}
+                    >
+                      <strong>{s.title}.</strong> {s.action}
+                    </span>
+                  </label>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }
