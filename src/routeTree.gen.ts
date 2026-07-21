@@ -10,11 +10,17 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as Protocolo21DiasRouteImport } from './routes/protocolo-21-dias'
+import { Route as BemVindoRouteImport } from './routes/bem-vindo'
 import { Route as IndexRouteImport } from './routes/index'
 
 const Protocolo21DiasRoute = Protocolo21DiasRouteImport.update({
   id: '/protocolo-21-dias',
   path: '/protocolo-21-dias',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BemVindoRoute = BemVindoRouteImport.update({
+  id: '/bem-vindo',
+  path: '/bem-vindo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -25,27 +31,31 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/bem-vindo': typeof BemVindoRoute
   '/protocolo-21-dias': typeof Protocolo21DiasRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/bem-vindo': typeof BemVindoRoute
   '/protocolo-21-dias': typeof Protocolo21DiasRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/bem-vindo': typeof BemVindoRoute
   '/protocolo-21-dias': typeof Protocolo21DiasRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/protocolo-21-dias'
+  fullPaths: '/' | '/bem-vindo' | '/protocolo-21-dias'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/protocolo-21-dias'
-  id: '__root__' | '/' | '/protocolo-21-dias'
+  to: '/' | '/bem-vindo' | '/protocolo-21-dias'
+  id: '__root__' | '/' | '/bem-vindo' | '/protocolo-21-dias'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BemVindoRoute: typeof BemVindoRoute
   Protocolo21DiasRoute: typeof Protocolo21DiasRoute
 }
 
@@ -56,6 +66,13 @@ declare module '@tanstack/react-router' {
       path: '/protocolo-21-dias'
       fullPath: '/protocolo-21-dias'
       preLoaderRoute: typeof Protocolo21DiasRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/bem-vindo': {
+      id: '/bem-vindo'
+      path: '/bem-vindo'
+      fullPath: '/bem-vindo'
+      preLoaderRoute: typeof BemVindoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -70,18 +87,9 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BemVindoRoute: BemVindoRoute,
   Protocolo21DiasRoute: Protocolo21DiasRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
