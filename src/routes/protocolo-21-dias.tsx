@@ -701,17 +701,29 @@ function WelcomeScreen({ onStart, onExplore, setStatus }: { onStart: () => void;
     );
   };
 
+  const phaseStyles = [
+    { bg: "var(--color-plantae-cream)", accent: "var(--color-plantae-rose)" }, // Fase 1: Diagnosticar
+    { bg: "#F0F4F2", accent: "var(--color-plantae-lilac)" },                  // Fase 2: Manter (Tom levemente mais fresco)
+    { bg: "#F9F2F7", accent: "rgba(217,70,239,0.1)" },                       // Fase 3: Consolidar (Tom levemente magenta suave)
+  ];
+  
+  const currentStyle = phaseStyles[phaseIndex];
   const phaseLabels = ["Diagnosticar", "Manter", "Consolidar"];
   const currentPhaseLabel = phaseLabels[phaseIndex];
 
   return (
-    <div
+    <motion.div
+      initial={false}
+      animate={{ backgroundColor: currentStyle.bg }}
+      transition={{ duration: 1.2, ease: "easeInOut" }}
       className="min-h-screen font-sans"
-      style={{ backgroundColor: "var(--color-plantae-cream)", color: "var(--color-plantae-ink)" }}
+      style={{ color: "var(--color-plantae-ink)" }}
     >
-      <div
-        className="mx-auto flex min-h-screen w-full max-w-[440px] flex-col px-5 pb-8 pt-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-[28px] sm:px-6 sm:shadow-[0_20px_70px_-40px_rgba(23,61,50,0.35)]"
-        style={{ backgroundColor: "var(--color-plantae-cream)" }}
+      <motion.div
+        initial={false}
+        animate={{ backgroundColor: currentStyle.bg }}
+        transition={{ duration: 1.2, ease: "easeInOut" }}
+        className="mx-auto flex min-h-screen w-full max-w-[440px] flex-col px-5 pb-8 pt-6 sm:my-6 sm:min-h-[calc(100vh-3rem)] sm:rounded-[28px] sm:px-6 sm:shadow-[0_20px_70px_-40px_rgba(23,61,50,0.35)] border-x border-border/10 sm:border"
       >
         {/* Header */}
         <header className="flex items-center gap-2.5">
@@ -733,8 +745,8 @@ function WelcomeScreen({ onStart, onExplore, setStatus }: { onStart: () => void;
 
         {/* Photo */}
         <figure
-          className="relative mt-5 overflow-hidden rounded-[28px] border border-white/20 shadow-xl"
-          style={{ backgroundColor: "var(--color-plantae-lilac)" }}
+          className="relative mt-5 overflow-hidden rounded-[28px] border border-white/20 shadow-xl transition-colors duration-1000"
+          style={{ backgroundColor: currentStyle.accent }}
         >
           <AnimatePresence mode="wait">
             <motion.div
@@ -900,8 +912,8 @@ function WelcomeScreen({ onStart, onExplore, setStatus }: { onStart: () => void;
             Apenas explorar como visitante
           </button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
