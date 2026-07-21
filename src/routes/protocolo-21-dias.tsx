@@ -84,6 +84,7 @@ import {
 import { saveProgressRemote } from "@/lib/protocol-cloud";
 import welcomeOrchid from "@/assets/welcome-orchid.jpg";
 import { QuickTour } from "@/components/QuickTour";
+import { exportProtocolPDF } from "@/lib/pdf-export";
 
 
 
@@ -1635,6 +1636,7 @@ function InfoCard({
 
 function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t: Tab) => void; setStatus: (s: AuthBootstrapStatus) => void }) {
   const planTitleRef = useRef<HTMLDivElement>(null);
+  const [exportingPDF, setExportingPDF] = useState(false);
 
   const handleRedirectToPlan = () => {
     setTab("plano");
@@ -1646,6 +1648,25 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
   };
 
   const { state, setCurrentDay, toggleReminder } = useProtocolStore();
+
+  const handleExportPDF = async () => {
+    if (exportingPDF) return;
+    setExportingPDF(true);
+    try {
+      await exportProtocolPDF(state);
+      toast.success("Relatório em PDF gerado", {
+        description: "Seu progresso foi baixado.",
+      });
+    } catch (err) {
+      console.error("Erro ao gerar PDF:", err);
+      toast.error("Não foi possível gerar o PDF", {
+        description: "Tente novamente em instantes.",
+      });
+    } finally {
+      setExportingPDF(false);
+    }
+  };
+
   const day = state.currentDay;
   const phase = phaseOf(day);
   const isApplicationDay = APPLICATION_DAYS.includes(day);
@@ -1950,6 +1971,25 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           </button>
         );
       })()}
+
+      {/* Exportar progresso em PDF */}
+      <button
+        onClick={handleExportPDF}
+        disabled={exportingPDF}
+        className="flex w-full items-center justify-center gap-2 rounded-full border-2 border-primary/25 bg-card px-6 py-3.5 text-sm font-bold text-primary transition-all hover:bg-primary/[0.06] active:scale-[0.98] disabled:opacity-60"
+      >
+        {exportingPDF ? (
+          <>
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+            Gerando PDF...
+          </>
+        ) : (
+          <>
+            <FileText size={16} />
+            Exportar meu progresso em PDF
+          </>
+        )}
+      </button>
 
       <div 
         onClick={handleRedirectToPlan}
@@ -4003,61 +4043,7 @@ function ResumoTab({ actorId }: { actorId: string }) {
   const generatePDF = async () => {
     setIsGenerating(true);
     try {
-      const { jsPDF } = await import("jspdf");
-      const { default: autoTable } = await import("jspdf-autotable");
-      
-      const doc = new jsPDF();
-      
-      // Header
-      doc.setFontSize(22);
-      doc.setTextColor(23, 61, 50); // #173D32
-      doc.text("Relatório: Guia Prático Orquídeas Floridas", 14, 22);
-      
-      doc.setFontSize(12);
-      doc.setTextColor(100);
-      doc.text(`Gerado em: ${new Date().toLocaleDateString("pt-BR")}`, 14, 30);
-      doc.text(`Planta: ${state.plant.name || "Não informada"}`, 14, 37);
-
-      // Summary Table
-      autoTable(doc, {
-        startY: 45,
-        head: [["Métrica", "Valor"]],
-        body: [
-          ["Dias Concluídos", `${completedDays} de 21`],
-          ["Aplicações Realizadas", totalApplications.toString()],
-          ["Registros de Observação", totalNotes.toString()],
-          ["Fotos Registradas", totalPhotos.toString()],
-        ],
-        theme: "striped",
-        headStyles: { fillColor: [23, 61, 50] },
-      });
-
-      // Detailed Records
-      const records = Object.entries(state.days)
-        .filter(([_, d]) => d.completed || d.note?.trim())
-        .sort(([a], [b]) => Number(a) - Number(b))
-        .map(([day, d]) => [
-          `Dia ${day}`,
-          d.completed ? "Sim" : "Não",
-          d.note || "-",
-          d.applicationDone ? "Realizada" : "-"
-        ]);
-
-      if (records.length > 0) {
-        doc.setFontSize(16);
-        doc.setTextColor(23, 61, 50);
-        doc.text("Detalhamento por Dia", 14, (doc as any).lastAutoTable.finalY + 15);
-
-        autoTable(doc, {
-          startY: (doc as any).lastAutoTable.finalY + 20,
-          head: [["Dia", "Concluído", "Observação", "Aplicação"]],
-          body: records,
-          theme: "grid",
-          headStyles: { fillColor: [217, 70, 239] }, // Accent color
-        });
-      }
-
-      doc.save(`protocolo-orquidea-${state.plant.name || "resumo"}.pdf`);
+      await exportProtocolPDF(state);
     } catch (error) {
       console.error("Erro ao gerar PDF:", error);
       alert("Ocorreu um erro ao gerar o PDF. Tente novamente.");
