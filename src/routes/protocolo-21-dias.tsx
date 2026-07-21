@@ -3,8 +3,6 @@ import { useMemo, useState, type ReactNode, type ChangeEvent, useEffect, useRef,
 import { toast, Toaster } from "sonner";
 import confetti from "canvas-confetti";
 import { motion, AnimatePresence } from "framer-motion";
-import raizAsset from "@/assets/raiz-500ml.png";
-import orkAsset from "@/assets/ork-500ml.png";
 import sceneEnraizar from "@/assets/scene-enraizar.jpg";
 import sceneNutrir from "@/assets/scene-nutrir.jpg";
 import { playSuccessSound, playPopSound } from "@/lib/audio-feedback";
