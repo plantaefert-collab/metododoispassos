@@ -353,7 +353,7 @@ function ProtocoloPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <AppShell tab={tab} setTab={setTab} onReset={() => setShowReset(true)} userEmail={user?.email} setStatus={setStatus} tourStep={tourStep}>
+            <AppShell tab={tab} setTab={setTab} onReset={() => setShowReset(true)} userEmail={user?.email} setStatus={setStatus}>
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={tab}
@@ -571,7 +571,7 @@ function AppShell({
             <TabBtn
               active={tab === "plano"}
               onClick={() => setTab("plano")}
-              icon={<CalendarCheck size={20} id="nav-plano" className={tourStep === 2 ? 'text-primary scale-125 transition-transform' : ''} />}
+              icon={<CalendarCheck size={20} id="nav-plano" />}
               label="Plano"
             />
             <TabBtn
@@ -1554,49 +1554,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
     // O foco e scroll serão tratados pelo useEffect na PlanoTab
   };
 
-  const { state, setCurrentDay, toggleReminder, setTourCompleted } = useProtocolStore();
-  const [tourStep, setTourStep] = useState<number | null>(null);
-
-  useEffect(() => {
-    if (state.onboarded && !state.tourCompleted && tourStep === null) {
-      setTourStep(0);
-    }
-  }, [state.onboarded, state.tourCompleted, tourStep]);
-
-  const tourSteps = [
-    {
-      target: "btn-diag",
-      title: "Começar diagnóstico",
-      text: "Inicie aqui para entender as necessidades específicas da sua orquídea.",
-      position: "bottom" as const
-    },
-    {
-      target: "btn-signup",
-      title: "Cadastro da orquídea",
-      text: "Registre os dados da sua planta para um acompanhamento preciso.",
-      position: "bottom" as const
-    },
-    {
-      target: "nav-plano",
-      title: "Diário & Plano",
-      text: "Aqui você registra suas aplicações e acompanha a evolução diária.",
-      position: "top" as const
-    }
-  ];
-
-  const handleNextTour = () => {
-    if (tourStep !== null) {
-      if (tourStep < tourSteps.length - 1) {
-        setTourStep(tourStep + 1);
-      } else {
-        setTourStep(null);
-        setTourCompleted(true, actorId);
-        toast.success("Tour finalizado! Agora você está pronto para cuidar da sua orquídea.", {
-          icon: <Sparkles size={16} className="text-primary" />
-        });
-      }
-    }
-  };
+  const { state, setCurrentDay, toggleReminder } = useProtocolStore();
   const day = state.currentDay;
   const phase = phaseOf(day);
   const isApplicationDay = APPLICATION_DAYS.includes(day);
