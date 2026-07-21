@@ -111,6 +111,15 @@ export function computeFocusDay(state: ProtocolState, getChecklist: (day: number
 }
 
 export { totalObservations };
+// Re-exports for backwards compatibility with existing tests / callers
+// that historically imported these helpers from protocol-store.
+export {
+  migrateLegacyDiagnosis,
+  uniqueStrings,
+  normalizeCurrentDay,
+  normalizeAnswersVersion,
+  reconcileDiagnosisResultState,
+} from "./diagnosis-matrix";
 
 const DEFAULT_CURRENT_DAY = 1;
 
