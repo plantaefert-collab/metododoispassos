@@ -1,29 +1,40 @@
-## Causa raiz
+## Objetivo
 
-O erro **409 Conflict** não vem do `UPDATE` em `profiles` (isso é `plant_registered_at`), vem do `upsert` em `protocol_progress` que dispara logo em seguida, no mesmo salvamento do onboarding.
+Criar uma tela dedicada **"Minha Orquídea"** que combine em um único lugar:
+1. O **cadastro da planta** (nome, espécie, local, vaso, substrato, dificuldade, foto) — salvo localmente no navegador e sincronizado com a conta quando logado.
+2. Um **resumo do progresso** no protocolo de 21 dias (dia atual, % concluído, aplicações, observações, fotos, status do diagnóstico).
 
-A tabela `protocol_progress` tem duas restrições únicas:
+## Escopo
 
-- `PRIMARY KEY (id)`
-- `UNIQUE (user_id)` ← e o trigger `handle_new_user` já criou uma linha nessa chave para todo usuário novo
+### Nova rota
+- `src/routes/minha-orquidea.tsx` → renderiza `ProtocoloShell` com `initialTab="orquidea"`.
+- Head meta próprio (title, description, og:title, og:description).
 
-O código atual em `src/lib/protocol-cloud.ts` chama:
+### Alterações em `src/routes/protocolo-21-dias.tsx`
+- Adicionar `"orquidea"` ao tipo `Tab` e ao mapeamento `TAB_TO_PATH` (→ `/minha-orquidea`).
+- Renderizar `<MinhaOrquideaTab />` quando `tab === "orquidea"`.
+- Adicionar botão no menu inferior: mudar `grid-cols-5` para `grid-cols-6` e inserir `TabBtn` com ícone `Flower2` e label "Orquídea", logo após "Início".
+- Criar componente `MinhaOrquideaTab` ao final do arquivo, reutilizando componentes existentes (`Field`, `SelectField`, `StatCard`) e helpers já disponíveis (`useProtocolStore`, `updatePlant`, `compressImage`, `registerPlantRemote`, `isDiagnosisCurrent`).
 
-```ts
-supabase.from("protocol_progress").upsert({ user_id, ... })
-```
+### Estrutura visual do `MinhaOrquideaTab`
+1. **Cabeçalho de identidade** — foto/avatar da planta + nome + espécie.
+2. **Bloco de progresso** — barra animada de %, 4 `StatCard`s (dias, aplicações, observações, fotos), indicador do diagnóstico (Atualizado/Pendente), CTAs "Ver meu plano" e "Ver resumo completo".
+3. **Bloco de cadastro** — formulário com todos os campos do `plant` (nome, espécie + "não sei", local, vaso, substrato, dificuldade, foto com upload comprimido), botão "Salvar cadastro" que chama `registerPlantRemote` quando logado.
 
-Sem `onConflict`, o PostgREST resolve o conflito pela PK (`id`). Como não enviamos `id`, ele tenta um `INSERT` novo, colide com a linha já existente pela `UNIQUE(user_id)` e devolve **409**. O `UPDATE` do perfil funciona; a UI só não avança porque o `Promise.all`/sequência de sync quebra no progresso.
+## Persistência
 
-## Correção
+- Atualizações usam `updatePlant()`, que já persiste no cache local e sincroniza com `protocol_progress` na nuvem (quando `actorId !== "guest"`).
+- Botão "Salvar cadastro" chama `registerPlantRemote()` para gravar os campos em `profiles` no Supabase. Sem novas tabelas, migrations ou policies — schema atual já cobre todos os campos.
 
-Arquivo único: `src/lib/protocol-cloud.ts`
+## Fora de escopo
 
-- Em `saveProgressRemote`, trocar `.upsert({...})` por `.upsert({...}, { onConflict: "user_id" })` para que o `ON CONFLICT` alvo seja a chave única correta.
-
-Nada mais precisa mudar — a linha já existe (criada pelo trigger), então o upsert vira `UPDATE` limpo e o fluxo Cadastro → Início destrava.
+- Alterar a Home (`/`) para linkar até a nova tela.
+- Novas migrations, RLS ou colunas.
+- Testes automatizados.
 
 ## Verificação
 
-1. Rodar o onboarding no preview autenticado e confirmar avanço para a aba Início.
-2. Conferir no console/network que `PATCH /protocol_progress` retorna 200/204 (não 409).
+1. Navegar para `/minha-orquidea` e ver o cadastro + resumo.
+2. Alternar entre abas pelo menu inferior e confirmar sincronização URL ↔ aba.
+3. Editar um campo → confirmar cache local e (logado) sincronização com Supabase.
+4. Confirmar sem erros de TypeScript.
