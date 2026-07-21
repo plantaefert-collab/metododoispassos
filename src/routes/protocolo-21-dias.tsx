@@ -1493,7 +1493,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
     // O foco e scroll serão tratados pelo useEffect na PlanoTab
   };
 
-  const { state, setCurrentDay } = useProtocolStore();
+  const { state, setCurrentDay, toggleReminder } = useProtocolStore();
   const day = state.currentDay;
   const phase = phaseOf(day);
   const isApplicationDay = APPLICATION_DAYS.includes(day);
@@ -1505,8 +1505,51 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
   const totalNotes = Object.values(state.days).filter((d) => d.note?.trim()).length;
   const totalPhotos = Object.values(state.days).filter((d) => d.photo).length;
 
+  const reminderDays = [1, 7, 14, 21];
+  const upcomingReminders = reminderDays.filter(d => d >= day && !state.remindersCompleted?.[d]);
+
   return (
     <div className="space-y-4">
+      {upcomingReminders.length > 0 && (
+        <div className="rounded-2xl border border-primary/20 bg-primary/[0.02] p-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-primary">
+              <Bell size={14} className="animate-pulse" />
+              <span className="text-[10px] font-bold uppercase tracking-widest">Lembretes Importantes</span>
+            </div>
+            <span className="text-[10px] text-muted-foreground">{upcomingReminders.length} pendente(s)</span>
+          </div>
+          <div className="mt-3 space-y-2">
+            {upcomingReminders.map(d => (
+              <div 
+                key={d}
+                className="flex items-center justify-between rounded-xl border border-border bg-card p-3 shadow-sm"
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`grid h-8 w-8 place-items-center rounded-lg text-xs font-bold ${d === day ? 'bg-primary text-primary-foreground' : 'bg-secondary text-primary'}`}>
+                    {d}
+                  </div>
+                  <div>
+                    <div className="text-xs font-bold text-primary">Dia {d}: {d === 1 ? 'Início & Diagnóstico' : d === 21 ? 'Avaliação Final' : 'Manutenção Crítica'}</div>
+                    <div className="text-[10px] text-muted-foreground">Tarefa essencial do protocolo</div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    toggleReminder(d, actorId);
+                    toast.success(`Lembrete do dia ${d} concluído!`, {
+                      icon: <CheckCircle2 size={16} className="text-primary" />
+                    });
+                  }}
+                  className="rounded-lg bg-primary/10 p-2 text-primary transition-colors hover:bg-primary/20"
+                >
+                  <Check size={16} />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       {isApplicationDay && (
         <div className="rounded-2xl border border-accent/20 bg-accent/5 p-5">
           <div className="flex items-center gap-2 text-accent">
