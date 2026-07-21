@@ -4166,6 +4166,89 @@ function MinhaOrquideaTab({ actorId, setTab }: { actorId: string; setTab: (t: Ta
         </div>
       </div>
 
+      {/* Hoje — Resumo do dia atual */}
+      <div className="rounded-2xl border border-primary/20 bg-card p-6 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
+            <Sparkles size={18} />
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-accent">Hoje · Dia {state.currentDay}</div>
+            <h2 className="mt-0.5 truncate font-display text-lg text-primary">{today.title}</h2>
+          </div>
+        </div>
+
+        {today.objective && (
+          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{today.objective}</p>
+        )}
+
+        {todayChecklist.length > 0 && (
+          <div className="mt-4 rounded-xl border border-border bg-muted/30 p-4">
+            <div className="flex items-center justify-between text-xs font-semibold text-foreground">
+              <span>Checklist do dia</span>
+              <span className="text-muted-foreground">{todayDoneCount}/{todayChecklist.length}</span>
+            </div>
+            <ul className="mt-2 space-y-1.5">
+              {todayChecklist.slice(0, 3).map((item) => (
+                <li key={item} className="flex items-start gap-2 text-sm text-foreground">
+                  <span className={`mt-0.5 inline-block h-4 w-4 shrink-0 rounded-full border ${todayTasks[item] ? "border-primary bg-primary" : "border-border"}`} />
+                  <span className={todayTasks[item] ? "text-muted-foreground line-through" : ""}>{item}</span>
+                </li>
+              ))}
+              {todayChecklist.length > 3 && (
+                <li className="pl-6 text-xs text-muted-foreground">+ {todayChecklist.length - 3} outras tarefas</li>
+              )}
+            </ul>
+          </div>
+        )}
+
+        <button
+          onClick={() => goToDay(state.currentDay)}
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm active:scale-[0.98]"
+        >
+          Abrir tarefa de hoje
+          <ArrowRight size={16} />
+        </button>
+      </div>
+
+      {/* Próximos passos */}
+      {upcomingDays.length > 0 && (
+        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <div className="flex items-center gap-3">
+            <div className="grid h-9 w-9 place-items-center rounded-xl bg-accent/10 text-accent">
+              <CalendarCheck size={18} />
+            </div>
+            <div>
+              <h2 className="font-display text-lg text-primary">Próximos passos</h2>
+              <p className="text-xs text-muted-foreground">Atalhos para os próximos dias do protocolo</p>
+            </div>
+          </div>
+
+          <ul className="mt-4 space-y-2">
+            {upcomingDays.map((d) => {
+              const meta = getProtocolDay(d);
+              return (
+                <li key={d}>
+                  <button
+                    onClick={() => goToDay(d)}
+                    className="group flex w-full items-center gap-3 rounded-xl border border-border bg-muted/30 px-4 py-3 text-left transition-colors hover:border-primary/40 hover:bg-muted/60"
+                  >
+                    <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-primary/10 font-display text-sm font-bold text-primary">
+                      {d}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-[10px] font-bold uppercase tracking-widest text-accent">Dia {d} · Fase {meta.phase}</div>
+                      <div className="mt-0.5 truncate text-sm font-semibold text-foreground">{meta.title}</div>
+                    </div>
+                    <ArrowRight size={16} className="shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+                  </button>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
       {/* Cadastro Local */}
       <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
         <div className="flex items-center gap-3">
