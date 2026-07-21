@@ -611,12 +611,18 @@ function AppShell({
 
         <PhaseProgressBar currentDay={state.currentDay} />
         <nav className="sticky bottom-0 z-20 border-t border-border bg-card/80 backdrop-blur-md sm:rounded-b-2xl">
-          <div className="grid grid-cols-5">
+          <div className="grid grid-cols-6">
             <TabBtn
               active={tab === "inicio"}
               onClick={() => setTab("inicio")}
               icon={<Home size={20} />}
               label="Início"
+            />
+            <TabBtn
+              active={tab === "orquidea"}
+              onClick={() => setTab("orquidea")}
+              icon={<Flower2 size={20} />}
+              label="Orquídea"
             />
             <TabBtn
               active={tab === "plano"}
