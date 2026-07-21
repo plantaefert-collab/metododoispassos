@@ -5,6 +5,7 @@ import confetti from "canvas-confetti";
 import { motion, AnimatePresence } from "framer-motion";
 import sceneEnraizar from "@/assets/scene-enraizar.jpg";
 import sceneNutrir from "@/assets/scene-nutrir.jpg";
+import kitMetodo from "@/assets/kit-metodo.jpg.asset.json";
 import { playSuccessSound, playPopSound } from "@/lib/audio-feedback";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -1811,11 +1812,20 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
       })()}
 
       {/* Método 2 Passos — bloco de destaque em verde */}
-      <div className="group relative overflow-hidden rounded-2xl border-2 border-primary/40 bg-gradient-to-br from-primary/15 via-primary/8 to-primary/[0.03] p-6 shadow-lg shadow-primary/10 transition-all hover:border-primary/60 hover:shadow-primary/20">
-        <div className="absolute -right-6 -top-6 text-primary/20 transition-transform group-hover:scale-110">
-          <Sparkles size={120} />
+      <div className="group relative overflow-hidden rounded-2xl border-2 border-primary/40 bg-gradient-to-br from-primary/15 via-primary/8 to-primary/[0.03] shadow-lg shadow-primary/10 transition-all hover:border-primary/60 hover:shadow-primary/20">
+        <div className="relative w-full overflow-hidden">
+          <img
+            src={kitMetodo.url}
+            alt="Kit Método 2 Passos — Enraizador Forte e Bokashi Orquídeas Premium em cena botânica"
+            loading="lazy"
+            className="h-44 w-full object-cover sm:h-52 md:h-60"
+          />
+          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-primary/25 via-transparent to-transparent" />
         </div>
-        <div className="relative z-10">
+        <div className="relative z-10 p-6">
+          <div className="pointer-events-none absolute -right-6 -top-6 text-primary/20 transition-transform group-hover:scale-110">
+            <Sparkles size={120} />
+          </div>
           <div className="flex items-center gap-2 text-primary">
             <div className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-primary-foreground shadow-md shadow-primary/30">
               <Sprout size={18} />
