@@ -2332,6 +2332,7 @@ function PlanoTab({ actorId, setTab, onPreviewDay, setStatus }: PlanoTabProps) {
 
   const day = state.currentDay;
   const [showMethod, setShowMethod] = useState(false);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
   const meta = getProtocolDay(day);
   const entry = state.days[day] ?? { checklist: {}, note: "", completed: false };
   const isApplication = APPLICATION_DAYS.includes(day);
