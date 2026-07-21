@@ -17,6 +17,7 @@ import { Route as InicioRouteImport } from './routes/inicio'
 import { Route as DiarioRouteImport } from './routes/diario'
 import { Route as DiagnosticoRouteImport } from './routes/diagnostico'
 import { Route as BemVindoRouteImport } from './routes/bem-vindo'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AprenderRouteImport } from './routes/aprender'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -60,6 +61,11 @@ const BemVindoRoute = BemVindoRouteImport.update({
   path: '/bem-vindo',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AprenderRoute = AprenderRouteImport.update({
   id: '/aprender',
   path: '/aprender',
@@ -74,6 +80,7 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/aprender': typeof AprenderRoute
+  '/auth': typeof AuthRoute
   '/bem-vindo': typeof BemVindoRoute
   '/diagnostico': typeof DiagnosticoRoute
   '/diario': typeof DiarioRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/aprender': typeof AprenderRoute
+  '/auth': typeof AuthRoute
   '/bem-vindo': typeof BemVindoRoute
   '/diagnostico': typeof DiagnosticoRoute
   '/diario': typeof DiarioRoute
@@ -99,6 +107,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/aprender': typeof AprenderRoute
+  '/auth': typeof AuthRoute
   '/bem-vindo': typeof BemVindoRoute
   '/diagnostico': typeof DiagnosticoRoute
   '/diario': typeof DiarioRoute
@@ -113,6 +122,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/aprender'
+    | '/auth'
     | '/bem-vindo'
     | '/diagnostico'
     | '/diario'
@@ -125,6 +135,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/aprender'
+    | '/auth'
     | '/bem-vindo'
     | '/diagnostico'
     | '/diario'
@@ -137,6 +148,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/aprender'
+    | '/auth'
     | '/bem-vindo'
     | '/diagnostico'
     | '/diario'
@@ -150,6 +162,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AprenderRoute: typeof AprenderRoute
+  AuthRoute: typeof AuthRoute
   BemVindoRoute: typeof BemVindoRoute
   DiagnosticoRoute: typeof DiagnosticoRoute
   DiarioRoute: typeof DiarioRoute
@@ -218,6 +231,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BemVindoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/aprender': {
       id: '/aprender'
       path: '/aprender'
@@ -238,6 +258,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AprenderRoute: AprenderRoute,
+  AuthRoute: AuthRoute,
   BemVindoRoute: BemVindoRoute,
   DiagnosticoRoute: DiagnosticoRoute,
   DiarioRoute: DiarioRoute,
@@ -250,13 +271,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
