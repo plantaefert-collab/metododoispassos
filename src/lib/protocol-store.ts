@@ -71,6 +71,7 @@ export type ProtocolState = {
   applications: ApplicationRecord[];
   finalEval: FinalEvaluation;
   onboarded: boolean;
+  remindersCompleted?: Record<number, boolean>;
   /** Non-persisted transient flag set when the last localStorage write failed. */
   saveError?: string;
 };
@@ -121,6 +122,7 @@ export const defaultState: ProtocolState = {
   applications: [],
   finalEval: { improved: "", same: "", attention: "", keep: "", path: "" },
   onboarded: false,
+  remindersCompleted: {},
 };
 
 let listeners: Array<() => void> = [];
@@ -275,6 +277,16 @@ export function useProtocolStore() {
     wrapSetState((s) => ({ ...s, onboarded: v }), actorId);
   }, [wrapSetState]);
 
+  const toggleReminder = useCallback((day: number, actorId: string | "guest") => {
+    wrapSetState((s) => ({
+      ...s,
+      remindersCompleted: {
+        ...(s.remindersCompleted || {}),
+        [day]: !(s.remindersCompleted?.[day])
+      }
+    }), actorId);
+  }, [wrapSetState]);
+
   const updateFinalEval = useCallback((patch: Partial<FinalEvaluation>, actorId: string | "guest") => {
     wrapSetState((s) => ({ ...s, finalEval: { ...s.finalEval, ...patch } }), actorId);
   }, [wrapSetState]);
@@ -290,6 +302,7 @@ export function useProtocolStore() {
     registerApplication,
     setCurrentDay,
     setOnboarded,
+    toggleReminder,
     updateFinalEval,
     hydrateStore, // Adicionado para facilitar uso em componentes quando necessário
     clearStore,   // Adicionado
