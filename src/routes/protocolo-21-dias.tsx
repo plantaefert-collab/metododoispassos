@@ -1697,7 +1697,6 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
   const day = state.currentDay;
   const phase = phaseOf(day);
   const isApplicationDay = APPLICATION_DAYS.includes(day);
-  const trackingPoints = state.diagnosisResult?.trackingPoints ?? [];
   const diagnosisFresh = isDiagnosisCurrent(state);
 
   const completedDays = Object.values(state.days).filter((d) => d.completed).length;
@@ -1907,28 +1906,8 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         </div>
       </div>
 
-      {/* Linha do Tempo */}
-      {diagnosisFresh && trackingPoints.length > 0 && (
-        <div className="rounded-2xl border border-primary/20 bg-secondary/40 p-4 sm:p-5">
-          <div className="flex items-center gap-2 text-primary">
-            <Info size={16} />
-            <div className="text-sm font-bold">Pontos do seu diagnóstico para acompanhar</div>
-          </div>
-          <ul className="mt-3 space-y-1.5">
-            {trackingPoints.map((p) => (
-              <li key={p} className="flex gap-2 text-sm text-foreground/85">
-                <ChevronRight size={16} className="mt-0.5 shrink-0 text-primary" /> {p}
-              </li>
-            ))}
-          </ul>
-          <button
-            onClick={() => setTab("diagnostico")}
-            className="mt-3 text-xs font-semibold text-accent hover:underline"
-          >
-            Ver diagnóstico completo
-          </button>
-        </div>
-      )}
+
+
 
       {/* Resumo Rápido do Dia Atual */}
       {(() => {
@@ -2064,34 +2043,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
       })()}
 
 
-      {isApplicationDay && (
-        <div className="rounded-2xl border border-accent/20 bg-accent/5 p-5">
-          <div className="flex items-center gap-2 text-accent">
-            <Sparkles size={16} />
-            <span className="text-xs font-bold uppercase tracking-wider">Dia de aplicação</span>
-          </div>
-          <h2 className="mt-2 text-xl font-display text-primary">
-            Hoje é dia de aplicar o Método de 2 Passos
-          </h2>
-          <p className="mt-1 text-sm text-primary/80">
-            Enraizar primeiro, depois nutrir. Prefira horário fresco e evite sol forte.
-          </p>
-          <div className="mt-4 flex flex-col gap-2">
-            <button
-              onClick={handleRedirectToPlan}
-              className="flex items-center justify-center gap-2 rounded-full border-2 border-primary/30 bg-primary/10 px-6 py-3.5 text-sm font-bold text-primary transition-all hover:bg-primary/20 active:scale-[0.98] sm:py-3"
-            >
-              <Stethoscope size={18} /> Ver meu plano
-            </button>
-            <button
-              onClick={handleRedirectToPlan}
-              className="rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground"
-            >
-              Registrar aplicação
-            </button>
-          </div>
-        </div>
-      )}
+
       {/* CTA - Começar plano de 21 dias */}
       {(() => {
         const hasProgress = completedDays > 0 || totalApplications > 0 || day > 1;
@@ -2124,23 +2076,8 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         );
       })()}
 
-      {!isApplicationDay && (
-        <div className="rounded-2xl border border-border bg-card p-5">
-          <div className="text-xs font-bold uppercase tracking-wider text-primary">
-            Tarefa do dia
-          </div>
-          <h2 className="mt-1 text-lg font-display text-foreground">{getProtocolDay(day).title}</h2>
-          <p className="mt-1 text-sm text-muted-foreground">{getProtocolDay(day).objective}</p>
-          <div className="mt-3 flex flex-wrap gap-2">
-            <button
-              onClick={() => setStatus("needs_diagnosis")}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full border-2 border-primary/30 bg-primary/10 px-6 py-3.5 text-sm font-bold text-primary transition-all hover:bg-primary/20 active:scale-[0.98] sm:w-auto sm:py-3"
-            >
-              <Stethoscope size={18} /> Fazer diagnóstico
-            </button>
-          </div>
-        </div>
-      )}
+
+
 
 
 
