@@ -545,6 +545,7 @@ function AppShell({
           </div>
         )}
 
+        <QuickTour actorId={actorId} />
         <main className="flex-1 overflow-y-auto px-4 pb-28 pt-4">
           <div className="relative space-y-6">
             {tab === "inicio" && userEmail && (
