@@ -11,6 +11,7 @@ import {
   Sprout,
   Leaf,
   Home,
+  Calendar,
   CalendarCheck,
   Stethoscope,
   Images,
