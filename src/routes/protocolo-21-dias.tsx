@@ -1821,19 +1821,26 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           </div>
           <div className="mt-3 space-y-2">
             {upcomingReminders.map(d => (
-              <div 
+              <div
                 key={d}
-                className="flex items-center justify-between rounded-xl border border-border bg-card p-3 shadow-sm"
+                className="flex items-center justify-between rounded-xl border border-border bg-card p-3 shadow-sm transition-all hover:border-primary/40 hover:shadow-md"
               >
-                <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCurrentDay(d, actorId);
+                    handleRedirectToPlan();
+                  }}
+                  className="flex flex-1 items-center gap-3 text-left"
+                >
                   <div className={`grid h-8 w-8 place-items-center rounded-lg text-xs font-bold ${d === day ? 'bg-primary text-primary-foreground' : 'bg-secondary text-primary'}`}>
                     {d}
                   </div>
                   <div>
                     <div className="text-xs font-bold text-primary">Dia {d}: {d === 1 ? 'Início & Diagnóstico' : d === 21 ? 'Avaliação Final' : 'Manutenção Crítica'}</div>
-                    <div className="text-[10px] text-muted-foreground">Tarefa essencial do protocolo</div>
+                    <div className="text-[10px] text-muted-foreground">Toque para abrir este dia</div>
                   </div>
-                </div>
+                </button>
                 <button
                   onClick={() => {
                     toggleReminder(d, actorId);
@@ -1841,7 +1848,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
                       icon: <CheckCircle2 size={16} className="text-primary" />
                     });
                   }}
-                  className="rounded-lg bg-primary/10 p-2 text-primary transition-colors hover:bg-primary/20"
+                  className="ml-2 shrink-0 rounded-lg bg-primary/10 p-2 text-primary transition-colors hover:bg-primary/20"
                 >
                   <Check size={16} />
                 </button>
