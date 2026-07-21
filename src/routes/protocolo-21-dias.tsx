@@ -4003,61 +4003,7 @@ function ResumoTab({ actorId }: { actorId: string }) {
   const generatePDF = async () => {
     setIsGenerating(true);
     try {
-      const { jsPDF } = await import("jspdf");
-      const { default: autoTable } = await import("jspdf-autotable");
-      
-      const doc = new jsPDF();
-      
-      // Header
-      doc.setFontSize(22);
-      doc.setTextColor(23, 61, 50); // #173D32
-      doc.text("Relatório: Guia Prático Orquídeas Floridas", 14, 22);
-      
-      doc.setFontSize(12);
-      doc.setTextColor(100);
-      doc.text(`Gerado em: ${new Date().toLocaleDateString("pt-BR")}`, 14, 30);
-      doc.text(`Planta: ${state.plant.name || "Não informada"}`, 14, 37);
-
-      // Summary Table
-      autoTable(doc, {
-        startY: 45,
-        head: [["Métrica", "Valor"]],
-        body: [
-          ["Dias Concluídos", `${completedDays} de 21`],
-          ["Aplicações Realizadas", totalApplications.toString()],
-          ["Registros de Observação", totalNotes.toString()],
-          ["Fotos Registradas", totalPhotos.toString()],
-        ],
-        theme: "striped",
-        headStyles: { fillColor: [23, 61, 50] },
-      });
-
-      // Detailed Records
-      const records = Object.entries(state.days)
-        .filter(([_, d]) => d.completed || d.note?.trim())
-        .sort(([a], [b]) => Number(a) - Number(b))
-        .map(([day, d]) => [
-          `Dia ${day}`,
-          d.completed ? "Sim" : "Não",
-          d.note || "-",
-          d.applicationDone ? "Realizada" : "-"
-        ]);
-
-      if (records.length > 0) {
-        doc.setFontSize(16);
-        doc.setTextColor(23, 61, 50);
-        doc.text("Detalhamento por Dia", 14, (doc as any).lastAutoTable.finalY + 15);
-
-        autoTable(doc, {
-          startY: (doc as any).lastAutoTable.finalY + 20,
-          head: [["Dia", "Concluído", "Observação", "Aplicação"]],
-          body: records,
-          theme: "grid",
-          headStyles: { fillColor: [217, 70, 239] }, // Accent color
-        });
-      }
-
-      doc.save(`protocolo-orquidea-${state.plant.name || "resumo"}.pdf`);
+      await exportProtocolPDF(state);
     } catch (error) {
       console.error("Erro ao gerar PDF:", error);
       alert("Ocorreu um erro ao gerar o PDF. Tente novamente.");
