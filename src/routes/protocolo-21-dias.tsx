@@ -110,7 +110,7 @@ export const Route = createFileRoute("/protocolo-21-dias")({
   component: ProtocoloPage,
 });
 
-type Tab = "inicio" | "plano" | "diagnostico" | "diario" | "aprender" | "resumo" | "metodo";
+type Tab = "inicio" | "plano" | "diagnostico" | "diario" | "aprender" | "resumo" | "metodo" | "orquidea";
 
 function phaseOf(day: number) {
   const phase = getProtocolPhase(day);
@@ -138,6 +138,7 @@ const TAB_TO_PATH: Record<Tab, string> = {
   aprender: "/aprender",
   resumo: "/resumo",
   metodo: "/metodo",
+  orquidea: "/minha-orquidea",
 };
 const PATH_TO_TAB: Record<string, Tab> = Object.fromEntries(
   Object.entries(TAB_TO_PATH).map(([t, p]) => [p, t as Tab]),
@@ -424,6 +425,7 @@ export function ProtocoloShell({ initialTab }: { initialTab?: Tab } = {}) {
                   {tab === "aprender" && <AprenderTab setTab={setTab} />}
                   {tab === "resumo" && <ResumoTab actorId={actorId} />}
                   {tab === "metodo" && <MetodoContent />}
+                  {tab === "orquidea" && <MinhaOrquideaTab actorId={actorId} setTab={setTab} />}
                 </motion.div>
               </AnimatePresence>
             </AppShell>
@@ -609,12 +611,18 @@ function AppShell({
 
         <PhaseProgressBar currentDay={state.currentDay} />
         <nav className="sticky bottom-0 z-20 border-t border-border bg-card/80 backdrop-blur-md sm:rounded-b-2xl">
-          <div className="grid grid-cols-5">
+          <div className="grid grid-cols-6">
             <TabBtn
               active={tab === "inicio"}
               onClick={() => setTab("inicio")}
               icon={<Home size={20} />}
               label="Início"
+            />
+            <TabBtn
+              active={tab === "orquidea"}
+              onClick={() => setTab("orquidea")}
+              icon={<Flower2 size={20} />}
+              label="Orquídea"
             />
             <TabBtn
               active={tab === "plano"}
@@ -4014,6 +4022,247 @@ function DayPreviewModal({
           </div>
         </div>
       </motion.div>
+    </div>
+  );
+}
+
+/* ---------------- Minha Orquídea ---------------- */
+
+function MinhaOrquideaTab({ actorId, setTab }: { actorId: string; setTab: (t: Tab) => void }) {
+  const { state, updatePlant } = useProtocolStore();
+  const plant = state.plant;
+
+  const completedDays = Object.values(state.days).filter((d) => d.completed).length;
+  const totalApplications = state.applications.length;
+  const totalPhotos = Object.values(state.days).filter((d) => d.photo).length;
+  const totalNotes = Object.values(state.days).filter((d) => d.note?.trim()).length;
+  const progressPct = Math.round((completedDays / 21) * 100);
+  const diagnosisFresh = isDiagnosisCurrent(state);
+
+  const handlePhoto = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const dataUrl = await compressImage(file);
+      updatePlant({ photo: dataUrl }, actorId);
+      toast.success("Foto atualizada");
+    } catch {
+      toast.error(PHOTO_ERROR_MESSAGE);
+    }
+  };
+
+  const persistProfile = async () => {
+    if (actorId === "guest") {
+      toast.success("Dados salvos no navegador");
+      return;
+    }
+    const { registerPlantRemote } = await import("@/lib/protocol-cloud");
+    const { error } = await registerPlantRemote(actorId, {
+      plant_name: plant.name,
+      plant_species: plant.species,
+      plant_unknown_species: plant.unknownSpecies,
+      plant_location: plant.location,
+      plant_pot: plant.pot,
+      plant_substrate: plant.substrate,
+      plant_difficulty: plant.difficulty,
+    });
+    if (error) {
+      toast.error("Não foi possível salvar. Tente novamente.");
+      return;
+    }
+    toast.success("Cadastro salvo");
+  };
+
+  return (
+    <div className="space-y-6">
+      {/* Header/Identidade */}
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <div className="flex items-center gap-4">
+          <div className="relative shrink-0">
+            {plant.photo ? (
+              <img
+                src={plant.photo}
+                alt={plant.name || "Sua orquídea"}
+                className="h-20 w-20 rounded-2xl object-cover ring-2 ring-primary/20"
+              />
+            ) : (
+              <div className="grid h-20 w-20 place-items-center rounded-2xl bg-primary/10 text-primary">
+                <Flower2 size={32} />
+              </div>
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-accent">Minha Orquídea</div>
+            <h1 className="mt-0.5 truncate font-display text-2xl text-primary">
+              {plant.name || "Sem nome ainda"}
+            </h1>
+            <p className="mt-0.5 text-xs text-muted-foreground">
+              {plant.species || (plant.unknownSpecies ? "Espécie desconhecida" : "Espécie não informada")}
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Resumo de Progresso */}
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
+            <CalendarCheck size={18} />
+          </div>
+          <div>
+            <h2 className="font-display text-lg text-primary">Meu progresso</h2>
+            <p className="text-xs text-muted-foreground">Dia {state.currentDay} de 21 · {progressPct}% concluído</p>
+          </div>
+        </div>
+
+        <div className="mt-4 h-2 w-full overflow-hidden rounded-full bg-muted">
+          <motion.div
+            className="h-full rounded-full bg-primary"
+            initial={{ width: 0 }}
+            animate={{ width: `${progressPct}%` }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+          />
+        </div>
+
+        <div className="mt-4 grid grid-cols-2 gap-3">
+          <StatCard label="Dias concluídos" value={`${completedDays}/21`} icon={<CalendarCheck size={16} />} />
+          <StatCard label="Aplicações" value={totalApplications} icon={<Droplets size={16} />} />
+          <StatCard label="Observações" value={totalNotes} icon={<BookOpen size={16} />} />
+          <StatCard label="Fotos" value={totalPhotos} icon={<Images size={16} />} />
+        </div>
+
+        <div className="mt-4 flex items-center justify-between rounded-xl border border-border bg-muted/40 px-4 py-3">
+          <div className="flex items-center gap-2 text-sm">
+            <Stethoscope size={16} className="text-primary" />
+            <span className="text-foreground">Diagnóstico</span>
+          </div>
+          <span className={`text-xs font-semibold ${diagnosisFresh ? "text-primary" : "text-accent"}`}>
+            {diagnosisFresh ? "Atualizado" : "Pendente"}
+          </span>
+        </div>
+
+        <div className="mt-3 grid grid-cols-2 gap-2">
+          <button
+            onClick={() => setTab("plano")}
+            className="rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm active:scale-[0.98]"
+          >
+            Ver meu plano
+          </button>
+          <button
+            onClick={() => setTab("resumo")}
+            className="rounded-full border border-border px-4 py-2.5 text-sm font-semibold text-foreground hover:bg-muted"
+          >
+            Ver resumo completo
+          </button>
+        </div>
+      </div>
+
+      {/* Cadastro Local */}
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
+            <Flower2 size={18} />
+          </div>
+          <div>
+            <h2 className="font-display text-lg text-primary">Cadastro da planta</h2>
+            <p className="text-xs text-muted-foreground">
+              Salvo no seu navegador{actorId !== "guest" ? " e sincronizado com sua conta" : ""}.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-5 space-y-5">
+          <Field label="Nome da planta">
+            <input
+              value={plant.name}
+              onChange={(e) => updatePlant({ name: e.target.value }, actorId)}
+              placeholder="Ex.: Minha Phalaenopsis"
+              className="w-full rounded-lg border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-1 focus:ring-primary"
+            />
+          </Field>
+
+          <Field label="Espécie (opcional)">
+            <input
+              value={plant.species}
+              onChange={(e) => updatePlant({ species: e.target.value, unknownSpecies: false }, actorId)}
+              disabled={plant.unknownSpecies}
+              placeholder="Ex.: Phalaenopsis, Cattleya…"
+              className="w-full rounded-lg border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
+            />
+            <label className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+              <input
+                type="checkbox"
+                checked={plant.unknownSpecies}
+                onChange={(e) => {
+                  const unknownSpecies = e.target.checked;
+                  updatePlant({ unknownSpecies, species: unknownSpecies ? "" : plant.species }, actorId);
+                }}
+                className="h-4 w-4 rounded border-input accent-primary"
+              />
+              Não sei a espécie
+            </label>
+          </Field>
+
+          <SelectField
+            label="Local de cultivo"
+            value={plant.location}
+            onChange={(v) => updatePlant({ location: v }, actorId)}
+            options={["Varanda", "Janela interna", "Jardim externo", "Estufa", "Outro"]}
+          />
+
+          <SelectField
+            label="Tipo de vaso"
+            value={plant.pot}
+            onChange={(v) => updatePlant({ pot: v }, actorId)}
+            options={["Vaso plástico transparente", "Vaso plástico comum", "Vaso de barro", "Vaso de madeira", "Cachepot", "Outro"]}
+          />
+
+          <SelectField
+            label="Tipo de substrato"
+            value={plant.substrate}
+            onChange={(v) => updatePlant({ substrate: v }, actorId)}
+            options={["Casca de pinus", "Fibra de coco", "Musgo (sphagnum)", "Mistura", "Não sei", "Outro"]}
+          />
+
+          <SelectField
+            label="Principal dificuldade"
+            value={plant.difficulty}
+            onChange={(v) => updatePlant({ difficulty: v }, actorId)}
+            options={["Não floresce", "Folhas caídas ou enrugadas", "Raízes fracas", "Manchas nas folhas", "Não sei o que fazer", "Outra"]}
+          />
+
+          <Field label="Foto da planta">
+            <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/40 px-4 py-6 text-center transition-colors hover:border-primary/40">
+              {plant.photo ? (
+                <img src={plant.photo} alt="Sua orquídea" className="max-h-48 rounded-lg object-cover" />
+              ) : (
+                <>
+                  <Camera size={22} className="text-muted-foreground" />
+                  <div className="text-sm font-medium text-foreground">Enviar foto</div>
+                  <div className="text-xs text-muted-foreground">Salva no seu navegador</div>
+                </>
+              )}
+              <input type="file" accept="image/*" className="sr-only" onChange={handlePhoto} />
+            </label>
+            {plant.photo && (
+              <button
+                onClick={() => updatePlant({ photo: null }, actorId)}
+                className="mt-2 text-xs text-muted-foreground underline"
+              >
+                Remover foto
+              </button>
+            )}
+          </Field>
+        </div>
+
+        <button
+          onClick={persistProfile}
+          disabled={!plant.name.trim()}
+          className="mt-6 w-full rounded-full bg-primary px-6 py-3.5 text-base font-semibold text-primary-foreground shadow-sm transition-transform active:scale-[0.98] disabled:opacity-40"
+        >
+          Salvar cadastro
+        </button>
+      </div>
     </div>
   );
 }
