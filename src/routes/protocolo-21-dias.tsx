@@ -3335,11 +3335,13 @@ function AprenderTab({ setTab }: { setTab: (tab: any) => void }) {
         </div>
       </div>
 
-      {current && (
-        <Drawer onClose={() => setOpen(null)} title={current.title} icon={current.icon}>
-          <p className="text-base leading-relaxed text-foreground/90">{current.body}</p>
-        </Drawer>
-      )}
+      <AnimatePresence>
+        {current && (
+          <Drawer onClose={() => setOpen(null)} title={current.title} icon={current.icon}>
+            <p className="text-base leading-relaxed text-foreground/90">{current.body}</p>
+          </Drawer>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
