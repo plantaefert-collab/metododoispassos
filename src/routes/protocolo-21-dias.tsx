@@ -1982,10 +1982,10 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           </p>
           <div className="mt-4 flex flex-col gap-2">
             <button
-              onClick={() => setStatus("needs_diagnosis")}
+              onClick={handleRedirectToPlan}
               className="flex items-center justify-center gap-2 rounded-full border-2 border-primary/30 bg-primary/10 px-6 py-3.5 text-sm font-bold text-primary transition-all hover:bg-primary/20 active:scale-[0.98] sm:py-3"
             >
-              <Stethoscope size={18} /> Fazer diagnóstico
+              <Stethoscope size={18} /> Ver meu plano
             </button>
             <button
               onClick={handleRedirectToPlan}
