@@ -11,6 +11,7 @@ import {
   Sprout,
   Leaf,
   Home,
+  Calendar,
   CalendarCheck,
   Stethoscope,
   Images,
@@ -248,6 +249,7 @@ function ProtocoloPage() {
                 setTab("aprender");
               }}
               setStatus={setStatus}
+              setTab={setTab}
             />
           </motion.div>
         )}
@@ -661,7 +663,17 @@ function TabBtn({
 
 /* ---------------- Welcome ---------------- */
 
-function WelcomeScreen({ onStart, onExplore, setStatus }: { onStart: () => void; onExplore: () => void; setStatus: (s: AuthBootstrapStatus) => void }) {
+function WelcomeScreen({ 
+  onStart, 
+  onExplore, 
+  setStatus, 
+  setTab 
+}: { 
+  onStart: () => void; 
+  onExplore: () => void; 
+  setStatus: (s: AuthBootstrapStatus) => void;
+  setTab: (t: Tab) => void;
+}) {
   const { state } = useProtocolStore();
   const day = state.currentDay;
   const phase = getProtocolPhase(day);
@@ -862,6 +874,48 @@ function WelcomeScreen({ onStart, onExplore, setStatus }: { onStart: () => void;
             Acompanhe tudo em um só lugar.
           </p>
         </div>
+
+        {/* Next Action Quick Panel */}
+        {state.currentDay > 1 && (
+          <div 
+            className="mt-6 overflow-hidden rounded-[24px] border border-white/30 shadow-sm"
+            style={{ backgroundColor: "rgba(255,255,255,0.4)" }}
+          >
+            <div className="flex items-center justify-between border-b border-black/5 px-5 py-3.5">
+              <span className="text-[11px] font-bold uppercase tracking-widest opacity-60">Próxima ação</span>
+              <div className="flex h-1.5 w-1.5 animate-pulse rounded-full bg-[#D946EF]" />
+            </div>
+            <div className="grid grid-cols-3 divide-x divide-black/5">
+              <button 
+                onClick={() => { setStatus("ready"); setTab("diagnostico"); }}
+                className="flex flex-col items-center gap-1.5 py-4 transition-colors hover:bg-white/40 active:scale-95"
+              >
+                <div className="rounded-full bg-white p-2 shadow-sm">
+                  <Stethoscope size={16} className="text-[#173D32]" />
+                </div>
+                <span className="text-[10px] font-bold uppercase tracking-tight">Exame</span>
+              </button>
+              <button 
+                onClick={() => { setStatus("ready"); setTab("plano"); }}
+                className="flex flex-col items-center gap-1.5 py-4 transition-colors hover:bg-white/40 active:scale-95"
+              >
+                <div className="rounded-full bg-white p-2 shadow-sm">
+                  <Calendar size={16} className="text-[#173D32]" />
+                </div>
+                <span className="text-[10px] font-bold uppercase tracking-tight">Diário</span>
+              </button>
+              <button 
+                onClick={() => { setStatus("ready"); setTab("aprender"); }}
+                className="flex flex-col items-center gap-1.5 py-4 transition-colors hover:bg-white/40 active:scale-95"
+              >
+                <div className="rounded-full bg-white p-2 shadow-sm">
+                  <BookOpen size={16} className="text-[#173D32]" />
+                </div>
+                <span className="text-[10px] font-bold uppercase tracking-tight">Aprender</span>
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* CTAs */}
         <div className="mt-6 flex flex-col gap-3">
