@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import welcomeOrchid from "@/assets/welcome-orchid.jpg";
 import kitMetodo from "@/assets/kit-metodo.jpg.asset.json";
+import logoPlantaefert from "@/assets/logo-plantaefert.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -73,10 +74,13 @@ function HomePage() {
       {/* Nav */}
       <header className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-4">
-          <div className="flex items-center gap-2 font-serif text-lg">
-            <Sprout className="h-5 w-5 text-primary" />
-            <span>PlantaeFert</span>
-          </div>
+          <Link to="/" className="flex items-center">
+            <img
+              src={logoPlantaefert}
+              alt="PlantaeFert — Nutrição Vegetal"
+              className="h-9 w-auto md:h-10"
+            />
+          </Link>
           <nav className="flex items-center gap-3 text-sm">
             <Link to="/metodo" className="hidden text-muted-foreground hover:text-foreground sm:inline">
               Método
