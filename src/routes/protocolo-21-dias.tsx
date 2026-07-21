@@ -1757,7 +1757,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-primary">
-                <CalendarDays size={14} />
+              <Calendar size={14} />
                 <span className="text-[10px] font-bold uppercase tracking-widest">Resumo do Dia {day}</span>
               </div>
               <ChevronRight size={16} className="text-primary/50 transition-transform group-hover:translate-x-1" />
