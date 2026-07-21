@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import sceneEnraizar from "@/assets/scene-enraizar.jpg";
 import sceneNutrir from "@/assets/scene-nutrir.jpg";
 import kitMetodo from "@/assets/kit-metodo.jpg.asset.json";
+import logoPlantaefert from "@/assets/logo-plantaefert.png";
 import { playSuccessSound, playPopSound } from "@/lib/audio-feedback";
 import { supabase } from "@/integrations/supabase/client";
 import {
