@@ -745,8 +745,8 @@ function WelcomeScreen({ onStart, onExplore, setStatus }: { onStart: () => void;
 
         {/* Photo */}
         <figure
-          className="relative mt-5 overflow-hidden rounded-[28px] border border-white/20 shadow-xl"
-          style={{ backgroundColor: "var(--color-plantae-lilac)" }}
+          className="relative mt-5 overflow-hidden rounded-[28px] border border-white/20 shadow-xl transition-colors duration-1000"
+          style={{ backgroundColor: currentStyle.accent }}
         >
           <AnimatePresence mode="wait">
             <motion.div
