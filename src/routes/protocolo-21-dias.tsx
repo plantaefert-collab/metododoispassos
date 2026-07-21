@@ -1697,7 +1697,6 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
   const day = state.currentDay;
   const phase = phaseOf(day);
   const isApplicationDay = APPLICATION_DAYS.includes(day);
-  const trackingPoints = state.diagnosisResult?.trackingPoints ?? [];
   const diagnosisFresh = isDiagnosisCurrent(state);
 
   const completedDays = Object.values(state.days).filter((d) => d.completed).length;
