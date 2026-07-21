@@ -1972,6 +1972,25 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         );
       })()}
 
+      {/* Exportar progresso em PDF */}
+      <button
+        onClick={handleExportPDF}
+        disabled={exportingPDF}
+        className="flex w-full items-center justify-center gap-2 rounded-full border-2 border-primary/25 bg-card px-6 py-3.5 text-sm font-bold text-primary transition-all hover:bg-primary/[0.06] active:scale-[0.98] disabled:opacity-60"
+      >
+        {exportingPDF ? (
+          <>
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+            Gerando PDF...
+          </>
+        ) : (
+          <>
+            <FileText size={16} />
+            Exportar meu progresso em PDF
+          </>
+        )}
+      </button>
+
       <div 
         onClick={handleRedirectToPlan}
         className="group relative cursor-pointer overflow-hidden rounded-2xl border border-border bg-plantae-cream/40 p-5 transition-all hover:border-primary/30 active:scale-[0.99]"
