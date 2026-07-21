@@ -1,5 +1,6 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import { useEffect } from "react";
 import {
   Sprout,
   Leaf,
@@ -74,6 +75,16 @@ const BENEFITS = [
 function HomePage() {
   const { user } = useAuthBootstrap();
   const isLoggedIn = !!user;
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isLoggedIn) return;
+    try {
+      if (!localStorage.getItem("pf_welcomed")) {
+        navigate({ to: "/bem-vindo", replace: true });
+      }
+    } catch {}
+  }, [isLoggedIn, navigate]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">

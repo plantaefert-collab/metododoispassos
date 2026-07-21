@@ -1,4 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { WelcomeScreen } from "@/components/WelcomeScreen";
 import { setGuestActive } from "@/lib/protocol-cache";
 
@@ -24,14 +25,19 @@ export const Route = createFileRoute("/bem-vindo")({
 
 function BemVindoPage() {
   const navigate = useNavigate();
+  useEffect(() => {
+    try {
+      localStorage.setItem("pf_welcomed", "1");
+    } catch {}
+  }, []);
   return (
     <WelcomeScreen
-      onStart={() => navigate({ to: "/protocolo-21-dias" })}
+      onStart={() => navigate({ to: "/diagnostico" })}
       onExplore={() => {
         setGuestActive(true);
-        navigate({ to: "/protocolo-21-dias" });
+        navigate({ to: "/inicio" });
       }}
-      onRegisterOrchid={() => navigate({ to: "/protocolo-21-dias" })}
+      onRegisterOrchid={() => navigate({ to: "/minha-orquidea" })}
     />
   );
 }
