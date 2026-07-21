@@ -189,10 +189,15 @@ export function ProtocoloShell({ initialTab }: { initialTab?: Tab } = {}) {
   const actorId = user?.id ?? "guest";
 
   useEffect(() => {
-    // Modo visitante persistente
-    if (status === "signed_out" && isGuestActive()) {
-      setGuestMode(true);
-      if (!hasInitialTab) setTab("aprender");
+    // Modo visitante persistente OU navegação direta para uma aba específica
+    if (status === "signed_out") {
+      if (isGuestActive()) {
+        setGuestMode(true);
+      } else if (hasInitialTab) {
+        // Usuário entrou por deep link em uma aba: ativa visitante para não bloquear com Welcome
+        setGuestActive(true);
+        setGuestMode(true);
+      }
     }
   }, [status, hasInitialTab]);
 
