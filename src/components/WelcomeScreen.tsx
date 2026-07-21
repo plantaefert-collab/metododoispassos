@@ -154,8 +154,9 @@ export function WelcomeScreen({
         </h1>
 
         <p className="mt-4 text-[15px] font-semibold" style={{ color: "var(--color-plantae-green)" }}>
-          Seu plano guiado • {phase.range}
+          Seu plano guiado • Dias 1 a 21
         </p>
+
         <p className="mt-1.5 text-[14px] leading-relaxed" style={{ color: "var(--color-plantae-mute)" }}>
           {phase.description}
         </p>
