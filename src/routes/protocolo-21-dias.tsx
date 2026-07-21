@@ -1800,6 +1800,58 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         );
       })()}
 
+      {/* Próximo passo recomendado — baseado no progresso salvo */}
+      {(() => {
+        const meta = getProtocolDay(day);
+        const today = state.days[day] ?? { checklist: {}, note: "", completed: false };
+        const checklistState = today.checklist ?? {};
+        const pendingChecklist = meta.checklist
+          .map((label, i) => ({ label, i, done: !!checklistState[i] }))
+          .filter((c) => !c.done);
+        const nextItems = pendingChecklist.slice(0, 3);
+        const allDone = pendingChecklist.length === 0;
+        return (
+          <button
+            onClick={handleRedirectToPlan}
+            className="group relative w-full overflow-hidden rounded-2xl border-2 border-accent/30 bg-gradient-to-br from-accent/[0.06] to-primary/[0.04] p-5 text-left shadow-sm transition-all hover:border-accent/50 active:scale-[0.99]"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-accent">
+                <Sparkles size={14} />
+                <span className="text-[10px] font-bold uppercase tracking-widest">Próximo passo · Dia {day}</span>
+              </div>
+              <ChevronRight size={16} className="text-accent/60 transition-transform group-hover:translate-x-1" />
+            </div>
+            <h3 className="mt-2 font-display text-xl leading-tight text-primary">
+              {allDone ? "Você concluiu tudo do dia" : meta.title}
+            </h3>
+            <p className="mt-1.5 text-sm text-primary/75">
+              {allDone
+                ? "Registre uma observação final ou avance para o próximo dia."
+                : meta.mainAction}
+            </p>
+            {!allDone && nextItems.length > 0 && (
+              <div className="mt-3 space-y-1.5 rounded-xl bg-card/60 p-3">
+                <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                  Checklist pendente
+                </div>
+                {nextItems.map((c) => (
+                  <div key={c.i} className="flex items-start gap-2 text-xs text-primary/85">
+                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                    <span className="leading-snug">{c.label}</span>
+                  </div>
+                ))}
+                {pendingChecklist.length > nextItems.length && (
+                  <div className="pt-1 text-[10px] italic text-muted-foreground">
+                    +{pendingChecklist.length - nextItems.length} item(ns) no plano
+                  </div>
+                )}
+              </div>
+            )}
+          </button>
+        );
+      })()}
+
       {/* CTA - Começar plano de 21 dias */}
       {(() => {
         const hasProgress = completedDays > 0 || totalApplications > 0 || day > 1;
