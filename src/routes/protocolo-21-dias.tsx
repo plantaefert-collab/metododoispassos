@@ -3335,11 +3335,13 @@ function AprenderTab({ setTab }: { setTab: (tab: any) => void }) {
         </div>
       </div>
 
-      {current && (
-        <Drawer onClose={() => setOpen(null)} title={current.title} icon={current.icon}>
-          <p className="text-base leading-relaxed text-foreground/90">{current.body}</p>
-        </Drawer>
-      )}
+      <AnimatePresence>
+        {current && (
+          <Drawer onClose={() => setOpen(null)} title={current.title} icon={current.icon}>
+            <p className="text-base leading-relaxed text-foreground/90">{current.body}</p>
+          </Drawer>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
@@ -3596,12 +3598,19 @@ function Drawer({
   icon?: ReactNode;
 }) {
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-end justify-center bg-[var(--color-plantae-green)]/40 backdrop-blur-md sm:items-center"
       onClick={onClose}
     >
-      <div
-        className="max-h-[90vh] w-full max-w-[440px] overflow-hidden rounded-t-[32px] border-t border-white/20 bg-[var(--color-plantae-cream)] shadow-2xl animate-in slide-in-from-bottom duration-300 sm:rounded-[32px] sm:border"
+      <motion.div
+        initial={{ y: "100%" }}
+        animate={{ y: 0 }}
+        exit={{ y: "100%" }}
+        transition={{ type: "spring", damping: 25, stiffness: 200 }}
+        className="max-h-[92vh] w-full max-w-[440px] overflow-y-auto rounded-t-[32px] border-t border-white/20 bg-[var(--color-plantae-cream)] shadow-2xl sm:rounded-[32px] sm:border"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Barra de arraste visual para mobile */}
@@ -3642,8 +3651,8 @@ function Drawer({
             Entendido
           </button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
