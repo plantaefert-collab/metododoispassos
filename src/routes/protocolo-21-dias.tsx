@@ -665,6 +665,7 @@ function WelcomeScreen({ onStart, onExplore, setStatus }: { onStart: () => void;
   const { state } = useProtocolStore();
   const day = state.currentDay;
   const phase = getProtocolPhase(day);
+  const protocolDay = getProtocolDay(day);
   const phaseIndex = phase.id === "fase-1" ? 0 : phase.id === "fase-2" ? 1 : 2;
 
   // Botanical line illustrations for each phase
@@ -852,24 +853,44 @@ function WelcomeScreen({ onStart, onExplore, setStatus }: { onStart: () => void;
 
         {/* CTAs */}
         <div className="mt-6 flex flex-col gap-3">
-          <button
-            onClick={onStart}
-            className="group relative flex items-center justify-center gap-2 overflow-hidden rounded-full px-6 py-4 text-[15px] font-semibold uppercase tracking-[0.06em] transition-all active:scale-[0.98]"
-            style={{ backgroundColor: "var(--color-plantae-green)", color: "var(--color-plantae-cream)" }}
-          >
-            <span className="relative z-10 flex items-center gap-2">
-              Começar diagnóstico <ChevronRight size={18} className="transition-transform group-hover:translate-x-1" />
-            </span>
-            <div className="absolute inset-0 bg-white/10 opacity-0 transition-opacity group-hover:opacity-100" />
-          </button>
-          
-          <button
-            onClick={() => setStatus("needs_diagnosis")}
-            className="flex items-center justify-center gap-2 rounded-full border border-[#173D32]/10 px-6 py-3.5 text-[14px] font-medium transition-colors hover:bg-white/40"
-            style={{ color: "var(--color-plantae-green)" }}
-          >
-            <Sprout size={16} /> Cadastro da orquídea
-          </button>
+          {state.currentDay > 1 ? (
+            <button
+              onClick={onStart}
+              className="group relative flex items-center justify-center gap-2 overflow-hidden rounded-full px-6 py-4 text-[15px] font-semibold uppercase tracking-[0.06em] transition-all active:scale-[0.98]"
+              style={{ backgroundColor: "var(--color-plantae-green)", color: "var(--color-plantae-cream)" }}
+            >
+              <span className="relative z-10 flex flex-col items-center">
+                <span className="flex items-center gap-2">
+                  Retomar: Dia {state.currentDay} <ChevronRight size={18} className="transition-transform group-hover:translate-x-1" />
+                </span>
+                <span className="text-[10px] opacity-70 normal-case tracking-normal">
+                  Próximo passo: {protocolDay.title}
+                </span>
+              </span>
+              <div className="absolute inset-0 bg-white/10 opacity-0 transition-opacity group-hover:opacity-100" />
+            </button>
+          ) : (
+            <>
+              <button
+                onClick={onStart}
+                className="group relative flex items-center justify-center gap-2 overflow-hidden rounded-full px-6 py-4 text-[15px] font-semibold uppercase tracking-[0.06em] transition-all active:scale-[0.98]"
+                style={{ backgroundColor: "var(--color-plantae-green)", color: "var(--color-plantae-cream)" }}
+              >
+                <span className="relative z-10 flex items-center gap-2">
+                  Começar diagnóstico <ChevronRight size={18} className="transition-transform group-hover:translate-x-1" />
+                </span>
+                <div className="absolute inset-0 bg-white/10 opacity-0 transition-opacity group-hover:opacity-100" />
+              </button>
+              
+              <button
+                onClick={() => setStatus("needs_diagnosis")}
+                className="flex items-center justify-center gap-2 rounded-full border border-[#173D32]/10 px-6 py-3.5 text-[14px] font-medium transition-colors hover:bg-white/40"
+                style={{ color: "var(--color-plantae-green)" }}
+              >
+                <Sprout size={16} /> Cadastro da orquídea
+              </button>
+            </>
+          )}
 
           <button
             onClick={onExplore}
