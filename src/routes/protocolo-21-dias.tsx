@@ -786,20 +786,32 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
         </div>
 
         {/* CTAs */}
-        <div className="mt-6 flex flex-col gap-2">
+        <div className="mt-6 flex flex-col gap-3">
           <button
             onClick={onStart}
-            className="rounded-full px-6 py-4 text-[15px] font-semibold uppercase tracking-[0.06em] transition-transform active:scale-[0.98]"
+            className="group relative flex items-center justify-center gap-2 overflow-hidden rounded-full px-6 py-4 text-[15px] font-semibold uppercase tracking-[0.06em] transition-all active:scale-[0.98]"
             style={{ backgroundColor: "var(--color-plantae-green)", color: "var(--color-plantae-cream)" }}
           >
-            Começar meu plano
+            <span className="relative z-10 flex items-center gap-2">
+              Começar diagnóstico <ChevronRight size={18} className="transition-transform group-hover:translate-x-1" />
+            </span>
+            <div className="absolute inset-0 bg-white/10 opacity-0 transition-opacity group-hover:opacity-100" />
           </button>
+          
+          <button
+            onClick={onStart}
+            className="flex items-center justify-center gap-2 rounded-full border border-[#173D32]/10 px-6 py-3.5 text-[14px] font-medium transition-colors hover:bg-white/40"
+            style={{ color: "var(--color-plantae-green)" }}
+          >
+            <Sprout size={16} /> Cadastro da orquídea
+          </button>
+
           <button
             onClick={onExplore}
-            className="rounded-full px-6 py-2.5 text-[13px] font-medium underline-offset-4 hover:underline"
+            className="mt-2 rounded-full px-6 py-2.5 text-[13px] font-medium underline-offset-4 hover:underline"
             style={{ color: "var(--color-plantae-mute)" }}
           >
-            Explorar o conteúdo
+            Apenas explorar como visitante
           </button>
         </div>
       </div>
