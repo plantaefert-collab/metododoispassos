@@ -487,7 +487,8 @@ function AppShell({
   children: ReactNode;
 }) {
   const { state, clearSaveError } = useProtocolStore();
-  const actorId = state.plant.user_id || "guest";
+  const { user } = useAuthBootstrap();
+  const actorId = user?.id || "guest";
   const diagnosisFresh = isDiagnosisCurrent(state);
   return (
     <div className="min-h-screen bg-background font-sans selection:bg-primary/10">
