@@ -250,9 +250,13 @@ function ProtocoloPage() {
                 setGuestMode(true);
                 setTab("aprender");
               }}
-              setStatus={setStatus}
-              setTab={setTab}
+              onRegisterOrchid={() => setStatus("needs_diagnosis")}
+              onQuickAction={(t) => {
+                setStatus("ready");
+                setTab(t as Tab);
+              }}
             />
+
           </motion.div>
         )}
 
