@@ -3437,7 +3437,7 @@ function AprenderTab({ setTab }: { setTab: (tab: any) => void }) {
 
 /* ---------------- Método Tab ---------------- */
 
-function MetodoTab() {
+function MetodoContent() {
   const [activeProduct, setActiveProduct] = useState<"enraizador" | "nutrir" | null>(null);
 
   const productDetails = {
