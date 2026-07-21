@@ -661,7 +661,7 @@ function TabBtn({
 
 /* ---------------- Welcome ---------------- */
 
-function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore: () => void }) {
+function WelcomeScreen({ onStart, onExplore, setStatus }: { onStart: () => void; onExplore: () => void; setStatus: (s: AuthBootstrapStatus) => void }) {
   const { state } = useProtocolStore();
   const day = state.currentDay;
   const phase = getProtocolPhase(day);
