@@ -76,8 +76,9 @@ export function AuthScreen({ onBack, onSuccess }: AuthScreenProps) {
         setLastSignupEmail(trimmedEmail);
         setFeedback({
           tone: "success",
-          message: "Cadastro criado. Enviamos um link de confirmação para o seu e-mail; depois de confirmar, volte aqui e entre com sua senha.",
+          message: "Cadastro criado! Agora entre com seu e-mail e senha.",
         });
+        setMode("login");
       }
     } catch (err: unknown) {
       setFeedback({
