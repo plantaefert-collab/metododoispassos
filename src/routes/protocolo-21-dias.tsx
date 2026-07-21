@@ -60,6 +60,8 @@ import {
   PROTOCOL_PHASES,
   WEEKS,
   getWeekForDay,
+  getFocusCategories,
+  getFocusDays,
   type ProtocolDay,
   type DayStage,
   type RegisterOption,
