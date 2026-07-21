@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResumoRouteImport } from './routes/resumo'
 import { Route as Protocolo21DiasRouteImport } from './routes/protocolo-21-dias'
 import { Route as PlanoRouteImport } from './routes/plano'
+import { Route as MinhaOrquideaRouteImport } from './routes/minha-orquidea'
 import { Route as MetodoRouteImport } from './routes/metodo'
 import { Route as InicioRouteImport } from './routes/inicio'
 import { Route as DiarioRouteImport } from './routes/diario'
@@ -34,6 +35,11 @@ const Protocolo21DiasRoute = Protocolo21DiasRouteImport.update({
 const PlanoRoute = PlanoRouteImport.update({
   id: '/plano',
   path: '/plano',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MinhaOrquideaRoute = MinhaOrquideaRouteImport.update({
+  id: '/minha-orquidea',
+  path: '/minha-orquidea',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MetodoRoute = MetodoRouteImport.update({
@@ -86,6 +92,7 @@ export interface FileRoutesByFullPath {
   '/diario': typeof DiarioRoute
   '/inicio': typeof InicioRoute
   '/metodo': typeof MetodoRoute
+  '/minha-orquidea': typeof MinhaOrquideaRoute
   '/plano': typeof PlanoRoute
   '/protocolo-21-dias': typeof Protocolo21DiasRoute
   '/resumo': typeof ResumoRoute
@@ -99,6 +106,7 @@ export interface FileRoutesByTo {
   '/diario': typeof DiarioRoute
   '/inicio': typeof InicioRoute
   '/metodo': typeof MetodoRoute
+  '/minha-orquidea': typeof MinhaOrquideaRoute
   '/plano': typeof PlanoRoute
   '/protocolo-21-dias': typeof Protocolo21DiasRoute
   '/resumo': typeof ResumoRoute
@@ -113,6 +121,7 @@ export interface FileRoutesById {
   '/diario': typeof DiarioRoute
   '/inicio': typeof InicioRoute
   '/metodo': typeof MetodoRoute
+  '/minha-orquidea': typeof MinhaOrquideaRoute
   '/plano': typeof PlanoRoute
   '/protocolo-21-dias': typeof Protocolo21DiasRoute
   '/resumo': typeof ResumoRoute
@@ -128,6 +137,7 @@ export interface FileRouteTypes {
     | '/diario'
     | '/inicio'
     | '/metodo'
+    | '/minha-orquidea'
     | '/plano'
     | '/protocolo-21-dias'
     | '/resumo'
@@ -141,6 +151,7 @@ export interface FileRouteTypes {
     | '/diario'
     | '/inicio'
     | '/metodo'
+    | '/minha-orquidea'
     | '/plano'
     | '/protocolo-21-dias'
     | '/resumo'
@@ -154,6 +165,7 @@ export interface FileRouteTypes {
     | '/diario'
     | '/inicio'
     | '/metodo'
+    | '/minha-orquidea'
     | '/plano'
     | '/protocolo-21-dias'
     | '/resumo'
@@ -168,6 +180,7 @@ export interface RootRouteChildren {
   DiarioRoute: typeof DiarioRoute
   InicioRoute: typeof InicioRoute
   MetodoRoute: typeof MetodoRoute
+  MinhaOrquideaRoute: typeof MinhaOrquideaRoute
   PlanoRoute: typeof PlanoRoute
   Protocolo21DiasRoute: typeof Protocolo21DiasRoute
   ResumoRoute: typeof ResumoRoute
@@ -194,6 +207,13 @@ declare module '@tanstack/react-router' {
       path: '/plano'
       fullPath: '/plano'
       preLoaderRoute: typeof PlanoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/minha-orquidea': {
+      id: '/minha-orquidea'
+      path: '/minha-orquidea'
+      fullPath: '/minha-orquidea'
+      preLoaderRoute: typeof MinhaOrquideaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/metodo': {
@@ -264,6 +284,7 @@ const rootRouteChildren: RootRouteChildren = {
   DiarioRoute: DiarioRoute,
   InicioRoute: InicioRoute,
   MetodoRoute: MetodoRoute,
+  MinhaOrquideaRoute: MinhaOrquideaRoute,
   PlanoRoute: PlanoRoute,
   Protocolo21DiasRoute: Protocolo21DiasRoute,
   ResumoRoute: ResumoRoute,
@@ -271,13 +292,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

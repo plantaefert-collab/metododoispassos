@@ -110,7 +110,7 @@ export const Route = createFileRoute("/protocolo-21-dias")({
   component: ProtocoloPage,
 });
 
-type Tab = "inicio" | "plano" | "diagnostico" | "diario" | "aprender" | "resumo" | "metodo";
+type Tab = "inicio" | "plano" | "diagnostico" | "diario" | "aprender" | "resumo" | "metodo" | "orquidea";
 
 function phaseOf(day: number) {
   const phase = getProtocolPhase(day);
