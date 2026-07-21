@@ -1826,6 +1826,43 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
                 <ChevronRight size={14} className="text-primary/60" />
               </div>
             )}
+            {!needsNote && (
+              <div
+                role="button"
+                tabIndex={0}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setTab("plano");
+                  setTimeout(() => {
+                    const el = document.getElementById(`note-day-${day}`) as HTMLTextAreaElement | null;
+                    if (el) {
+                      el.scrollIntoView({ behavior: "smooth", block: "center" });
+                      el.focus();
+                      const len = el.value.length;
+                      el.setSelectionRange(len, len);
+                    }
+                  }, 350);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    (e.currentTarget as HTMLDivElement).click();
+                  }
+                }}
+                className="mt-3 rounded-xl border border-border bg-card/70 p-3 text-left transition-colors hover:border-primary/30"
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 text-primary">
+                    <FileText size={14} />
+                    <span className="text-xs font-semibold">Editar registro salvo</span>
+                  </div>
+                  <ChevronRight size={14} className="text-primary/60" />
+                </div>
+                <p className="mt-1.5 line-clamp-2 text-[11px] italic text-muted-foreground">
+                  “{today.note.trim()}”
+                </p>
+              </div>
+            )}
           </button>
         );
       })()}
