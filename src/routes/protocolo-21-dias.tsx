@@ -3089,12 +3089,55 @@ function RegisterField({
   const label = meta.recordPrompt || "Registre sua observação de hoje.";
   const options: RegisterOption[] | undefined = meta.registerOptions;
   const inputId = `note-day-${meta.day}`;
+  const [saveState, setSaveState] = useState<"idle" | "saving" | "saved">(
+    entry.note.trim() ? "saved" : "idle",
+  );
+  const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const notifyChange = (v: string) => {
+    onChange(v);
+    setSaveState("saving");
+    if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    saveTimerRef.current = setTimeout(() => {
+      setSaveState(v.trim() ? "saved" : "idle");
+    }, 600);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
+    };
+  }, []);
 
   return (
     <div className="mt-4 space-y-2">
-      <label htmlFor={inputId} className="block text-[13px] font-semibold text-primary">
-        {label}
-      </label>
+      <div className="flex items-center justify-between gap-2">
+        <label htmlFor={inputId} className="block text-[13px] font-semibold text-primary">
+          {label}
+        </label>
+        <span
+          role="status"
+          aria-live="polite"
+          className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider transition-colors ${
+            saveState === "saving"
+              ? "bg-accent/10 text-accent"
+              : saveState === "saved"
+                ? "bg-primary/10 text-primary"
+                : "bg-muted text-muted-foreground"
+          }`}
+        >
+          <span
+            className={`h-1.5 w-1.5 rounded-full ${
+              saveState === "saving"
+                ? "bg-accent animate-pulse"
+                : saveState === "saved"
+                  ? "bg-primary"
+                  : "bg-muted-foreground/50"
+            }`}
+          />
+          {saveState === "saving" ? "Salvando…" : saveState === "saved" ? "Salvo" : "Em progresso"}
+        </span>
+      </div>
       {options && options.length > 0 && (
         <div role="radiogroup" aria-label={label} className="flex flex-wrap gap-1.5">
           {options.map((opt) => {
@@ -3107,7 +3150,7 @@ function RegisterField({
                 aria-checked={active}
                 onClick={() => {
                   const rest = entry.note.replace(/^[^\n]*\n?/, "");
-                  onChange(rest ? `${opt.label}\n${rest}` : opt.label);
+                  notifyChange(rest ? `${opt.label}\n${rest}` : opt.label);
                 }}
                 className={`min-h-[36px] rounded-full border px-3 text-xs font-semibold transition-colors ${
                   active
@@ -3124,7 +3167,7 @@ function RegisterField({
       <textarea
         id={inputId}
         value={entry.note}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => notifyChange(e.target.value)}
         placeholder={
           options && options.length > 0 ? "Observação complementar (opcional)" : "Sua anotação"
         }
