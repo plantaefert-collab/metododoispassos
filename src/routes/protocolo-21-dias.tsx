@@ -3549,6 +3549,20 @@ function MetodoTab() {
             >
               <Info size={16} /> Ver como usar
             </button>
+
+            <AnimatePresence initial={false}>
+              {activeProduct === "enraizador" && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.35, ease: "easeInOut" }}
+                  className="overflow-hidden"
+                >
+                  <ProductInstructions detail={productDetails.enraizador} />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
 
@@ -3608,6 +3622,20 @@ function MetodoTab() {
             >
               <Info size={16} /> Ver como usar
             </button>
+
+            <AnimatePresence initial={false}>
+              {activeProduct === "nutrir" && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.35, ease: "easeInOut" }}
+                  className="overflow-hidden"
+                >
+                  <ProductInstructions detail={productDetails.nutrir} />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
@@ -3618,57 +3646,47 @@ function MetodoTab() {
           As orquídeas têm um metabolismo lento. 21 dias é o tempo ideal para que a planta processe os estímulos do enraizamento e comece a responder visualmente à nutrição, criando uma base sólida para o desenvolvimento contínuo.
         </p>
       </div>
+    </div>
+  );
+}
 
-      <AnimatePresence>
-        {activeProduct && (
-          <Drawer 
-            title={productDetails[activeProduct].title}
-            icon={productDetails[activeProduct].icon}
-            onClose={() => setActiveProduct(null)}
-          >
-            <div className="space-y-6">
-              <div>
-                <h4 className="mb-3 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
-                  Passo a Passo
-                </h4>
-                <div className="space-y-3">
-                  {productDetails[activeProduct].steps.map((step, i) => (
-                    <div key={i} className="flex gap-3">
-                      <div 
-                        className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-[12px] font-bold"
-                        style={{ backgroundColor: `${productDetails[activeProduct].color}15`, color: productDetails[activeProduct].color }}
-                      >
-                        {i + 1}
-                      </div>
-                      <p className="text-[14px] leading-relaxed text-foreground/80">{step}</p>
-                    </div>
-                  ))}
-                </div>
+function ProductInstructions({ detail }: { detail: { title: string; color: string; steps: string[]; doses: string; warnings: string } }) {
+  return (
+    <div className="mt-4 space-y-4 rounded-2xl border border-primary/10 bg-background/60 p-4">
+      <div>
+        <h4 className="mb-3 text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+          Passo a Passo
+        </h4>
+        <div className="space-y-3">
+          {detail.steps.map((step, i) => (
+            <div key={i} className="flex gap-3">
+              <div 
+                className="grid h-6 w-6 shrink-0 place-items-center rounded-full text-[12px] font-bold"
+                style={{ backgroundColor: `${detail.color}15`, color: detail.color }}
+              >
+                {i + 1}
               </div>
-
-              <div className="rounded-2xl bg-primary/[0.03] p-4 border border-primary/5">
-                <div className="flex items-center gap-2 mb-2">
-                  <Droplets size={16} style={{ color: productDetails[activeProduct].color }} />
-                  <h4 className="text-sm font-bold text-primary">Dose Sugerida</h4>
-                </div>
-                <p className="text-sm text-muted-foreground">
-                  {productDetails[activeProduct].doses}
-                </p>
-              </div>
-
-              <div className="rounded-2xl bg-amber-500/[0.03] p-4 border border-amber-500/10">
-                <div className="flex items-center gap-2 mb-2">
-                  <AlertCircle size={16} className="text-amber-600" />
-                  <h4 className="text-sm font-bold text-amber-700">Cuidados</h4>
-                </div>
-                <p className="text-sm text-amber-600/80 leading-relaxed">
-                  {productDetails[activeProduct].warnings}
-                </p>
-              </div>
+              <p className="text-[14px] leading-relaxed text-foreground/80">{step}</p>
             </div>
-          </Drawer>
-        )}
-      </AnimatePresence>
+          ))}
+        </div>
+      </div>
+
+      <div className="rounded-xl bg-primary/[0.04] p-3 border border-primary/5">
+        <div className="flex items-center gap-2 mb-1">
+          <Droplets size={14} style={{ color: detail.color }} />
+          <h4 className="text-[12px] font-bold uppercase tracking-wider text-primary">Dose Sugerida</h4>
+        </div>
+        <p className="text-[13px] text-muted-foreground">{detail.doses}</p>
+      </div>
+
+      <div className="rounded-xl bg-amber-500/[0.04] p-3 border border-amber-500/10">
+        <div className="flex items-center gap-2 mb-1">
+          <AlertCircle size={14} className="text-amber-600" />
+          <h4 className="text-[12px] font-bold uppercase tracking-wider text-amber-700">Cuidados</h4>
+        </div>
+        <p className="text-[13px] text-amber-600/80 leading-relaxed">{detail.warnings}</p>
+      </div>
     </div>
   );
 }
