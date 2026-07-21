@@ -186,7 +186,7 @@ function HomePage() {
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-2 md:items-center md:py-20">
           <div className="overflow-hidden rounded-3xl border border-border/60 shadow-lg">
             <img
-              src={kitMetodo.src}
+              src={kitMetodo.url}
               alt="Kit PlantaeFert: Enraizador Forte e Bokashi Orquídeas Premium"
               className="h-full w-full object-cover"
               loading="lazy"
