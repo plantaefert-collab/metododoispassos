@@ -1683,8 +1683,6 @@ function InfoCard({
 
 function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t: Tab) => void; setStatus: (s: AuthBootstrapStatus) => void }) {
   const planTitleRef = useRef<HTMLDivElement>(null);
-  const [exportingPDF, setExportingPDF] = useState(false);
-
   const handleRedirectToPlan = () => {
     setTab("plano");
     toast.success("Abrindo seu plano de 21 dias", {
@@ -1696,23 +1694,6 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
 
   const { state, setCurrentDay, toggleReminder } = useProtocolStore();
 
-  const handleExportPDF = async () => {
-    if (exportingPDF) return;
-    setExportingPDF(true);
-    try {
-      await exportProtocolPDF(state);
-      toast.success("Relatório em PDF gerado", {
-        description: "Seu progresso foi baixado.",
-      });
-    } catch (err) {
-      console.error("Erro ao gerar PDF:", err);
-      toast.error("Não foi possível gerar o PDF", {
-        description: "Tente novamente em instantes.",
-      });
-    } finally {
-      setExportingPDF(false);
-    }
-  };
 
   const day = state.currentDay;
   const phase = phaseOf(day);
