@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router"
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthScreen } from "@/components/auth/AuthScreen";
+import { fetchUserProfile, fetchUserProgress } from "@/lib/protocol-cloud";
 
 type AuthSearch = { redirect?: string };
 
@@ -22,28 +23,53 @@ export const Route = createFileRoute("/auth")({
 function AuthPage() {
   const navigate = useNavigate();
   const { redirect } = useSearch({ from: "/auth" });
-  const target = redirect && redirect.startsWith("/") && !redirect.startsWith("//") ? redirect : "/inicio";
+  const explicitRedirect =
+    redirect && redirect.startsWith("/") && !redirect.startsWith("//") ? redirect : null;
+
+  async function resolveDestination(userId: string, opts?: { isNewSignup?: boolean }) {
+    if (explicitRedirect) return explicitRedirect;
+    if (opts?.isNewSignup) return "/bem-vindo";
+    try {
+      const [{ data: profile }, { data: progress }] = await Promise.all([
+        fetchUserProfile(userId),
+        fetchUserProgress(userId),
+      ]);
+      if (!profile?.plant_registered_at) return "/minha-orquidea";
+      if (!progress?.diagnosis_result) return "/diagnostico";
+      return "/inicio";
+    } catch {
+      return "/inicio";
+    }
+  }
 
   useEffect(() => {
     let mounted = true;
-    supabase.auth.getSession().then(({ data }) => {
-      if (mounted && data.session) navigate({ to: target, replace: true });
+    supabase.auth.getSession().then(async ({ data }) => {
+      if (!mounted || !data.session) return;
+      const dest = await resolveDestination(data.session.user.id);
+      if (mounted) navigate({ to: dest, replace: true });
     });
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session && (event === "SIGNED_IN" || event === "TOKEN_REFRESHED")) {
-        navigate({ to: target, replace: true });
+        const dest = await resolveDestination(session.user.id);
+        if (mounted) navigate({ to: dest, replace: true });
       }
     });
     return () => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [navigate, target]);
+  }, [navigate, explicitRedirect]);
 
   return (
     <AuthScreen
       onBack={() => navigate({ to: "/", replace: true })}
-      onSuccess={() => navigate({ to: target, replace: true })}
+      onSuccess={async (ctx) => {
+        const { data } = await supabase.auth.getSession();
+        if (!data.session) return;
+        const dest = await resolveDestination(data.session.user.id, ctx);
+        navigate({ to: dest, replace: true });
+      }}
     />
   );
 }
