@@ -859,8 +859,13 @@ function WelcomeScreen({ onStart, onExplore, setStatus }: { onStart: () => void;
               className="group relative flex items-center justify-center gap-2 overflow-hidden rounded-full px-6 py-4 text-[15px] font-semibold uppercase tracking-[0.06em] transition-all active:scale-[0.98]"
               style={{ backgroundColor: "var(--color-plantae-green)", color: "var(--color-plantae-cream)" }}
             >
-              <span className="relative z-10 flex items-center gap-2">
-                Retomar: Dia {state.currentDay} <ChevronRight size={18} className="transition-transform group-hover:translate-x-1" />
+              <span className="relative z-10 flex flex-col items-center">
+                <span className="flex items-center gap-2">
+                  Retomar: Dia {state.currentDay} <ChevronRight size={18} className="transition-transform group-hover:translate-x-1" />
+                </span>
+                <span className="text-[10px] opacity-70 normal-case tracking-normal">
+                  Próximo passo: {protocolDay.title}
+                </span>
               </span>
               <div className="absolute inset-0 bg-white/10 opacity-0 transition-opacity group-hover:opacity-100" />
             </button>
