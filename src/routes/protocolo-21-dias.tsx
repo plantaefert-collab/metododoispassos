@@ -912,8 +912,8 @@ function WelcomeScreen({ onStart, onExplore, setStatus }: { onStart: () => void;
             Apenas explorar como visitante
           </button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 
