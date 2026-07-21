@@ -1834,6 +1834,144 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         </div>
       </div>
 
+      {/* ─────────── BLOCO 2 · PROGRESSO (movido para logo abaixo de Método 2 Passos) ─────────── */}
+      <SectionHeader
+        eyebrow="Bloco 2"
+        title="Progresso"
+        hint="Onde você está na jornada"
+      />
+
+      <div 
+        onClick={handleRedirectToPlan}
+        className="group relative cursor-pointer overflow-hidden rounded-2xl border border-border bg-plantae-cream/40 p-5 transition-all hover:border-primary/30 active:scale-[0.99]"
+      >
+        <div className="flex items-center gap-3">
+          <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-card transition-transform group-hover:scale-105">
+            {state.plant.photo ? (
+              <img
+                src={state.plant.photo}
+                alt={state.plant.name}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              <Flower2 size={22} className="text-muted-foreground" />
+            )}
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="truncate text-lg font-bold text-primary">
+              {state.plant.name || "Sua orquídea"}
+            </div>
+            <div className="text-xs text-muted-foreground">{phase.label}</div>
+          </div>
+        </div>
+        
+        <div className="mt-4">
+          <div className="flex items-baseline justify-between text-primary">
+            <div className="text-sm font-medium">Progresso do plano</div>
+            <div className="text-sm font-bold">Dia {day} de 21</div>
+          </div>
+          <ProgressBar 
+            className="mt-2" 
+            value={(day / 21) * 100} 
+            color={day <= 7 ? "bg-primary" : day <= 14 ? "bg-[#D946EF]" : "bg-accent"} 
+          />
+        </div>
+
+        <div className="mt-4 border-t border-border/50 pt-4">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              handleRedirectToPlan();
+            }}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary/10 py-2.5 text-xs font-bold text-primary transition-colors hover:bg-primary/20"
+          >
+            Ir para o Plano <ChevronRight size={14} />
+          </button>
+        </div>
+      </div>
+
+      {/* Resumo da Jornada */}
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
+            <FileText size={18} />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-primary">Sua jornada até aqui</h3>
+            <p className="text-[10px] text-muted-foreground">Progresso consolidado</p>
+          </div>
+        </div>
+        <div className="mt-4 grid grid-cols-2 gap-2">
+          <StatCard label="Dias concluídos" value={`${completedDays}/21`} icon={<CalendarCheck size={14} />} />
+          <StatCard label="Aplicações" value={totalApplications} icon={<Droplets size={14} />} />
+          <StatCard label="Observações" value={totalNotes} icon={<BookOpen size={14} />} />
+          <StatCard label="Fotos" value={totalPhotos} icon={<Images size={14} />} />
+        </div>
+      </div>
+
+      {/* Linha do Tempo */}
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+        <div className="mb-4 flex items-center justify-between">
+          <h3 className="text-sm font-bold text-primary">Linha do Tempo</h3>
+          <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">21 dias</div>
+        </div>
+        <div className="space-y-4">
+          {[1, 2, 3].map((weekNum) => {
+            const weekDays = [1, 2, 3, 4, 5, 6, 7].map(d => (weekNum - 1) * 7 + d);
+            const weekCompleted = weekDays.filter(d => state.days[d]?.completed).length;
+            const weekPhaseColor = weekNum === 1 ? "bg-primary" : weekNum === 2 ? "bg-[#D946EF]" : "bg-accent";
+            
+            return (
+              <div key={weekNum} className="relative pl-6">
+                <div className="absolute left-0 top-1 h-full w-px bg-border/60" />
+                <div className={`absolute -left-[3px] top-1.5 h-1.5 w-1.5 rounded-full ${weekPhaseColor}`} />
+                
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Semana {weekNum}
+                  </span>
+                  <span className="text-[10px] font-medium text-primary">
+                    {weekCompleted}/7 concluídos
+                  </span>
+                </div>
+                
+                <div className="mt-2 grid grid-cols-7 gap-1">
+                  {weekDays.map(d => (
+                    <div 
+                      key={d} 
+                      className={`h-1.5 rounded-full transition-colors ${state.days[d]?.completed ? weekPhaseColor : 'bg-secondary/60'}`}
+                      title={`Dia ${d}`}
+                    />
+                  ))}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {diagnosisFresh && trackingPoints.length > 0 && (
+        <div className="rounded-2xl border border-primary/20 bg-secondary/40 p-5">
+          <div className="flex items-center gap-2 text-primary">
+            <Info size={16} />
+            <div className="text-sm font-bold">Pontos do seu diagnóstico para acompanhar</div>
+          </div>
+          <ul className="mt-3 space-y-1.5">
+            {trackingPoints.map((p) => (
+              <li key={p} className="flex gap-2 text-sm text-foreground/85">
+                <ChevronRight size={16} className="mt-0.5 shrink-0 text-primary" /> {p}
+              </li>
+            ))}
+          </ul>
+          <button
+            onClick={() => setTab("diagnostico")}
+            className="mt-3 text-xs font-semibold text-accent hover:underline"
+          >
+            Ver diagnóstico completo
+          </button>
+        </div>
+      )}
+
       {/* Resumo Rápido do Dia Atual */}
       {(() => {
         const today = state.days[day] ?? { checklist: {}, note: "", completed: false };
@@ -2047,143 +2185,6 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
       )}
 
       {/* ─────────── BLOCO 2 · PROGRESSO ─────────── */}
-      <SectionHeader
-        eyebrow="Bloco 2"
-        title="Progresso"
-        hint="Onde você está na jornada"
-      />
-
-      <div 
-        onClick={handleRedirectToPlan}
-        className="group relative cursor-pointer overflow-hidden rounded-2xl border border-border bg-plantae-cream/40 p-5 transition-all hover:border-primary/30 active:scale-[0.99]"
-      >
-        <div className="flex items-center gap-3">
-          <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-card transition-transform group-hover:scale-105">
-            {state.plant.photo ? (
-              <img
-                src={state.plant.photo}
-                alt={state.plant.name}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <Flower2 size={22} className="text-muted-foreground" />
-            )}
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="truncate text-lg font-bold text-primary">
-              {state.plant.name || "Sua orquídea"}
-            </div>
-            <div className="text-xs text-muted-foreground">{phase.label}</div>
-          </div>
-        </div>
-        
-        <div className="mt-4">
-          <div className="flex items-baseline justify-between text-primary">
-            <div className="text-sm font-medium">Progresso do plano</div>
-            <div className="text-sm font-bold">Dia {day} de 21</div>
-          </div>
-          <ProgressBar 
-            className="mt-2" 
-            value={(day / 21) * 100} 
-            color={day <= 7 ? "bg-primary" : day <= 14 ? "bg-[#D946EF]" : "bg-accent"} 
-          />
-        </div>
-
-        <div className="mt-4 border-t border-border/50 pt-4">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleRedirectToPlan();
-            }}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary/10 py-2.5 text-xs font-bold text-primary transition-colors hover:bg-primary/20"
-          >
-            Ir para o Plano <ChevronRight size={14} />
-          </button>
-        </div>
-      </div>
-
-      {/* Resumo da Jornada */}
-      <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
-            <FileText size={18} />
-          </div>
-          <div>
-            <h3 className="text-sm font-bold text-primary">Sua jornada até aqui</h3>
-            <p className="text-[10px] text-muted-foreground">Progresso consolidado</p>
-          </div>
-        </div>
-        <div className="mt-4 grid grid-cols-2 gap-2">
-          <StatCard label="Dias concluídos" value={`${completedDays}/21`} icon={<CalendarCheck size={14} />} />
-          <StatCard label="Aplicações" value={totalApplications} icon={<Droplets size={14} />} />
-          <StatCard label="Observações" value={totalNotes} icon={<BookOpen size={14} />} />
-          <StatCard label="Fotos" value={totalPhotos} icon={<Images size={14} />} />
-        </div>
-      </div>
-
-      {/* Linha do Tempo */}
-      <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="text-sm font-bold text-primary">Linha do Tempo</h3>
-          <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">21 dias</div>
-        </div>
-        <div className="space-y-4">
-          {[1, 2, 3].map((weekNum) => {
-            const weekDays = [1, 2, 3, 4, 5, 6, 7].map(d => (weekNum - 1) * 7 + d);
-            const weekCompleted = weekDays.filter(d => state.days[d]?.completed).length;
-            const weekPhaseColor = weekNum === 1 ? "bg-primary" : weekNum === 2 ? "bg-[#D946EF]" : "bg-accent";
-            
-            return (
-              <div key={weekNum} className="relative pl-6">
-                <div className="absolute left-0 top-1 h-full w-px bg-border/60" />
-                <div className={`absolute -left-[3px] top-1.5 h-1.5 w-1.5 rounded-full ${weekPhaseColor}`} />
-                
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
-                    Semana {weekNum}
-                  </span>
-                  <span className="text-[10px] font-medium text-primary">
-                    {weekCompleted}/7 concluídos
-                  </span>
-                </div>
-                
-                <div className="mt-2 grid grid-cols-7 gap-1">
-                  {weekDays.map(d => (
-                    <div 
-                      key={d} 
-                      className={`h-1.5 rounded-full transition-colors ${state.days[d]?.completed ? weekPhaseColor : 'bg-secondary/60'}`}
-                      title={`Dia ${d}`}
-                    />
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {diagnosisFresh && trackingPoints.length > 0 && (
-        <div className="rounded-2xl border border-primary/20 bg-secondary/40 p-5">
-          <div className="flex items-center gap-2 text-primary">
-            <Info size={16} />
-            <div className="text-sm font-bold">Pontos do seu diagnóstico para acompanhar</div>
-          </div>
-          <ul className="mt-3 space-y-1.5">
-            {trackingPoints.map((p) => (
-              <li key={p} className="flex gap-2 text-sm text-foreground/85">
-                <ChevronRight size={16} className="mt-0.5 shrink-0 text-primary" /> {p}
-              </li>
-            ))}
-          </ul>
-          <button
-            onClick={() => setTab("diagnostico")}
-            className="mt-3 text-xs font-semibold text-accent hover:underline"
-          >
-            Ver diagnóstico completo
-          </button>
-        </div>
-      )}
-
       {/* ─────────── BLOCO 3 · AÇÕES & ATALHOS ─────────── */}
       <SectionHeader
         eyebrow="Bloco 3"
