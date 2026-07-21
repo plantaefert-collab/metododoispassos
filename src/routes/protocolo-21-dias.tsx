@@ -2228,6 +2228,34 @@ function PlanoTab({ actorId, setTab, onPreviewDay, setStatus }: PlanoTabProps) {
         weekDays={activeWeek.days}
       />
 
+      {focusCategories.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl border border-accent/30 bg-gradient-to-br from-accent/10 to-accent/5 p-3.5"
+        >
+          <div className="flex items-start gap-2.5">
+            <div className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-accent/15 text-accent">
+              <Sparkles size={14} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-accent">
+                Plano personalizado pelo diagnóstico
+              </div>
+              <p className="mt-1 text-xs leading-relaxed text-foreground/80">
+                Foco em{" "}
+                <strong>
+                  {focusCategories.map((c) => CATEGORY_LABEL[c]).join(" e ").toLowerCase()}
+                </strong>
+                . Dias destacados abordam esses pontos com mais profundidade.
+                {isFocusDay && " Hoje é um deles."}
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
+
       {!diagnosisFresh && day === 1 && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
