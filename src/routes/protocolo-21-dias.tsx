@@ -50,7 +50,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { useProtocolStore, isDiagnosisCurrent, defaultState, getState } from "@/lib/protocol-store";
+import { useProtocolStore, isDiagnosisCurrent, defaultState, getState, computeFocusDay, isDayFullyDone } from "@/lib/protocol-store";
 import { compressImage, PHOTO_ERROR_MESSAGE } from "@/lib/image-compress";
 import {
   getProtocolDay,
@@ -1676,21 +1676,8 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
   const { state, setCurrentDay, toggleReminder } = useProtocolStore();
 
 
-  // Foco do dia é derivado da conclusão real do checklist,
-  // para refletir automaticamente o progresso do usuário.
-  const isDayFullyDone = (d: number) => {
-    const meta = getProtocolDay(d);
-    const entry = state.days[d];
-    if (!entry) return false;
-    if (!meta.checklist || meta.checklist.length === 0) return !!entry.completed;
-    return meta.checklist.every((label) => !!entry.checklist?.[label]);
-  };
-  const focusDay = (() => {
-    for (let d = 1; d <= 21; d++) {
-      if (!isDayFullyDone(d)) return d;
-    }
-    return 21;
-  })();
+  // Foco do dia = fonte única compartilhada (Início, Minha Orquídea, Plano).
+  const focusDay = computeFocusDay(state, (d) => getProtocolDay(d).checklist);
   const day = focusDay;
   const phase = phaseOf(day);
   const isApplicationDay = APPLICATION_DAYS.includes(day);
@@ -1705,7 +1692,9 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [focusDay]);
 
-  const completedDays = Array.from({ length: 21 }, (_, i) => i + 1).filter(isDayFullyDone).length;
+  const completedDays = Array.from({ length: 21 }, (_, i) => i + 1).filter((d) =>
+    isDayFullyDone(state, d, getProtocolDay(d).checklist),
+  ).length;
   const totalApplications = state.applications.length;
   const totalNotes = Object.values(state.days).filter((d) => d.note?.trim()).length;
   const totalPhotos = Object.values(state.days).filter((d) => d.photo).length;
@@ -4457,18 +4446,22 @@ function DayPreviewModal({
 
 function MinhaOrquideaTab({ actorId, setTab }: { actorId: string; setTab: (t: Tab) => void }) {
   const { state, updatePlant, setCurrentDay } = useProtocolStore();
-  const today = getProtocolDay(state.currentDay);
+  // Foco derivado do checklist real — mesma fonte de verdade da aba Início.
+  const focusDay = computeFocusDay(state, (d) => getProtocolDay(d).checklist);
+  const today = getProtocolDay(focusDay);
   const todayChecklist = today.checklist ?? [];
-  const todayTasks = state.days[state.currentDay]?.checklist ?? {};
+  const todayTasks = state.days[focusDay]?.checklist ?? {};
   const todayDoneCount = todayChecklist.filter((t) => todayTasks[t]).length;
-  const upcomingDays = Array.from({ length: 3 }, (_, i) => state.currentDay + 1 + i).filter((d) => d <= 21);
+  const upcomingDays = Array.from({ length: 3 }, (_, i) => focusDay + 1 + i).filter((d) => d <= 21);
   const goToDay = (d: number) => {
     setCurrentDay(d, actorId);
     setTab("plano");
   };
   const plant = state.plant;
 
-  const completedDays = Object.values(state.days).filter((d) => d.completed).length;
+  const completedDays = Array.from({ length: 21 }, (_, i) => i + 1).filter((d) =>
+    isDayFullyDone(state, d, getProtocolDay(d).checklist),
+  ).length;
   const totalApplications = state.applications.length;
   const totalPhotos = Object.values(state.days).filter((d) => d.photo).length;
   const totalNotes = Object.values(state.days).filter((d) => d.note?.trim()).length;
@@ -4547,7 +4540,7 @@ function MinhaOrquideaTab({ actorId, setTab }: { actorId: string; setTab: (t: Ta
           </div>
           <div>
             <h2 className="font-display text-lg text-primary">Meu progresso</h2>
-            <p className="text-xs text-muted-foreground">Dia {state.currentDay} de 21 · {progressPct}% concluído</p>
+            <p className="text-xs text-muted-foreground">Dia {focusDay} de 21 · {progressPct}% concluído</p>
           </div>
         </div>
 
@@ -4600,7 +4593,7 @@ function MinhaOrquideaTab({ actorId, setTab }: { actorId: string; setTab: (t: Ta
             <Sparkles size={18} />
           </div>
           <div className="min-w-0 flex-1">
-            <div className="text-[10px] font-bold uppercase tracking-widest text-accent">Hoje · Dia {state.currentDay}</div>
+            <div className="text-[10px] font-bold uppercase tracking-widest text-accent">Hoje · Dia {focusDay}</div>
             <h2 className="mt-0.5 truncate font-display text-lg text-primary">{today.title}</h2>
           </div>
         </div>
@@ -4630,7 +4623,7 @@ function MinhaOrquideaTab({ actorId, setTab }: { actorId: string; setTab: (t: Ta
         )}
 
         <button
-          onClick={() => goToDay(state.currentDay)}
+          onClick={() => goToDay(focusDay)}
           className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm active:scale-[0.98]"
         >
           Abrir tarefa de hoje

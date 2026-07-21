@@ -88,6 +88,28 @@ export function isDiagnosisCurrent(state: ProtocolState): boolean {
   );
 }
 
+/**
+ * Verifica se o dia está totalmente concluído com base no checklist real
+ * (ou na flag `completed` quando o dia não tem checklist).
+ */
+export function isDayFullyDone(state: ProtocolState, day: number, checklist: string[] | undefined): boolean {
+  const entry = state.days[day];
+  if (!entry) return false;
+  if (!checklist || checklist.length === 0) return !!entry.completed;
+  return checklist.every((label) => !!entry.checklist?.[label]);
+}
+
+/**
+ * Deriva o dia de foco a partir do primeiro dia não concluído no checklist.
+ * Fonte única de verdade compartilhada por Início, Minha Orquídea e Plano.
+ */
+export function computeFocusDay(state: ProtocolState, getChecklist: (day: number) => string[] | undefined): number {
+  for (let d = 1; d <= 21; d++) {
+    if (!isDayFullyDone(state, d, getChecklist(d))) return d;
+  }
+  return 21;
+}
+
 export { totalObservations };
 
 const DEFAULT_CURRENT_DAY = 1;
