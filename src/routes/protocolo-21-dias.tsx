@@ -353,7 +353,7 @@ function ProtocoloPage() {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5 }}
           >
-            <AppShell tab={tab} setTab={setTab} onReset={() => setShowReset(true)} userEmail={user?.email} setStatus={setStatus}>
+            <AppShell tab={tab} setTab={setTab} onReset={() => setShowReset(true)} userEmail={user?.email} setStatus={setStatus} tourStep={tourStep}>
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={tab}
@@ -483,6 +483,7 @@ function AppShell({
   onReset: () => void;
   userEmail?: string;
   setStatus?: (s: AuthBootstrapStatus) => void;
+  tourStep?: number | null;
   children: ReactNode;
 }) {
   const { state, clearSaveError } = useProtocolStore();
