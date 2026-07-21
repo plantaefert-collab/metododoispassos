@@ -425,6 +425,7 @@ export function ProtocoloShell({ initialTab }: { initialTab?: Tab } = {}) {
                   {tab === "aprender" && <AprenderTab setTab={setTab} />}
                   {tab === "resumo" && <ResumoTab actorId={actorId} />}
                   {tab === "metodo" && <MetodoContent />}
+                  {tab === "orquidea" && <MinhaOrquideaTab actorId={actorId} setTab={setTab} />}
                 </motion.div>
               </AnimatePresence>
             </AppShell>
