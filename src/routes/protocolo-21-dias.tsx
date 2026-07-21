@@ -1907,28 +1907,8 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         </div>
       </div>
 
-      {/* Linha do Tempo */}
-      {diagnosisFresh && trackingPoints.length > 0 && (
-        <div className="rounded-2xl border border-primary/20 bg-secondary/40 p-4 sm:p-5">
-          <div className="flex items-center gap-2 text-primary">
-            <Info size={16} />
-            <div className="text-sm font-bold">Pontos do seu diagnóstico para acompanhar</div>
-          </div>
-          <ul className="mt-3 space-y-1.5">
-            {trackingPoints.map((p) => (
-              <li key={p} className="flex gap-2 text-sm text-foreground/85">
-                <ChevronRight size={16} className="mt-0.5 shrink-0 text-primary" /> {p}
-              </li>
-            ))}
-          </ul>
-          <button
-            onClick={() => setTab("diagnostico")}
-            className="mt-3 text-xs font-semibold text-accent hover:underline"
-          >
-            Ver diagnóstico completo
-          </button>
-        </div>
-      )}
+
+
 
       {/* Resumo Rápido do Dia Atual */}
       {(() => {
