@@ -3,8 +3,8 @@ import { useMemo, useState, type ReactNode, type ChangeEvent, useEffect, useRef,
 import { toast, Toaster } from "sonner";
 import confetti from "canvas-confetti";
 import { motion, AnimatePresence } from "framer-motion";
-import raizAsset from "@/assets/RAIZ-500ML.png.asset.json";
-import orkAsset from "@/assets/ORK-500ML.png.asset.json";
+import raizAsset from "@/assets/raiz-500ml.png";
+import orkAsset from "@/assets/ork-500ml.png";
 import { playSuccessSound, playPopSound } from "@/lib/audio-feedback";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -3507,7 +3507,7 @@ function MetodoTab() {
           <div className="relative z-10 flex flex-col items-center gap-4">
             <div className="relative flex h-56 w-full items-end justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-primary/10 via-primary/5 to-transparent">
               <motion.img
-                src={raizAsset.url}
+                src={raizAsset}
                 alt="Enraizador Forte"
                 className="relative z-10 h-52 w-auto object-contain drop-shadow-xl"
                 initial={{ y: 10, opacity: 0 }}
@@ -3577,7 +3577,7 @@ function MetodoTab() {
           <div className="relative z-10 flex flex-col items-center gap-4">
             <div className="relative flex h-56 w-full items-end justify-center overflow-hidden rounded-2xl bg-gradient-to-b from-accent/10 via-accent/5 to-transparent">
               <motion.img
-                src={orkAsset.url}
+                src={orkAsset}
                 alt="Bokashi Orquídeas"
                 className="relative z-10 h-52 w-auto object-contain drop-shadow-xl"
                 initial={{ y: 10, opacity: 0 }}
