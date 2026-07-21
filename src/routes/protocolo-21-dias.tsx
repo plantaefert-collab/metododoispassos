@@ -1682,9 +1682,6 @@ function InfoCard({
 /* ---------------- Início ---------------- */
 
 function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t: Tab) => void; setStatus: (s: AuthBootstrapStatus) => void }) {
-  const planTitleRef = useRef<HTMLDivElement>(null);
-  const [exportingPDF, setExportingPDF] = useState(false);
-
   const handleRedirectToPlan = () => {
     setTab("plano");
     toast.success("Abrindo seu plano de 21 dias", {
@@ -1696,23 +1693,6 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
 
   const { state, setCurrentDay, toggleReminder } = useProtocolStore();
 
-  const handleExportPDF = async () => {
-    if (exportingPDF) return;
-    setExportingPDF(true);
-    try {
-      await exportProtocolPDF(state);
-      toast.success("Relatório em PDF gerado", {
-        description: "Seu progresso foi baixado.",
-      });
-    } catch (err) {
-      console.error("Erro ao gerar PDF:", err);
-      toast.error("Não foi possível gerar o PDF", {
-        description: "Tente novamente em instantes.",
-      });
-    } finally {
-      setExportingPDF(false);
-    }
-  };
 
   const day = state.currentDay;
   const phase = phaseOf(day);
@@ -2162,70 +2142,9 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         </div>
       )}
 
-      {/* ─────────── BLOCO 3 · AÇÕES & ATALHOS ─────────── */}
-      <SectionHeader
-        eyebrow="Bloco 3"
-        title="Ações & atalhos"
-        hint="Marcos, exportação e navegação rápida"
-      />
 
-      <div className="rounded-2xl border border-border bg-card p-5">
-        <div className="mb-3 flex items-center justify-between">
-          <div className="text-sm font-bold text-primary">Próximos marcos</div>
-          <button
-            onClick={() => setTab("plano")}
-            className="text-xs font-medium text-accent hover:underline"
-          >
-            Ver todos
-          </button>
-        </div>
-        <div className="grid grid-cols-3 gap-2">
-          {[7, 14, 21].map((d) => (
-            <button
-              key={d}
-              onClick={() => {
-                setCurrentDay(d, actorId);
-                setTab("plano");
-              }}
-              className="rounded-xl border border-border bg-secondary/40 p-3 text-left transition-colors hover:border-primary/40"
-            >
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-accent">
-                {d === 7 ? "1ª avaliação" : d === 14 ? "Intermediária" : "Final"}
-              </div>
-              <div className="mt-1 text-base font-display text-primary">Dia {d}</div>
-            </button>
-          ))}
-        </div>
-      </div>
 
-      <div className="rounded-2xl border border-border bg-card p-5">
-        <div className="flex items-center gap-2 text-sm font-bold text-primary">
-          <CalendarCheck size={16} className="text-accent" />
-          Acesso Rápido ao Protocolo
-        </div>
-        <p className="mt-1 text-xs text-muted-foreground">
-          Consulte as tarefas e orientações de dias específicos do plano de 21 dias.
-        </p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {[1, 7, 14, 21].map((d) => (
-            <button
-              key={d}
-              onClick={() => {
-                setCurrentDay(d, actorId);
-                setTab("plano");
-                toast.info(`Navegando para o Dia ${d}`);
-              }}
-              className="flex flex-col items-center justify-center min-w-[60px] gap-1 rounded-xl border border-border bg-card px-3 py-3 text-xs font-semibold text-foreground transition-all hover:border-primary/40 hover:bg-muted active:scale-95"
-            >
-              <span className="text-[10px] text-muted-foreground/60 uppercase">Dia</span>
-              <span className="font-display text-2xl text-primary leading-none">{d}</span>
-              <ChevronRight size={10} className="text-muted-foreground/40 mt-1" />
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Lembretes Importantes (movidos para abaixo de Acesso Rápido) */}
+      {/* Lembretes Importantes */}
       {upcomingReminders.length > 0 && (
         <div className="rounded-2xl border border-primary/20 bg-primary/[0.02] p-4">
           <div className="flex items-center justify-between">
@@ -2274,86 +2193,11 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         </div>
       )}
 
-      {/* Diagnóstico Opcional / Concluído (movido para abaixo de Lembretes Importantes) */}
-      {!diagnosisFresh && (
-        <div className="group relative overflow-hidden rounded-2xl border border-accent/20 bg-accent/5 p-6 shadow-sm transition-all hover:shadow-md">
-          <div className="absolute -right-4 -top-4 text-accent/10 transition-transform group-hover:scale-110">
-            <Stethoscope size={80} />
-          </div>
-          <div className="relative z-10">
-            <div className="flex items-center gap-2 text-accent">
-              <Sparkles size={18} className="animate-pulse" />
-              <div className="font-display text-lg font-bold">Diagnóstico Opcional</div>
-            </div>
-            <p className="mt-2 text-sm leading-relaxed text-primary/80">
-              Para receber orientações específicas para a sua planta, complete o diagnóstico opcional.
-            </p>
-            <div className="mt-5 flex flex-col gap-3">
-              <button
-                id="btn-diag"
-                onClick={() => setStatus("needs_diagnosis")}
-                className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-accent-foreground shadow-lg shadow-accent/20 transition-all hover:brightness-110 active:scale-[0.98]"
-              >
-                Fazer diagnóstico <ChevronRight size={16} />
-              </button>
-              <div className="flex items-center justify-center gap-4 text-[10px] font-bold tracking-widest text-accent/60 uppercase">
-                <span className="flex items-center gap-1"><CheckCircle2 size={10} /> 5 Áreas</span>
-                <span className="flex items-center gap-1"><CheckCircle2 size={10} /> 2 Minutos</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {diagnosisFresh && (
-        <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary/10 text-primary">
-                <Stethoscope size={16} />
-              </div>
-              <div className="text-sm font-bold text-primary">Diagnóstico Concluído</div>
-            </div>
-            <button
-              onClick={() => setStatus("needs_diagnosis")}
-              className="text-xs font-medium text-muted-foreground hover:text-accent hover:underline"
-            >
-              Refazer
-            </button>
-          </div>
-          <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-            Seu exame está atualizado. Você pode revisar os detalhes ou atualizar o estado da sua planta a qualquer momento.
-          </p>
-          <button
-            onClick={() => setTab("diagnostico")}
-            className="mt-4 inline-flex items-center gap-2 rounded-xl border border-border px-5 py-2.5 text-sm font-bold text-foreground transition-colors hover:bg-muted"
-          >
-            Ver detalhes <ChevronRight size={14} />
-          </button>
-        </div>
-      )}
 
       <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
         Aplique no horário fresco, evite sol forte e não atinja diretamente as flores.
       </InfoCard>
 
-      <button
-        onClick={handleExportPDF}
-        disabled={exportingPDF}
-        className="flex w-full items-center justify-center gap-2 rounded-full border-2 border-primary/25 bg-card px-6 py-3.5 text-sm font-bold text-primary transition-all hover:bg-primary/[0.06] active:scale-[0.98] disabled:opacity-60"
-      >
-        {exportingPDF ? (
-          <>
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
-            Gerando PDF...
-          </>
-        ) : (
-          <>
-            <FileText size={16} />
-            Exportar meu progresso em PDF
-          </>
-        )}
-      </button>
 
       <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <button
