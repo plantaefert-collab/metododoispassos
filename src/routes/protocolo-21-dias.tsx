@@ -2176,6 +2176,12 @@ function PlanoTab({ actorId, setTab, onPreviewDay, setStatus }: PlanoTabProps) {
 
   const week = useMemo(() => getWeekForDay(day), [day]);
   const activeWeek = WEEKS.find((w) => w.id === week) ?? WEEKS[0];
+  const focusCategories = useMemo(
+    () => (diagnosisFresh ? getFocusCategories(state.diagnosisResult) : []),
+    [state.diagnosisResult, diagnosisFresh],
+  );
+  const focusDaysSet = useMemo(() => new Set(getFocusDays(focusCategories)), [focusCategories]);
+  const isFocusDay = focusDaysSet.has(day);
 
   return (
     <div ref={containerRef} className="space-y-4">
