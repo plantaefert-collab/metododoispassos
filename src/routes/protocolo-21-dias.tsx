@@ -1611,6 +1611,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
   const upcomingReminders = reminderDays.filter(d => d >= day && !state.remindersCompleted?.[d]);
 
   return (
+    <>
       {/* Tour Overlay */}
       <AnimatePresence>
         {tourStep !== null && (
@@ -2078,7 +2079,8 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           <ChevronRight size={16} className="text-primary/40" />
         </button>
       </div>
-    </div>
+      </div>
+    </>
   );
 }
 
