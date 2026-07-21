@@ -2162,41 +2162,6 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         </div>
       )}
 
-      {/* ─────────── BLOCO 3 · AÇÕES & ATALHOS ─────────── */}
-      <SectionHeader
-        eyebrow="Bloco 3"
-        title="Ações & atalhos"
-        hint="Marcos, exportação e navegação rápida"
-      />
-
-      <div className="rounded-2xl border border-border bg-card p-5">
-        <div className="mb-3 flex items-center justify-between">
-          <div className="text-sm font-bold text-primary">Próximos marcos</div>
-          <button
-            onClick={() => setTab("plano")}
-            className="text-xs font-medium text-accent hover:underline"
-          >
-            Ver todos
-          </button>
-        </div>
-        <div className="grid grid-cols-3 gap-2">
-          {[7, 14, 21].map((d) => (
-            <button
-              key={d}
-              onClick={() => {
-                setCurrentDay(d, actorId);
-                setTab("plano");
-              }}
-              className="rounded-xl border border-border bg-secondary/40 p-3 text-left transition-colors hover:border-primary/40"
-            >
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-accent">
-                {d === 7 ? "1ª avaliação" : d === 14 ? "Intermediária" : "Final"}
-              </div>
-              <div className="mt-1 text-base font-display text-primary">Dia {d}</div>
-            </button>
-          ))}
-        </div>
-      </div>
 
       <div className="rounded-2xl border border-border bg-card p-5">
         <div className="flex items-center gap-2 text-sm font-bold text-primary">
