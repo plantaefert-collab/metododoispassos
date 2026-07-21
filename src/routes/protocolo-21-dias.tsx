@@ -1843,10 +1843,10 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
 
       <div 
         onClick={handleRedirectToPlan}
-        className="group relative cursor-pointer overflow-hidden rounded-2xl border border-border bg-plantae-cream/40 p-5 transition-all hover:border-primary/30 active:scale-[0.99]"
+        className="group relative cursor-pointer overflow-hidden rounded-2xl border border-border bg-plantae-cream/40 p-4 sm:p-5 transition-all hover:border-primary/30 active:scale-[0.99]"
       >
         <div className="flex items-center gap-3">
-          <div className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-card transition-transform group-hover:scale-105">
+          <div className="grid h-12 w-12 sm:h-14 sm:w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-card transition-transform group-hover:scale-105">
             {state.plant.photo ? (
               <img
                 src={state.plant.photo}
@@ -1858,17 +1858,17 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             )}
           </div>
           <div className="min-w-0 flex-1">
-            <div className="truncate text-lg font-bold text-primary">
+            <div className="truncate text-base sm:text-lg font-bold text-primary">
               {state.plant.name || "Sua orquídea"}
             </div>
-            <div className="text-xs text-muted-foreground">{phase.label}</div>
+            <div className="text-[11px] sm:text-xs text-muted-foreground">{phase.label}</div>
           </div>
         </div>
         
-        <div className="mt-4">
+        <div className="mt-3 sm:mt-4">
           <div className="flex items-baseline justify-between text-primary">
-            <div className="text-sm font-medium">Progresso do plano</div>
-            <div className="text-sm font-bold">Dia {day} de 21</div>
+            <div className="text-xs sm:text-sm font-medium">Progresso do plano</div>
+            <div className="text-xs sm:text-sm font-bold">Dia {day} de 21</div>
           </div>
           <ProgressBar 
             className="mt-2" 
@@ -1877,7 +1877,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           />
         </div>
 
-        <div className="mt-4 border-t border-border/50 pt-4">
+        <div className="mt-3 sm:mt-4 border-t border-border/50 pt-3 sm:pt-4">
           <button
             onClick={(e) => {
               e.stopPropagation();
@@ -1891,7 +1891,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
       </div>
 
       {/* Resumo da Jornada */}
-      <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+      <div className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-sm">
         <div className="flex items-center gap-3">
           <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
             <FileText size={18} />
@@ -1901,7 +1901,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             <p className="text-[10px] text-muted-foreground">Progresso consolidado</p>
           </div>
         </div>
-        <div className="mt-4 grid grid-cols-2 gap-2">
+        <div className="mt-3 sm:mt-4 grid grid-cols-2 gap-2">
           <StatCard label="Dias concluídos" value={`${completedDays}/21`} icon={<CalendarCheck size={14} />} />
           <StatCard label="Aplicações" value={totalApplications} icon={<Droplets size={14} />} />
           <StatCard label="Observações" value={totalNotes} icon={<BookOpen size={14} />} />
@@ -1910,12 +1910,12 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
       </div>
 
       {/* Linha do Tempo */}
-      <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
-        <div className="mb-4 flex items-center justify-between">
+      <div className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-sm">
+        <div className="mb-3 sm:mb-4 flex items-center justify-between">
           <h3 className="text-sm font-bold text-primary">Linha do Tempo</h3>
           <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">21 dias</div>
         </div>
-        <div className="space-y-4">
+        <div className="space-y-3 sm:space-y-4">
           {[1, 2, 3].map((weekNum) => {
             const weekDays = [1, 2, 3, 4, 5, 6, 7].map(d => (weekNum - 1) * 7 + d);
             const weekCompleted = weekDays.filter(d => state.days[d]?.completed).length;
@@ -1939,7 +1939,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
                   {weekDays.map(d => (
                     <div 
                       key={d} 
-                      className={`h-1.5 rounded-full transition-colors ${state.days[d]?.completed ? weekPhaseColor : 'bg-secondary/60'}`}
+                      className={`h-2 rounded-full transition-colors ${state.days[d]?.completed ? weekPhaseColor : 'bg-secondary/60'}`}
                       title={`Dia ${d}`}
                     />
                   ))}
@@ -1951,7 +1951,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
       </div>
 
       {diagnosisFresh && trackingPoints.length > 0 && (
-        <div className="rounded-2xl border border-primary/20 bg-secondary/40 p-5">
+        <div className="rounded-2xl border border-primary/20 bg-secondary/40 p-4 sm:p-5">
           <div className="flex items-center gap-2 text-primary">
             <Info size={16} />
             <div className="text-sm font-bold">Pontos do seu diagnóstico para acompanhar</div>
