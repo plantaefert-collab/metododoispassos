@@ -1,6 +1,5 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
-import { useEffect } from "react";
 import {
   Sprout,
   Leaf,
@@ -26,10 +25,10 @@ export const Route = createFileRoute("/")({
         content:
           "Método de 2 Passos + protocolo guiado de 21 dias para diagnosticar, enraizar e nutrir sua orquídea. Comece grátis.",
       },
-      { property: "og:title", content: "PlantaeFert — Orquídeas Floridas em 21 Dias" },
+      { property: "og:title", content: "PlantaeFert — Guia Prático para Orquídeas Floridas em 21 Dias" },
       {
         property: "og:description",
-        content: "Diagnóstico, plano diário, diário de bordo e método de 2 passos.",
+        content: "Método de 2 Passos + protocolo guiado de 21 dias para diagnosticar, enraizar e nutrir sua orquídea. Comece grátis.",
       },
     ],
     links: [
@@ -75,16 +74,6 @@ const BENEFITS = [
 function HomePage() {
   const { user } = useAuthBootstrap();
   const isLoggedIn = !!user;
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    if (isLoggedIn) return;
-    try {
-      if (!localStorage.getItem("pf_welcomed")) {
-        navigate({ to: "/bem-vindo", replace: true });
-      }
-    } catch {}
-  }, [isLoggedIn, navigate]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">

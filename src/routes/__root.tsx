@@ -77,20 +77,22 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Guia Prático Orquídeas Floridas — PlantaeFert" },
+      { title: "PlantaeFert — Guia Prático para Orquídeas Floridas em 21 Dias" },
       {
         name: "description",
         content:
-          "Protocolo interativo de 21 dias da PlantaeFert para diagnosticar, enraizar, nutrir e acompanhar sua orquídea.",
+          "Método de 2 Passos + protocolo guiado de 21 dias para diagnosticar, enraizar e nutrir sua orquídea. Comece grátis.",
       },
       { name: "author", content: "PlantaeFert Nutrição Vegetal" },
-      { property: "og:title", content: "Guia Prático Orquídeas Floridas — PlantaeFert" },
+      { property: "og:title", content: "PlantaeFert — Guia Prático para Orquídeas Floridas em 21 Dias" },
       {
         property: "og:description",
-        content: "Plano guiado de 21 dias com o Método de 2 Passos: Enraizar e Nutrir.",
+        content: "Método de 2 Passos + protocolo guiado de 21 dias para diagnosticar, enraizar e nutrir sua orquídea. Comece grátis.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "PlantaeFert — Guia Prático para Orquídeas Floridas em 21 Dias" },
+      { name: "twitter:description", content: "Método de 2 Passos + protocolo guiado de 21 dias para diagnosticar, enraizar e nutrir sua orquídea. Comece grátis." },
     ],
     links: [
       {
@@ -104,8 +106,8 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Fira+Sans:wght@400;500;600;700&display=swap",
       },
-      { property: "og:image", content: "https://id-preview--496f492c-d143-4ce5-84d8-dd764bec07fc.lovable.app/assets/welcome-orchid.jpg" },
-      { name: "twitter:image", content: "https://id-preview--496f492c-d143-4ce5-84d8-dd764bec07fc.lovable.app/assets/welcome-orchid.jpg" },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/1d770e5d-4899-4f0b-9384-5b2b9f91cf78" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/1d770e5d-4899-4f0b-9384-5b2b9f91cf78" },
     ],
 
   }),
