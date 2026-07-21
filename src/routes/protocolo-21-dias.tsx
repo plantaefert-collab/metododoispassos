@@ -35,6 +35,8 @@ import {
   Loader2,
   FileText,
   Download,
+  Bell,
+  Check,
 } from "lucide-react";
 import {
   Accordion,
