@@ -159,9 +159,10 @@ export function ProtocoloShell({ initialTab }: { initialTab?: Tab } = {}) {
     // Modo visitante persistente
     if (status === "signed_out" && isGuestActive()) {
       setGuestMode(true);
-      setTab("aprender");
+      if (!hasInitialTab) setTab("aprender");
     }
-  }, [status]);
+  }, [status, hasInitialTab]);
+
 
   useEffect(() => {
     if (status === "loading_remote_data" && hasLegacyData()) {
