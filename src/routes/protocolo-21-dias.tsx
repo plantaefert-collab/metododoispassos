@@ -247,6 +247,7 @@ function ProtocoloPage() {
                 setGuestMode(true);
                 setTab("aprender");
               }}
+              setStatus={setStatus}
             />
           </motion.div>
         )}
@@ -863,7 +864,7 @@ function WelcomeScreen({ onStart, onExplore }: { onStart: () => void; onExplore:
           </button>
           
           <button
-            onClick={onStart}
+            onClick={() => setStatus("needs_diagnosis")}
             className="flex items-center justify-center gap-2 rounded-full border border-[#173D32]/10 px-6 py-3.5 text-[14px] font-medium transition-colors hover:bg-white/40"
             style={{ color: "var(--color-plantae-green)" }}
           >
