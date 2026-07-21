@@ -2557,6 +2557,7 @@ function StageBody({ stage, onOpenMethod, setStatus, day }: { stage: DayStage; o
       />
       {day === 1 && stage.id === "etapa-1-registrar" && setStatus && (
         <button
+          id="btn-signup"
           onClick={() => setStatus("needs_diagnosis")}
           className="mt-2 flex w-full items-center justify-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-3 text-sm font-semibold text-primary transition-all hover:bg-primary/10 active:scale-[0.98]"
         >
