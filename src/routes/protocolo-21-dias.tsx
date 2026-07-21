@@ -2218,23 +2218,6 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         Aplique no horário fresco, evite sol forte e não atinja diretamente as flores.
       </InfoCard>
 
-      <button
-        onClick={handleExportPDF}
-        disabled={exportingPDF}
-        className="flex w-full items-center justify-center gap-2 rounded-full border-2 border-primary/25 bg-card px-6 py-3.5 text-sm font-bold text-primary transition-all hover:bg-primary/[0.06] active:scale-[0.98] disabled:opacity-60"
-      >
-        {exportingPDF ? (
-          <>
-            <div className="h-4 w-4 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
-            Gerando PDF...
-          </>
-        ) : (
-          <>
-            <FileText size={16} />
-            Exportar meu progresso em PDF
-          </>
-        )}
-      </button>
 
       <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
         <button
