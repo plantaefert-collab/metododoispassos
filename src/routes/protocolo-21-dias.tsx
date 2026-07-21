@@ -1857,34 +1857,6 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           </div>
         </div>
       )}
-      {isApplicationDay && (
-        <div className="rounded-2xl border border-accent/20 bg-accent/5 p-5">
-          <div className="flex items-center gap-2 text-accent">
-            <Sparkles size={16} />
-            <span className="text-xs font-bold uppercase tracking-wider">Dia de aplicação</span>
-          </div>
-          <h2 className="mt-2 text-xl font-display text-primary">
-            Hoje é dia de aplicar o Método de 2 Passos
-          </h2>
-          <p className="mt-1 text-sm text-primary/80">
-            Enraizar primeiro, depois nutrir. Prefira horário fresco e evite sol forte.
-          </p>
-          <div className="mt-4 flex flex-col gap-2">
-            <button
-              onClick={() => setStatus("needs_diagnosis")}
-              className="flex items-center justify-center gap-2 rounded-full border-2 border-primary/30 bg-primary/10 px-6 py-3.5 text-sm font-bold text-primary transition-all hover:bg-primary/20 active:scale-[0.98] sm:py-3"
-            >
-              <Stethoscope size={18} /> Fazer diagnóstico
-            </button>
-            <button
-              onClick={handleRedirectToPlan}
-              className="rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground"
-            >
-              Registrar aplicação
-            </button>
-          </div>
-        </div>
-      )}
 
       {/* Resumo Rápido do Dia Atual */}
       {(() => {
@@ -2019,6 +1991,35 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         );
       })()}
 
+
+      {isApplicationDay && (
+        <div className="rounded-2xl border border-accent/20 bg-accent/5 p-5">
+          <div className="flex items-center gap-2 text-accent">
+            <Sparkles size={16} />
+            <span className="text-xs font-bold uppercase tracking-wider">Dia de aplicação</span>
+          </div>
+          <h2 className="mt-2 text-xl font-display text-primary">
+            Hoje é dia de aplicar o Método de 2 Passos
+          </h2>
+          <p className="mt-1 text-sm text-primary/80">
+            Enraizar primeiro, depois nutrir. Prefira horário fresco e evite sol forte.
+          </p>
+          <div className="mt-4 flex flex-col gap-2">
+            <button
+              onClick={() => setStatus("needs_diagnosis")}
+              className="flex items-center justify-center gap-2 rounded-full border-2 border-primary/30 bg-primary/10 px-6 py-3.5 text-sm font-bold text-primary transition-all hover:bg-primary/20 active:scale-[0.98] sm:py-3"
+            >
+              <Stethoscope size={18} /> Fazer diagnóstico
+            </button>
+            <button
+              onClick={handleRedirectToPlan}
+              className="rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground"
+            >
+              Registrar aplicação
+            </button>
+          </div>
+        </div>
+      )}
       {/* CTA - Começar plano de 21 dias */}
       {(() => {
         const hasProgress = completedDays > 0 || totalApplications > 0 || day > 1;
