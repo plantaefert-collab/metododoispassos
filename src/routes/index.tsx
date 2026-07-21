@@ -94,13 +94,42 @@ function HomePage() {
             <Link to="/aprender" className="hidden text-muted-foreground hover:text-foreground sm:inline">
               Aprender
             </Link>
-            <Link
-              to="/protocolo-21-dias"
-              className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground shadow-sm transition hover:opacity-90"
-            >
-              Começar
-              <ChevronRight className="h-3.5 w-3.5" />
-            </Link>
+
+            {isLoggedIn ? (
+              <>
+                <Link
+                  to="/minha-orquidea"
+                  className="hidden items-center gap-1.5 text-muted-foreground hover:text-foreground sm:inline-flex"
+                >
+                  <Flower2 className="h-3.5 w-3.5" />
+                  Minha orquídea
+                </Link>
+                <Link
+                  to="/inicio"
+                  className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground shadow-sm transition hover:opacity-90"
+                >
+                  Continuar plano
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/auth"
+                  className="inline-flex items-center gap-1.5 text-muted-foreground hover:text-foreground"
+                >
+                  <LogIn className="h-3.5 w-3.5" />
+                  Entrar
+                </Link>
+                <Link
+                  to="/protocolo-21-dias"
+                  className="inline-flex items-center gap-1 rounded-full bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground shadow-sm transition hover:opacity-90"
+                >
+                  Começar grátis
+                  <ChevronRight className="h-3.5 w-3.5" />
+                </Link>
+              </>
+            )}
           </nav>
         </div>
       </header>
