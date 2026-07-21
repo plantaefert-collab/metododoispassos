@@ -1,5 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import { useEffect, useRef } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
+import { resolvePostAuthDestination } from "@/lib/auth-destination";
 import {
   Sprout,
   Leaf,
@@ -74,6 +78,24 @@ const BENEFITS = [
 function HomePage() {
   const { user } = useAuthBootstrap();
   const isLoggedIn = !!user;
+  const navigate = useNavigate();
+  const redirectedRef = useRef(false);
+
+  // Fallback: se o OAuth retornar para "/" (redirect_uri padrão), roteia contextualmente.
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event !== "SIGNED_IN" || !session || redirectedRef.current) return;
+      // Só redireciona se veio de um fluxo OAuth (hash com tokens) ou primeiro login desta sessão.
+      const hasOAuthHash = typeof window !== "undefined" && /access_token|code=/.test(window.location.hash + window.location.search);
+      const justSignedIn = sessionStorage.getItem("pf_oauth_pending") === "1";
+      if (!hasOAuthHash && !justSignedIn) return;
+      redirectedRef.current = true;
+      sessionStorage.removeItem("pf_oauth_pending");
+      const dest = await resolvePostAuthDestination(session.user.id);
+      navigate({ to: dest, replace: true });
+    });
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
