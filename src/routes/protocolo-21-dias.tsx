@@ -1148,7 +1148,7 @@ function DiagnosisResultScreen({ actorId, onBack, onFinish }: { actorId: string;
                 As respostas foram alteradas. Este resultado pode estar desatualizado, mas você ainda pode visualizá-lo abaixo.
               </InfoCard>
             )}
-            <ResultBlocks result={result} />
+            <ResultBlocks result={result} answers={state.diagnosis} />
           </div>
         ) : (
           <div className="mt-5">
@@ -1156,6 +1156,42 @@ function DiagnosisResultScreen({ actorId, onBack, onFinish }: { actorId: string;
               O resultado está sendo preparado. Revise as respostas e toque em “Ver resultado” para
               gerar as orientações personalizadas.
             </InfoCard>
+          </div>
+        )}
+
+        {result && (
+          <div className="mt-5 flex flex-wrap gap-2">
+            <button
+              onClick={async () => {
+                try {
+                  await exportProtocolPDF(state);
+                  toast.success("Diagnóstico exportado em PDF");
+                } catch {
+                  toast.error("Não foi possível gerar o PDF");
+                }
+              }}
+              className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <Download size={16} /> Baixar em PDF
+            </button>
+            <button
+              onClick={async () => {
+                const text = `Meu diagnóstico da orquídea${state.plant.name ? ` "${state.plant.name}"` : ""}: ${result.priorities.length} prioridade(s), ${result.adjustments.length} ajuste(s), ${result.favorable.length} sinal(is) favorável(is).`;
+                try {
+                  if (navigator.share) {
+                    await navigator.share({ title: "Diagnóstico da minha orquídea", text, url: window.location.href });
+                  } else {
+                    await navigator.clipboard.writeText(`${text}\n${window.location.href}`);
+                    toast.success("Resumo copiado para a área de transferência");
+                  }
+                } catch {
+                  /* usuário cancelou */
+                }
+              }}
+              className="flex items-center gap-2 rounded-full border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            >
+              <Share2 size={16} /> Compartilhar
+            </button>
           </div>
         )}
 
