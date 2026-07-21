@@ -3,6 +3,8 @@ import { useMemo, useState, type ReactNode, type ChangeEvent, useEffect, useRef,
 import { toast, Toaster } from "sonner";
 import confetti from "canvas-confetti";
 import { motion, AnimatePresence } from "framer-motion";
+import raizAsset from "@/assets/RAIZ-500ML.png.asset.json";
+import orkAsset from "@/assets/ORK-500ML.png.asset.json";
 import { playSuccessSound, playPopSound } from "@/lib/audio-feedback";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -3202,8 +3204,18 @@ function MetodoTab() {
           </div>
 
           <div className="flex items-center gap-4 relative z-10">
-            <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary">
-              <Sprout size={28} />
+            <div className="relative h-20 w-16 shrink-0 flex items-center justify-center">
+              <div className="absolute inset-0 grid place-items-center rounded-2xl bg-primary/10 text-primary">
+                <Sprout size={28} />
+              </div>
+              <motion.img 
+                src={raizAsset.url} 
+                alt="Enraizador Forte" 
+                className="relative z-10 h-24 w-auto object-contain drop-shadow-md"
+                initial={{ y: 5, opacity: 0 }}
+                animate={{ y: -5, opacity: 1 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+              />
             </div>
             <div>
               <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent">Passo 01</div>
@@ -3244,8 +3256,18 @@ function MetodoTab() {
           </div>
 
           <div className="flex items-center gap-4 relative z-10">
-            <div className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-accent/10 text-accent">
-              <Leaf size={28} />
+            <div className="relative h-20 w-16 shrink-0 flex items-center justify-center">
+              <div className="absolute inset-0 grid place-items-center rounded-2xl bg-accent/10 text-accent">
+                <Leaf size={28} />
+              </div>
+              <motion.img 
+                src={orkAsset.url} 
+                alt="Bokashi Orquídeas" 
+                className="relative z-10 h-24 w-auto object-contain drop-shadow-md"
+                initial={{ y: 5, opacity: 0 }}
+                animate={{ y: -5, opacity: 1 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+              />
             </div>
             <div>
               <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">Passo 02</div>
