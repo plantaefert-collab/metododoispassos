@@ -1355,6 +1355,46 @@ function ResultBlocks({
           </ul>
         </div>
       )}
+      {answers && (
+        <Accordion type="single" collapsible className="rounded-2xl border border-border bg-card">
+          <AccordionItem value="why" className="border-none">
+            <AccordionTrigger className="px-4 py-3 hover:no-underline">
+              <div className="flex items-center gap-2 text-sm font-semibold text-primary">
+                <HelpCircle size={16} /> Como chegamos nesse diagnóstico
+              </div>
+            </AccordionTrigger>
+            <AccordionContent className="px-4 pb-4">
+              <p className="text-xs text-muted-foreground">
+                Este resultado combina as respostas por categoria. Categorias com mais sinais têm maior peso no veredito.
+              </p>
+              <ul className="mt-3 space-y-2">
+                {(Object.keys(CATEGORY_LABEL) as DiagnosisCategory[]).map((cat) => {
+                  const values = answers[cat] ?? [];
+                  return (
+                    <li key={cat} className="rounded-lg border border-border/60 bg-muted/40 p-2.5">
+                      <div className="flex items-center justify-between">
+                        <div className="text-xs font-bold uppercase tracking-wider text-primary">{CATEGORY_LABEL[cat]}</div>
+                        <div className="text-[10px] text-muted-foreground">{values.length} sinal(is)</div>
+                      </div>
+                      {values.length > 0 ? (
+                        <div className="mt-1.5 flex flex-wrap gap-1.5">
+                          {values.map((v) => (
+                            <span key={v} className="rounded-full bg-card px-2 py-0.5 text-[11px] text-foreground/80 border border-border/60">
+                              {v}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="mt-1 text-[11px] italic text-muted-foreground">Nenhum sinal marcado.</div>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      )}
       <InfoCard tone="lilac" icon={<Info size={16} />}>
         Um sinal isolado não fecha um diagnóstico. Utilize estas orientações como apoio à
         observação.
