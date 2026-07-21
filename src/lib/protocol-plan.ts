@@ -106,3 +106,44 @@ export function getWeekForDay(day: number): 1 | 2 | 3 {
   if (day <= 14) return 2;
   return 3;
 }
+
+// ============================================================
+// Sincronização Diagnóstico ↔ Protocolo
+// ============================================================
+import type { DiagnosisCategory, DiagnosisGuidance } from "./diagnosis-matrix";
+
+/**
+ * Dias do protocolo que naturalmente abordam cada categoria do diagnóstico.
+ * Usado para destacar dias de "foco" quando a orquídea apresenta sinais
+ * naquela categoria.
+ */
+export const CATEGORY_FOCUS_DAYS: Record<DiagnosisCategory, number[]> = {
+  roots: [3, 10, 17],
+  leaves: [2, 12, 19],
+  environment: [5, 15],
+  potAndSubstrate: [3, 10, 17],
+  wateringAndRoutine: [4, 6, 11, 13, 18, 20],
+};
+
+/** Deriva as 1–2 categorias mais afetadas a partir do resultado do diagnóstico. */
+export function getFocusCategories(
+  result: { priorities: DiagnosisGuidance[]; adjustments: DiagnosisGuidance[] } | null | undefined,
+): DiagnosisCategory[] {
+  if (!result) return [];
+  const counts = new Map<DiagnosisCategory, number>();
+  const bump = (g: DiagnosisGuidance, w: number) =>
+    counts.set(g.category, (counts.get(g.category) ?? 0) + w);
+  result.priorities.forEach((g) => bump(g, 2));
+  result.adjustments.forEach((g) => bump(g, 1));
+  return [...counts.entries()]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 2)
+    .map(([c]) => c);
+}
+
+/** Conjunto de dias do plano em que o usuário deve focar, dado o diagnóstico. */
+export function getFocusDays(categories: DiagnosisCategory[]): number[] {
+  const set = new Set<number>();
+  categories.forEach((c) => CATEGORY_FOCUS_DAYS[c]?.forEach((d) => set.add(d)));
+  return [...set].sort((a, b) => a - b);
+}
