@@ -9,7 +9,7 @@ type Feedback = {
 
 interface AuthScreenProps {
   onBack: () => void;
-  onSuccess: () => void;
+  onSuccess: (context?: { isNewSignup?: boolean }) => void;
 }
 
 export function AuthScreen({ onBack, onSuccess }: AuthScreenProps) {
@@ -71,7 +71,7 @@ export function AuthScreen({ onBack, onSuccess }: AuthScreenProps) {
       
       if (error) throw error;
       if (data.session) {
-        onSuccess();
+        onSuccess({ isNewSignup: mode === "signup" });
       } else if (mode === "signup") {
         setLastSignupEmail(trimmedEmail);
         setFeedback({
