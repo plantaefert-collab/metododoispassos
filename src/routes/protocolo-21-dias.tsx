@@ -3646,7 +3646,7 @@ function Drawer({
             Entendido
           </button>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
