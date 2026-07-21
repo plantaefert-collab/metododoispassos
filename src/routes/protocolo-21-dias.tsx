@@ -2524,6 +2524,7 @@ function WeekPicker({
           const active = d === currentDay;
           const isApp = APPLICATION_DAYS.includes(d);
           const isCompleted = state.days[d]?.completed;
+          const isFocus = focusDays.has(d);
           return (
             <motion.button
               key={d}
@@ -2534,13 +2535,15 @@ function WeekPicker({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.95 }}
               aria-current={active ? "step" : undefined}
-              aria-label={`${isApp ? `Dia ${d}, dia de aplicação` : `Dia ${d}`}${isCompleted ? ", concluído" : ""}`}
+              aria-label={`${isApp ? `Dia ${d}, dia de aplicação` : `Dia ${d}`}${isCompleted ? ", concluído" : ""}${isFocus ? ", foco do diagnóstico" : ""}`}
               className={`relative min-h-[54px] rounded-xl border px-2 py-2 text-[13px] font-semibold transition-all focus:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
                 active
                   ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                  : isCompleted 
+                  : isCompleted
                     ? "border-primary/20 bg-primary/5 text-primary/80"
-                    : "border-border bg-card text-foreground hover:border-primary/40"
+                    : isFocus
+                      ? "border-accent/60 bg-accent/5 text-foreground hover:border-accent"
+                      : "border-border bg-card text-foreground hover:border-primary/40"
               }`}
             >
               <div className="flex flex-col items-center gap-0.5">
