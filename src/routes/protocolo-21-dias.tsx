@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouterState, Link } from "@tanstack/react-router";
 import { useMemo, useState, type ReactNode, type ChangeEvent, useEffect, useRef, useLayoutEffect } from "react";
 import { toast, Toaster } from "sonner";
 import confetti from "canvas-confetti";
@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import sceneEnraizar from "@/assets/scene-enraizar.jpg";
 import sceneNutrir from "@/assets/scene-nutrir.jpg";
 import kitMetodo from "@/assets/kit-metodo.jpg.asset.json";
+import logoPlantaefert from "@/assets/logo-plantaefert.png";
 import { playSuccessSound, playPopSound } from "@/lib/audio-feedback";
 import { supabase } from "@/integrations/supabase/client";
 import {
@@ -541,15 +542,13 @@ function AppShell({
       <div className="mx-auto flex min-h-screen max-w-[440px] flex-col shadow-[0_30px_90px_-20px_rgba(23,61,50,0.1)] sm:my-4 sm:min-h-[calc(100vh-2rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card">
         <header className="sticky top-0 z-20 flex flex-col border-b border-border bg-card/80 backdrop-blur-md sm:rounded-t-2xl">
           <div className="flex items-center justify-between gap-3 px-4 py-4">
-            <div className="flex items-center gap-2">
-              <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary text-primary-foreground shadow-md shadow-primary/20">
-                <Leaf size={18} strokeWidth={2.2} />
-              </div>
-              <div className="min-w-0">
-                <div className="text-xs font-bold tracking-tight text-primary uppercase">PlantaeFert</div>
-                <div className="truncate text-[10px] font-medium text-muted-foreground/80">LABS · NUTRIÇÃO</div>
-              </div>
-            </div>
+            <Link to="/" className="flex items-center" aria-label="PlantaeFert — Início">
+              <img
+                src={logoPlantaefert}
+                alt="PlantaeFert — Nutrição Vegetal"
+                className="h-8 w-auto"
+              />
+            </Link>
             <div className="flex items-center gap-1">
               {state.plant.name && (
                 <div className="hidden max-w-[130px] items-center gap-1 rounded-full bg-secondary px-2.5 py-1 text-xs font-medium text-secondary-foreground sm:flex">
