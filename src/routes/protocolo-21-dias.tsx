@@ -2144,7 +2144,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
 
 
 
-      {/* Lembretes Importantes (movidos para abaixo de Acesso Rápido) */}
+      {/* Lembretes Importantes */}
       {upcomingReminders.length > 0 && (
         <div className="rounded-2xl border border-primary/20 bg-primary/[0.02] p-4">
           <div className="flex items-center justify-between">
