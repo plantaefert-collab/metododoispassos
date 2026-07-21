@@ -84,7 +84,7 @@ import {
 import { saveProgressRemote } from "@/lib/protocol-cloud";
 import welcomeOrchid from "@/assets/welcome-orchid.jpg";
 import { QuickTour } from "@/components/QuickTour";
-import { exportProtocolPDF } from "@/lib/pdf-export";
+import { exportProtocolPDF, previewProtocolPDF, protocolPdfFilename } from "@/lib/pdf-export";
 
 
 
@@ -4228,6 +4228,8 @@ function DayCompleteModal({
 function ResumoTab({ actorId }: { actorId: string }) {
   const { state } = useProtocolStore();
   const [isGenerating, setIsGenerating] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isPreviewing, setIsPreviewing] = useState(false);
 
   const completedDays = Object.values(state.days).filter((d) => d.completed).length;
   const totalApplications = state.applications.length;
@@ -4245,6 +4247,32 @@ function ResumoTab({ actorId }: { actorId: string }) {
       setIsGenerating(false);
     }
   };
+
+  const openPreview = async () => {
+    if (isPreviewing) return;
+    setIsPreviewing(true);
+    try {
+      const url = await previewProtocolPDF(state);
+      setPreviewUrl(url);
+    } catch (error) {
+      console.error("Erro ao gerar pré-visualização:", error);
+      toast.error("Não foi possível gerar a pré-visualização.");
+    } finally {
+      setIsPreviewing(false);
+    }
+  };
+
+  const closePreview = () => {
+    if (previewUrl) URL.revokeObjectURL(previewUrl);
+    setPreviewUrl(null);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (previewUrl) URL.revokeObjectURL(previewUrl);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -4270,26 +4298,45 @@ function ResumoTab({ actorId }: { actorId: string }) {
       <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
         <h3 className="text-sm font-bold text-primary">Exportar Dados</h3>
         <p className="mt-1 text-xs text-muted-foreground leading-relaxed">
-          Gere um arquivo PDF completo com todos os seus registros, observações e progresso para arquivar ou compartilhar.
+          Revise a pré-visualização do relatório antes de baixar ou gere o PDF completo com todos os registros, observações e fotos.
         </p>
-        
-        <button
-          onClick={generatePDF}
-          disabled={isGenerating}
-          className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50"
-        >
-          {isGenerating ? (
-            <>
-              <Loader2 size={18} className="animate-spin" />
-              Gerando PDF...
-            </>
-          ) : (
-            <>
-              <Download size={18} />
-              Baixar Relatório em PDF
-            </>
-          )}
-        </button>
+
+        <div className="mt-4 grid gap-2">
+          <button
+            onClick={openPreview}
+            disabled={isPreviewing || isGenerating}
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-primary/30 bg-primary/5 py-3.5 text-sm font-bold text-primary transition-all hover:bg-primary/10 active:scale-[0.98] disabled:opacity-50"
+          >
+            {isPreviewing ? (
+              <>
+                <Loader2 size={18} className="animate-spin" />
+                Preparando pré-visualização...
+              </>
+            ) : (
+              <>
+                <FileText size={18} />
+                Pré-visualizar relatório
+              </>
+            )}
+          </button>
+          <button
+            onClick={generatePDF}
+            disabled={isGenerating}
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary py-3.5 text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-50"
+          >
+            {isGenerating ? (
+              <>
+                <Loader2 size={18} className="animate-spin" />
+                Gerando PDF...
+              </>
+            ) : (
+              <>
+                <Download size={18} />
+                Baixar Relatório em PDF
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       <div className="rounded-2xl border border-border bg-card p-5">
@@ -4327,6 +4374,48 @@ function ResumoTab({ actorId }: { actorId: string }) {
           })}
         </div>
       </div>
+
+      <AnimatePresence>
+        {previewUrl && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[70] flex flex-col bg-background/95 backdrop-blur-md"
+          >
+            <div className="flex items-center justify-between gap-3 border-b border-border bg-card px-4 py-3">
+              <div className="min-w-0">
+                <h3 className="truncate font-display text-base text-primary">Pré-visualização do relatório</h3>
+                <p className="truncate text-[11px] text-muted-foreground">
+                  Revise seus registros e fotos antes de baixar.
+                </p>
+              </div>
+              <div className="flex shrink-0 items-center gap-2">
+                <a
+                  href={previewUrl}
+                  download={protocolPdfFilename(state)}
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-xs font-bold text-primary-foreground shadow-sm transition-all hover:brightness-110"
+                >
+                  <Download size={14} />
+                  Baixar
+                </a>
+                <button
+                  onClick={closePreview}
+                  className="grid h-9 w-9 place-items-center rounded-lg bg-secondary/70 text-foreground/70 transition-colors hover:bg-secondary"
+                  aria-label="Fechar pré-visualização"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+            <iframe
+              src={previewUrl}
+              title="Pré-visualização do relatório em PDF"
+              className="flex-1 w-full border-0 bg-white"
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

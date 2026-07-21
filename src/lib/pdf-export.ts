@@ -1,6 +1,6 @@
 import type { ProtocolState } from "./protocol-store";
 
-export async function exportProtocolPDF(state: ProtocolState) {
+export async function buildProtocolPDF(state: ProtocolState) {
   const { jsPDF } = await import("jspdf");
   const { default: autoTable } = await import("jspdf-autotable");
 
@@ -102,5 +102,20 @@ export async function exportProtocolPDF(state: ProtocolState) {
     }
   }
 
-  doc.save(`protocolo-orquidea-${state.plant.name || "resumo"}.pdf`);
+  return doc;
+}
+
+export function protocolPdfFilename(state: ProtocolState) {
+  return `protocolo-orquidea-${state.plant.name || "resumo"}.pdf`;
+}
+
+export async function exportProtocolPDF(state: ProtocolState) {
+  const doc = await buildProtocolPDF(state);
+  doc.save(protocolPdfFilename(state));
+}
+
+export async function previewProtocolPDF(state: ProtocolState): Promise<string> {
+  const doc = await buildProtocolPDF(state);
+  const blob = doc.output("blob") as Blob;
+  return URL.createObjectURL(blob);
 }
