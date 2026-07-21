@@ -1418,6 +1418,14 @@ function ResultBlocks({
           </AccordionItem>
         </Accordion>
       )}
+      {hasAny && (
+        <DiagnosisSummaryChecklist
+          score={score}
+          statusLabel={scoreStatus.label}
+          priorities={priorities}
+          adjustments={adjustments}
+        />
+      )}
       <InfoCard tone="lilac" icon={<Info size={16} />}>
         Um sinal isolado não fecha um diagnóstico. Utilize estas orientações como apoio à
         observação.
