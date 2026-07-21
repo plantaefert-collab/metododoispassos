@@ -1735,14 +1735,19 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
       <MetodoContent />
 
       {/* CTA - Começar plano de 21 dias */}
-      <button
-        onClick={() => setTab("plano")}
-        className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-full bg-primary px-6 py-4 text-sm font-bold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-[0.98]"
-      >
-        <Sparkles size={18} />
-        Começar meu plano de 21 dias
-        <ChevronRight size={18} className="transition-transform group-hover:translate-x-1" />
-      </button>
+      {(() => {
+        const hasProgress = completedDays > 0 || totalApplications > 0 || day > 1;
+        return (
+          <button
+            onClick={() => setTab("plano")}
+            className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-full bg-primary px-6 py-4 text-sm font-bold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-[0.98]"
+          >
+            <Sparkles size={18} />
+            {hasProgress ? `Continuar meu plano — Dia ${day}` : "Começar meu plano de 21 dias"}
+            <ChevronRight size={18} className="transition-transform group-hover:translate-x-1" />
+          </button>
+        );
+      })()}
 
       <div 
         onClick={handleRedirectToPlan}
