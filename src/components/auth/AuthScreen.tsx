@@ -2,6 +2,11 @@ import { useState, type FormEvent } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Leaf, Loader2 } from "lucide-react";
 
+type Feedback = {
+  tone: "error" | "success";
+  message: string;
+} | null;
+
 interface AuthScreenProps {
   onBack: () => void;
   onSuccess: () => void;
@@ -13,7 +18,9 @@ export function AuthScreen({ onBack, onSuccess }: AuthScreenProps) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [lastSignupEmail, setLastSignupEmail] = useState("");
+  const [feedback, setFeedback] = useState<Feedback>(null);
 
   const getFriendlyAuthError = (message: string) => {
     const normalized = message.toLowerCase();
@@ -23,11 +30,11 @@ export function AuthScreen({ onBack, onSuccess }: AuthScreenProps) {
     }
 
     if (normalized.includes("email not confirmed")) {
-      return "Seu e-mail ainda não foi confirmado. Verifique sua caixa de entrada antes de entrar.";
+      return "Seu cadastro foi criado, mas o e-mail ainda não foi confirmado. Verifique sua caixa de entrada antes de entrar.";
     }
 
     if (normalized.includes("user already registered") || normalized.includes("already registered")) {
-      return "Este e-mail já tem uma conta. Toque em “Já tem uma conta? Entre agora” para acessar.";
+      return "Este e-mail já tem uma conta. Se você ainda não confirmou o cadastro, reenvie o link de confirmação.";
     }
 
     if (normalized.includes("weak password") || normalized.includes("password")) {
@@ -40,9 +47,20 @@ export function AuthScreen({ onBack, onSuccess }: AuthScreenProps) {
   const handleEmailAuth = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
+    setFeedback(null);
     try {
       const trimmedEmail = email.trim();
+
+      if (!trimmedEmail) {
+        setFeedback({ tone: "error", message: "Informe seu e-mail para continuar." });
+        return;
+      }
+
+      if (password.length < 6) {
+        setFeedback({ tone: "error", message: "Use uma senha com pelo menos 6 caracteres." });
+        return;
+      }
+
       const { data, error } = mode === "signup"
         ? await supabase.auth.signUp({
             email: trimmedEmail,
@@ -55,18 +73,60 @@ export function AuthScreen({ onBack, onSuccess }: AuthScreenProps) {
       if (data.session) {
         onSuccess();
       } else if (mode === "signup") {
-        setError("Verifique seu e-mail para confirmar o cadastro.");
+        setLastSignupEmail(trimmedEmail);
+        setFeedback({
+          tone: "success",
+          message: "Cadastro criado. Enviamos um link de confirmação para o seu e-mail; depois de confirmar, volte aqui e entre com sua senha.",
+        });
       }
     } catch (err: unknown) {
-      setError(getFriendlyAuthError(err instanceof Error ? err.message : "Erro na autenticação"));
+      setFeedback({
+        tone: "error",
+        message: getFriendlyAuthError(err instanceof Error ? err.message : "Erro na autenticação"),
+      });
     } finally {
       setLoading(false);
     }
   };
 
+  const handleResendConfirmation = async () => {
+    const targetEmail = (email.trim() || lastSignupEmail).trim();
+
+    if (!targetEmail) {
+      setFeedback({ tone: "error", message: "Informe seu e-mail para reenviar a confirmação." });
+      return;
+    }
+
+    setResendLoading(true);
+    setFeedback(null);
+
+    try {
+      const { error } = await supabase.auth.resend({
+        type: "signup",
+        email: targetEmail,
+        options: { emailRedirectTo: window.location.origin },
+      });
+
+      if (error) throw error;
+
+      setLastSignupEmail(targetEmail);
+      setFeedback({
+        tone: "success",
+        message: "Reenviamos o link de confirmação. Confira a caixa de entrada e o spam.",
+      });
+    } catch (err: unknown) {
+      setFeedback({
+        tone: "error",
+        message: getFriendlyAuthError(err instanceof Error ? err.message : "Erro ao reenviar confirmação"),
+      });
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   const handleGoogleAuth = async () => {
     setGoogleLoading(true);
-    setError(null);
+    setFeedback(null);
     try {
       const { lovable } = await import("@/integrations/lovable/index");
       
@@ -85,7 +145,10 @@ export function AuthScreen({ onBack, onSuccess }: AuthScreenProps) {
 
       onSuccess();
     } catch (err: unknown) {
-      setError("Erro ao iniciar login com Google: " + (err instanceof Error ? err.message : "desconhecido"));
+      setFeedback({
+        tone: "error",
+        message: "Erro ao iniciar login com Google: " + (err instanceof Error ? err.message : "desconhecido"),
+      });
       setGoogleLoading(false);
     }
   };
@@ -132,9 +195,16 @@ export function AuthScreen({ onBack, onSuccess }: AuthScreenProps) {
             />
           </div>
 
-          {error && (
-            <div className="p-3 rounded-xl bg-destructive/10 text-destructive text-xs font-medium">
-              {error}
+          {feedback && (
+            <div
+              aria-live="polite"
+              className={`p-3 rounded-xl text-xs font-medium ${
+                feedback.tone === "success"
+                  ? "bg-primary/10 text-primary"
+                  : "bg-destructive/10 text-destructive"
+              }`}
+            >
+              {feedback.message}
             </div>
           )}
 
@@ -144,6 +214,15 @@ export function AuthScreen({ onBack, onSuccess }: AuthScreenProps) {
             className="w-full rounded-full bg-primary py-3.5 text-sm font-bold text-primary-foreground shadow-md transition-all active:scale-[0.98] disabled:opacity-50"
           >
             {loading ? "Processando..." : mode === "login" ? "Entrar" : "Criar conta"}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleResendConfirmation}
+            disabled={loading || resendLoading}
+            className="w-full text-xs font-semibold text-primary transition-colors hover:underline disabled:cursor-not-allowed disabled:opacity-60"
+          >
+            {resendLoading ? "Reenviando confirmação..." : "Reenviar confirmação por e-mail"}
           </button>
         </form>
 
@@ -171,7 +250,11 @@ export function AuthScreen({ onBack, onSuccess }: AuthScreenProps) {
 
         <div className="mt-8 text-center text-sm">
           <button
-            onClick={() => setMode(mode === "login" ? "signup" : "login")}
+            type="button"
+            onClick={() => {
+              setMode(mode === "login" ? "signup" : "login");
+              setFeedback(null);
+            }}
             className="text-primary font-semibold hover:underline"
           >
             {mode === "login" ? "Não tem uma conta? Cadastre-se" : "Já tem uma conta? Entre agora"}
@@ -179,6 +262,7 @@ export function AuthScreen({ onBack, onSuccess }: AuthScreenProps) {
         </div>
 
         <button
+          type="button"
           onClick={onBack}
           className="mt-6 w-full text-xs text-muted-foreground hover:text-foreground transition-colors"
         >
