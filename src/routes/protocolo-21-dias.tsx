@@ -248,6 +248,7 @@ function ProtocoloPage() {
                 setTab("aprender");
               }}
               setStatus={setStatus}
+              setTab={setTab}
             />
           </motion.div>
         )}
