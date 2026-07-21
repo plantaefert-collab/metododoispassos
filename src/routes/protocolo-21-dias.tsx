@@ -3161,7 +3161,7 @@ const LIBRARY: Array<{ id: string; title: string; icon: ReactNode; body: string 
   },
 ];
 
-function AprenderTab() {
+function AprenderTab({ setTab }: { setTab: (tab: string) => void }) {
   const [open, setOpen] = useState<string | null>(null);
   const current = LIBRARY.find((l) => l.id === open);
 
