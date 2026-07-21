@@ -3204,6 +3204,28 @@ function AprenderTab() {
         ))}
       </div>
 
+      <div 
+        onClick={() => {
+          // O MetodoTab é renderizado pelo AppShell baseado no estado tab
+          // Aqui no AprenderTab, podemos sugerir a navegação se necessário,
+          // mas como o MetodoTab está sendo adicionado logo abaixo, vamos deixar o usuário navegar via menu
+        }}
+        className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/[0.05] to-transparent p-5"
+      >
+        <div className="flex items-center gap-3">
+          <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
+            <Info size={20} />
+          </div>
+          <div>
+            <h3 className="text-sm font-bold text-primary">O Método de 2 Passos</h3>
+            <p className="text-[10px] text-muted-foreground uppercase tracking-widest">Enraizar & Nutrir</p>
+          </div>
+        </div>
+        <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
+          Entenda a ciência por trás do nosso protocolo de 21 dias e como aplicar corretamente os produtos.
+        </p>
+      </div>
+
       {current && (
         <Drawer onClose={() => setOpen(null)} title={current.title} icon={current.icon}>
           <p className="text-base leading-relaxed text-foreground/90">{current.body}</p>
