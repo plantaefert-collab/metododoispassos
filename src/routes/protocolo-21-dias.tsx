@@ -1810,27 +1810,35 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         );
       })()}
 
-      {/* Método 2 Passos (movido para logo abaixo do Próximo passo · Dia 1) */}
-      <div className="group relative overflow-hidden rounded-2xl border border-primary/10 bg-gradient-to-br from-primary/[0.05] to-transparent p-5 transition-all hover:border-primary/30">
-        <div className="absolute -right-6 -top-6 text-primary/10 transition-transform group-hover:scale-110">
-          <Sparkles size={100} />
+      {/* Método 2 Passos — bloco de destaque em verde */}
+      <div className="group relative overflow-hidden rounded-2xl border-2 border-primary/40 bg-gradient-to-br from-primary/15 via-primary/8 to-primary/[0.03] p-6 shadow-lg shadow-primary/10 transition-all hover:border-primary/60 hover:shadow-primary/20">
+        <div className="absolute -right-6 -top-6 text-primary/20 transition-transform group-hover:scale-110">
+          <Sparkles size={120} />
         </div>
         <div className="relative z-10">
           <div className="flex items-center gap-2 text-primary">
-            <div className="grid h-8 w-8 place-items-center rounded-lg bg-primary/10">
-              <Sprout size={16} />
+            <div className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-primary-foreground shadow-md shadow-primary/30">
+              <Sprout size={18} />
             </div>
-            <h3 className="font-display text-lg">Método de 2 Passos</h3>
+            <h3 className="font-display text-xl text-primary">Método de 2 Passos</h3>
           </div>
-          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+          <p className="mt-2 text-sm leading-relaxed text-foreground/80">
             Entenda como funciona o protocolo de Enraizar e Nutrir para sua orquídea florescer.
           </p>
-          <button
-            onClick={() => setTab("metodo")}
-            className="mt-4 flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-xs font-bold text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:brightness-110 active:scale-[0.98]"
-          >
-            Ver explicação <ChevronRight size={14} />
-          </button>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <button
+              onClick={() => setTab("metodo")}
+              className="flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-xs font-bold text-primary-foreground shadow-lg shadow-primary/30 transition-all hover:brightness-110 active:scale-[0.98]"
+            >
+              Ver explicação <ChevronRight size={14} />
+            </button>
+            <button
+              onClick={() => setTab("metodo")}
+              className="flex items-center gap-2 rounded-full border-2 border-primary bg-primary/5 px-5 py-2 text-xs font-bold text-primary transition-all hover:bg-primary/15 active:scale-[0.98]"
+            >
+              Modo de usar <ChevronRight size={14} />
+            </button>
+          </div>
         </div>
       </div>
 
