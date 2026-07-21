@@ -3205,15 +3205,11 @@ function AprenderTab() {
       </div>
 
       <div 
-        onClick={() => {
-          // O MetodoTab é renderizado pelo AppShell baseado no estado tab
-          // Aqui no AprenderTab, podemos sugerir a navegação se necessário,
-          // mas como o MetodoTab está sendo adicionado logo abaixo, vamos deixar o usuário navegar via menu
-        }}
-        className="rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/[0.05] to-transparent p-5"
+        onClick={() => setTab("metodo")}
+        className="group relative cursor-pointer overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-br from-primary/[0.05] to-transparent p-5 transition-all hover:border-primary/40 active:scale-[0.99]"
       >
         <div className="flex items-center gap-3">
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
+          <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary transition-transform group-hover:scale-110">
             <Info size={20} />
           </div>
           <div>
@@ -3224,6 +3220,9 @@ function AprenderTab() {
         <p className="mt-3 text-xs leading-relaxed text-muted-foreground">
           Entenda a ciência por trás do nosso protocolo de 21 dias e como aplicar corretamente os produtos.
         </p>
+        <div className="mt-4 flex items-center gap-1 text-[11px] font-bold text-primary uppercase tracking-wider">
+          Ver detalhes <ChevronRight size={14} className="transition-transform group-hover:translate-x-1" />
+        </div>
       </div>
 
       {current && (
