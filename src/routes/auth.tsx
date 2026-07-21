@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate, useSearch } from "@tanstack/react-router"
 import { useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { AuthScreen } from "@/components/auth/AuthScreen";
-import { fetchUserProfile, fetchUserProgress } from "@/lib/protocol-cloud";
+import { resolvePostAuthDestination } from "@/lib/auth-destination";
 
 type AuthSearch = { redirect?: string };
 
@@ -27,19 +27,10 @@ function AuthPage() {
     redirect && redirect.startsWith("/") && !redirect.startsWith("//") ? redirect : null;
 
   async function resolveDestination(userId: string, opts?: { isNewSignup?: boolean }) {
-    if (explicitRedirect) return explicitRedirect;
-    if (opts?.isNewSignup) return "/bem-vindo";
-    try {
-      const [{ data: profile }, { data: progress }] = await Promise.all([
-        fetchUserProfile(userId),
-        fetchUserProgress(userId),
-      ]);
-      if (!profile?.plant_registered_at) return "/minha-orquidea";
-      if (!progress?.diagnosis_result) return "/diagnostico";
-      return "/inicio";
-    } catch {
-      return "/inicio";
-    }
+    return resolvePostAuthDestination(userId, {
+      isNewSignup: opts?.isNewSignup,
+      explicitRedirect,
+    });
   }
 
   useEffect(() => {
