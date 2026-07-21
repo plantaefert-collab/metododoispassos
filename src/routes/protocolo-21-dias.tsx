@@ -1734,6 +1734,72 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
       {/* Método de 2 Passos - Seção Completa */}
       <MetodoContent />
 
+      {/* Resumo Rápido do Dia Atual */}
+      {(() => {
+        const today = state.days[day] ?? { checklist: {}, note: "", completed: false };
+        const checklistItems = Object.values(today.checklist ?? {});
+        const checklistTotal = checklistItems.length;
+        const checklistDone = checklistItems.filter(Boolean).length;
+        const appToday = state.applications.filter((a) => a.day === day).length;
+        const needsApp = isApplicationDay && appToday === 0;
+        const needsNote = !today.note?.trim();
+        const needsPhoto = !today.photo;
+        const pending: string[] = [];
+        if (needsApp) pending.push("Aplicação");
+        if (checklistTotal > 0 && checklistDone < checklistTotal) pending.push(`${checklistTotal - checklistDone} tarefa(s)`);
+        if (needsNote) pending.push("Registro");
+        if (needsPhoto) pending.push("Foto");
+
+        return (
+          <button
+            onClick={handleRedirectToPlan}
+            className="group relative w-full overflow-hidden rounded-2xl border border-primary/20 bg-card p-5 text-left shadow-sm transition-all hover:border-primary/40 active:scale-[0.99]"
+          >
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-primary">
+                <CalendarDays size={14} />
+                <span className="text-[10px] font-bold uppercase tracking-widest">Resumo do Dia {day}</span>
+              </div>
+              <ChevronRight size={16} className="text-primary/50 transition-transform group-hover:translate-x-1" />
+            </div>
+            <h3 className="mt-2 font-display text-xl text-primary">
+              {today.completed ? "Dia concluído" : pending.length === 0 ? "Tudo em dia" : "Você tem pendências"}
+            </h3>
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              <div className="rounded-xl bg-primary/5 p-2.5 text-center">
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Tarefas</div>
+                <div className="mt-0.5 font-display text-lg text-primary">
+                  {checklistDone}/{checklistTotal || "—"}
+                </div>
+              </div>
+              <div className="rounded-xl bg-accent/5 p-2.5 text-center">
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Aplicações</div>
+                <div className="mt-0.5 font-display text-lg text-accent">{appToday}</div>
+              </div>
+              <div className="rounded-xl bg-secondary/50 p-2.5 text-center">
+                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Registro</div>
+                <div className="mt-0.5 flex items-center justify-center">
+                  {today.note?.trim() ? (
+                    <CheckCircle2 size={18} className="text-primary" />
+                  ) : (
+                    <span className="text-lg text-muted-foreground">—</span>
+                  )}
+                </div>
+              </div>
+            </div>
+            {pending.length > 0 && !today.completed && (
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {pending.map((p) => (
+                  <span key={p} className="rounded-full bg-accent/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-accent">
+                    {p} pendente
+                  </span>
+                ))}
+              </div>
+            )}
+          </button>
+        );
+      })()}
+
       {/* CTA - Começar plano de 21 dias */}
       {(() => {
         const hasProgress = completedDays > 0 || totalApplications > 0 || day > 1;
