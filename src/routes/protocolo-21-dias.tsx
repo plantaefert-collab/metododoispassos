@@ -1895,7 +1895,18 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             {hasProgress ? `Continuar meu plano — Dia ${day}` : "Começar meu plano de 21 dias"}
             {hasProgress && (
               <span className="ml-1 rounded-full bg-primary-foreground/15 px-2 py-0.5 text-[10px] font-bold tracking-wider text-primary-foreground backdrop-blur-sm">
-                {percent}%
+                <AnimatePresence mode="popLayout" initial={false}>
+                  <motion.span
+                    key={percent}
+                    initial={{ y: -8, opacity: 0, scale: 0.8 }}
+                    animate={{ y: 0, opacity: 1, scale: 1 }}
+                    exit={{ y: 8, opacity: 0, scale: 0.8 }}
+                    transition={{ type: "spring", stiffness: 380, damping: 22 }}
+                    className="inline-block tabular-nums"
+                  >
+                    {percent}%
+                  </motion.span>
+                </AnimatePresence>
               </span>
             )}
             <ChevronRight size={18} className="transition-transform group-hover:translate-x-1" />
