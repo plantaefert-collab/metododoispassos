@@ -371,7 +371,7 @@ function ProtocoloPage() {
                     <DiagnosticoTab actorId={actorId} onRedo={() => setStatus("needs_diagnosis")} setTab={setTab} />
                   )}
                   {tab === "diario" && <DiarioTab actorId={actorId} />}
-                  {tab === "aprender" && <AprenderTab />}
+                  {tab === "aprender" && <AprenderTab setTab={setTab} />}
                   {tab === "resumo" && <ResumoTab actorId={actorId} />}
                   {tab === "metodo" && <MetodoTab />}
                 </motion.div>
