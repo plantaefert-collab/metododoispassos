@@ -2184,7 +2184,6 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         </div>
       )}
 
-      {/* ─────────── BLOCO 2 · PROGRESSO ─────────── */}
       {/* ─────────── BLOCO 3 · AÇÕES & ATALHOS ─────────── */}
       <SectionHeader
         eyebrow="Bloco 3"
