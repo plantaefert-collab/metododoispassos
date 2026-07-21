@@ -1218,6 +1218,7 @@ function DiagnosisResultScreen({ actorId, onBack, onFinish }: { actorId: string;
 
 function ResultBlocks({
   result,
+  answers,
 }: {
   result: {
     priorities: DiagnosisGuidance[];
@@ -1226,41 +1227,87 @@ function ResultBlocks({
     insufficientInformation: DiagnosisGuidance[];
     trackingPoints: string[];
   };
+  answers?: Record<DiagnosisCategory, string[]>;
 }) {
   const { priorities, adjustments, favorable, insufficientInformation, trackingPoints } = result;
   const hasAny =
     priorities.length + adjustments.length + favorable.length + insufficientInformation.length > 0;
 
   const nextSteps = [...priorities, ...adjustments].slice(0, 3);
-  const overall =
-    priorities.length > 0
-      ? { label: "Requer atenção imediata", tone: "warn" as const }
-      : adjustments.length > 0
-        ? { label: "Ajustes recomendados", tone: "accent" as const }
-        : favorable.length > 0
-          ? { label: "Condições favoráveis", tone: "green" as const }
-          : { label: "Observação inicial", tone: "muted" as const };
-  const overallCls =
-    overall.tone === "warn"
-      ? "border-accent/40 bg-accent/10 text-accent"
-      : overall.tone === "accent"
-        ? "border-primary/20 bg-lilac/50 text-primary"
-        : overall.tone === "green"
-          ? "border-primary/20 bg-secondary/60 text-primary"
-          : "border-border bg-muted text-muted-foreground";
+
+  // Health score (0-100): penaliza prioridades e ajustes, bonifica sinais favoráveis
+  const rawScore = 100 - priorities.length * 20 - adjustments.length * 10 + favorable.length * 5;
+  const score = Math.max(0, Math.min(100, rawScore));
+  const scoreStatus =
+    score >= 80
+      ? { label: "Saudável", tone: "green" as const, message: "Sua orquídea mostra sinais consistentes de saúde. Mantenha a rotina." }
+      : score >= 60
+        ? { label: "Estável com ajustes", tone: "accent" as const, message: "Boa base. Alguns ajustes vão elevar o desempenho." }
+        : score >= 40
+          ? { label: "Em recuperação", tone: "accent" as const, message: "Há pontos de atenção. Siga as prioridades para reverter." }
+          : { label: "Requer atenção imediata", tone: "warn" as const, message: "Foque nas prioridades desta semana. É reversível." };
+  const scoreColor =
+    scoreStatus.tone === "green"
+      ? "text-primary"
+      : scoreStatus.tone === "accent"
+        ? "text-primary"
+        : "text-accent";
+  const scoreBgCls =
+    scoreStatus.tone === "warn"
+      ? "border-accent/40 bg-gradient-to-br from-accent/10 to-accent/5"
+      : scoreStatus.tone === "green"
+        ? "border-primary/25 bg-gradient-to-br from-secondary/60 to-secondary/30"
+        : "border-primary/20 bg-gradient-to-br from-lilac/60 to-lilac/20";
 
   return (
     <div className="mt-5 space-y-3">
       {hasAny && (
-        <div className={`rounded-2xl border p-4 ${overallCls}`}>
-          <div className="text-xs font-bold uppercase tracking-wider opacity-80">Resumo automático</div>
-          <div className="mt-1 font-display text-lg">{overall.label}</div>
-          <p className="mt-2 text-sm text-foreground/80">
-            Encontramos <strong>{priorities.length}</strong> prioridade(s), <strong>{adjustments.length}</strong> ajuste(s) e{" "}
-            <strong>{favorable.length}</strong> sinal(is) favorável(is) nas suas observações.
-          </p>
+        <div className={`rounded-2xl border p-4 ${scoreBgCls}`}>
+          <div className="flex items-center gap-4">
+            <div className="relative grid h-20 w-20 shrink-0 place-items-center rounded-full bg-card shadow-inner">
+              <svg className="absolute inset-0 -rotate-90" viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="34" fill="none" stroke="currentColor" strokeWidth="6" className="text-muted opacity-40" />
+                <motion.circle
+                  cx="40"
+                  cy="40"
+                  r="34"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                  className={scoreColor}
+                  initial={{ strokeDasharray: "0 214", strokeDashoffset: 0 }}
+                  animate={{ strokeDasharray: `${(score / 100) * 214} 214` }}
+                  transition={{ duration: 1, ease: "circOut" }}
+                />
+              </svg>
+              <div className="text-center">
+                <div className={`font-display text-2xl leading-none ${scoreColor}`}>{score}</div>
+                <div className="text-[9px] uppercase tracking-wider text-muted-foreground">saúde</div>
+              </div>
+            </div>
+            <div className="min-w-0">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">Veredito</div>
+              <div className={`font-display text-lg leading-tight ${scoreColor}`}>{scoreStatus.label}</div>
+              <p className="mt-1 text-xs text-foreground/80">{scoreStatus.message}</p>
+            </div>
+          </div>
+          <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+            <div className="rounded-lg bg-card/70 py-2">
+              <div className="text-lg font-bold text-accent">{priorities.length}</div>
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">prioridades</div>
+            </div>
+            <div className="rounded-lg bg-card/70 py-2">
+              <div className="text-lg font-bold text-primary">{adjustments.length}</div>
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">ajustes</div>
+            </div>
+            <div className="rounded-lg bg-card/70 py-2">
+              <div className="text-lg font-bold text-primary">{favorable.length}</div>
+              <div className="text-[10px] uppercase tracking-wider text-muted-foreground">favoráveis</div>
+            </div>
+          </div>
           {nextSteps.length > 0 && (
-            <div className="mt-3 rounded-xl border border-border/60 bg-card/70 p-3">
+            <div className="mt-3 rounded-xl border border-border/60 bg-card/80 p-3">
               <div className="text-xs font-bold uppercase tracking-wider text-primary">Próximos passos</div>
               <ol className="mt-2 space-y-2 text-sm text-foreground">
                 {nextSteps.map((s, i) => (
