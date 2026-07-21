@@ -997,12 +997,15 @@ const DIAG_CATEGORIES: Array<{ key: DiagnosisCategory; icon: ReactNode }> = [
 function DiagnosisScreen({ actorId, onFinish, onBack }: { actorId: string; onFinish: () => void; onBack: () => void }) {
   const { state, toggleDiagnosis, clearSaveError } = useProtocolStore();
 
-  const [stepIdx, setStepIdx] = useState(0);
   const total = DIAG_CATEGORIES.length;
-  const current = DIAG_CATEGORIES[stepIdx];
-  const options = DIAGNOSIS_OPTIONS[current.key];
-  const selected = state.diagnosis[current.key];
-  const isLast = stepIdx === total - 1;
+  const totalSelected = DIAG_CATEGORIES.reduce(
+    (acc, c) => acc + state.diagnosis[c.key].length,
+    0,
+  );
+  const categoriesWithAnswers = DIAG_CATEGORIES.filter(
+    (c) => state.diagnosis[c.key].length > 0,
+  ).length;
+  const [openItem, setOpenItem] = useState<string | undefined>(DIAG_CATEGORIES[0].key);
 
   return (
     <div className="min-h-screen overflow-y-auto bg-background">
@@ -1011,10 +1014,15 @@ function DiagnosisScreen({ actorId, onFinish, onBack }: { actorId: string; onFin
           step={2}
           total={3}
           title="Diagnóstico guiado"
-          subtitle="Marque tudo que você observa na sua orquídea."
+          subtitle="Toque em cada categoria e marque os sinais que você observa."
         />
 
-        <ProgressBar value={((stepIdx + 1) / total) * 100} className="mt-4" />
+        <ProgressBar value={(categoriesWithAnswers / total) * 100} className="mt-4" />
+        <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground">
+          <span>{categoriesWithAnswers} de {total} categorias exploradas</span>
+          <span>{totalSelected} sinal(is) marcado(s)</span>
+        </div>
+
         {state.saveError && (
           <div
             role="alert"
@@ -1032,88 +1040,103 @@ function DiagnosisScreen({ actorId, onFinish, onBack }: { actorId: string; onFin
             </button>
           </div>
         )}
-        <div className="mt-2 flex flex-wrap gap-1.5" aria-label="Etapas do diagnóstico">
-          {DIAG_CATEGORIES.map((c, i) => (
-            <span
-              key={c.key}
-              className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                i < stepIdx
-                  ? "bg-primary/10 text-primary"
-                  : i === stepIdx
-                    ? "bg-accent/15 text-accent"
-                    : "bg-muted text-muted-foreground"
-              }`}
-            >
-              {CATEGORY_LABEL[c.key]}
-            </span>
-          ))}
-        </div>
 
-        <div className="mt-6">
-          <div className="flex items-center gap-2 text-primary">
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-secondary">
-              {current.icon}
-            </span>
-            <h2 className="text-xl font-bold">{CATEGORY_LABEL[current.key]}</h2>
-          </div>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Selecione todas as alternativas que descrevem sua observação atual.
-          </p>
-          <div
-            className="mt-4 grid gap-2"
-            role="group"
-            aria-label={`Alternativas de ${CATEGORY_LABEL[current.key]}`}
-          >
-            {options.map((opt) => {
-              const active = selected.includes(opt);
-              return (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => toggleDiagnosis(current.key, opt, actorId)}
-                  aria-pressed={active}
-                  className={`flex items-center justify-between rounded-xl border px-4 py-3.5 text-left text-[15px] transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
-                    active
-                      ? "border-primary bg-primary/5 text-primary"
-                      : "border-border bg-card text-foreground hover:border-primary/40"
-                  }`}
-                >
-                  <span className="pr-3">{opt}</span>
-                  {active ? (
-                    <CheckCircle2 size={20} />
-                  ) : (
-                    <Circle size={20} className="text-muted-foreground" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
+        <Accordion
+          type="single"
+          collapsible
+          value={openItem}
+          onValueChange={setOpenItem}
+          className="mt-5 space-y-2"
+        >
+          {DIAG_CATEGORIES.map((c) => {
+            const options = DIAGNOSIS_OPTIONS[c.key];
+            const selected = state.diagnosis[c.key];
+            const count = selected.length;
+            return (
+              <AccordionItem
+                key={c.key}
+                value={c.key}
+                className="overflow-hidden rounded-2xl border border-border bg-card data-[state=open]:border-primary/40"
+              >
+                <AccordionTrigger className="px-4 py-3 hover:no-underline">
+                  <div className="flex flex-1 items-center gap-3 pr-2">
+                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-secondary text-primary">
+                      {c.icon}
+                    </span>
+                    <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
+                      <span className="truncate text-left text-sm font-semibold text-foreground">
+                        {CATEGORY_LABEL[c.key]}
+                      </span>
+                      <span
+                        className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium ${
+                          count > 0
+                            ? "bg-primary/10 text-primary"
+                            : "bg-muted text-muted-foreground"
+                        }`}
+                      >
+                        {count > 0 ? `${count} marcado(s)` : "toque para abrir"}
+                      </span>
+                    </div>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent className="px-4 pb-4">
+                  <p className="mb-3 text-[11px] text-muted-foreground">
+                    Toque nos chips que descrevem a observação atual.
+                  </p>
+                  <div
+                    className="flex flex-wrap gap-1.5"
+                    role="group"
+                    aria-label={`Alternativas de ${CATEGORY_LABEL[c.key]}`}
+                  >
+                    {options.map((opt) => {
+                      const active = selected.includes(opt);
+                      return (
+                        <button
+                          key={opt}
+                          type="button"
+                          onClick={() => toggleDiagnosis(c.key, opt, actorId)}
+                          aria-pressed={active}
+                          className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[13px] transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
+                            active
+                              ? "border-primary bg-primary/10 text-primary"
+                              : "border-border bg-card text-foreground hover:border-primary/40"
+                          }`}
+                        >
+                          {active ? <CheckCircle2 size={14} /> : <Circle size={14} className="text-muted-foreground" />}
+                          <span>{opt}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            );
+          })}
+        </Accordion>
 
         <InfoCard tone="lilac" icon={<Info size={16} />}>
-          Um sinal isolado não fecha um diagnóstico. Estas escolhas orientam a observação nos
-          próximos dias.
+          Um sinal isolado não fecha um diagnóstico. Marque só o que observa hoje — você pode voltar e editar.
         </InfoCard>
 
         <div className="mt-auto pt-8 flex gap-2 pb-4">
           <button
-            onClick={() => (stepIdx === 0 ? onBack() : setStepIdx((i) => i - 1))}
+            onClick={onBack}
             className="flex items-center gap-1 rounded-full border border-border px-4 py-3 text-sm font-medium text-foreground hover:bg-muted focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
             <ChevronLeft size={16} /> Voltar
           </button>
           <button
-            onClick={() => (isLast ? onFinish() : setStepIdx((i) => i + 1))}
+            onClick={onFinish}
             className="ml-auto flex items-center gap-1 rounded-full bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground active:scale-[0.98] focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            {isLast ? "Ver resultado" : "Próxima etapa"}
-            <ChevronRight size={16} />
+            Ver resultado <ChevronRight size={16} />
           </button>
         </div>
       </div>
     </div>
   );
 }
+
 
 /* ---------------- Diagnosis Result Screen ---------------- */
 
