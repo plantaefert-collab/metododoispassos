@@ -4029,7 +4029,16 @@ function DayPreviewModal({
 /* ---------------- Minha Orquídea ---------------- */
 
 function MinhaOrquideaTab({ actorId, setTab }: { actorId: string; setTab: (t: Tab) => void }) {
-  const { state, updatePlant } = useProtocolStore();
+  const { state, updatePlant, setCurrentDay } = useProtocolStore();
+  const today = getProtocolDay(state.currentDay);
+  const todayChecklist = today.checklist ?? [];
+  const todayTasks = state.days[state.currentDay]?.tasks ?? {};
+  const todayDoneCount = todayChecklist.filter((t) => todayTasks[t]).length;
+  const upcomingDays = Array.from({ length: 3 }, (_, i) => state.currentDay + 1 + i).filter((d) => d <= 21);
+  const goToDay = (d: number) => {
+    setCurrentDay(d, actorId);
+    setTab("plano");
+  };
   const plant = state.plant;
 
   const completedDays = Object.values(state.days).filter((d) => d.completed).length;
