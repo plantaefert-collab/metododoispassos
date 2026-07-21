@@ -60,6 +60,8 @@ import {
   PROTOCOL_PHASES,
   WEEKS,
   getWeekForDay,
+  getFocusCategories,
+  getFocusDays,
   type ProtocolDay,
   type DayStage,
   type RegisterOption,
@@ -1285,6 +1287,14 @@ function ResultBlocks({
   return (
     <div className="mt-5 space-y-3">
       {hasAny && (
+        <DiagnosisSummaryChecklist
+          score={score}
+          statusLabel={scoreStatus.label}
+          priorities={priorities}
+          adjustments={adjustments}
+        />
+      )}
+      {hasAny && (
         <div className={`rounded-2xl border p-4 ${scoreBgCls}`}>
           <div className="flex items-center gap-4">
             <div className="relative grid h-20 w-20 shrink-0 place-items-center rounded-full bg-card shadow-inner">
@@ -1417,14 +1427,6 @@ function ResultBlocks({
             </AccordionContent>
           </AccordionItem>
         </Accordion>
-      )}
-      {hasAny && (
-        <DiagnosisSummaryChecklist
-          score={score}
-          statusLabel={scoreStatus.label}
-          priorities={priorities}
-          adjustments={adjustments}
-        />
       )}
       <InfoCard tone="lilac" icon={<Info size={16} />}>
         Um sinal isolado não fecha um diagnóstico. Utilize estas orientações como apoio à
@@ -2174,6 +2176,12 @@ function PlanoTab({ actorId, setTab, onPreviewDay, setStatus }: PlanoTabProps) {
 
   const week = useMemo(() => getWeekForDay(day), [day]);
   const activeWeek = WEEKS.find((w) => w.id === week) ?? WEEKS[0];
+  const focusCategories = useMemo(
+    () => (diagnosisFresh ? getFocusCategories(state.diagnosisResult) : []),
+    [state.diagnosisResult, diagnosisFresh],
+  );
+  const focusDaysSet = useMemo(() => new Set(getFocusDays(focusCategories)), [focusCategories]);
+  const isFocusDay = focusDaysSet.has(day);
 
   return (
     <div ref={containerRef} className="space-y-4">
@@ -2219,6 +2227,34 @@ function PlanoTab({ actorId, setTab, onPreviewDay, setStatus }: PlanoTabProps) {
         onPreviewDay={onPreviewDay}
         weekDays={activeWeek.days}
       />
+
+      {focusCategories.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-2xl border border-accent/30 bg-gradient-to-br from-accent/10 to-accent/5 p-3.5"
+        >
+          <div className="flex items-start gap-2.5">
+            <div className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-accent/15 text-accent">
+              <Sparkles size={14} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-accent">
+                Plano personalizado pelo diagnóstico
+              </div>
+              <p className="mt-1 text-xs leading-relaxed text-foreground/80">
+                Foco em{" "}
+                <strong>
+                  {focusCategories.map((c) => CATEGORY_LABEL[c]).join(" e ").toLowerCase()}
+                </strong>
+                . Dias destacados abordam esses pontos com mais profundidade.
+                {isFocusDay && " Hoje é um deles."}
+              </p>
+            </div>
+          </div>
+        </motion.div>
+      )}
+
 
       {!diagnosisFresh && day === 1 && (
         <motion.div
@@ -2465,6 +2501,12 @@ function WeekPicker({
   weekDays: number[];
 }) {
   const { state } = useProtocolStore();
+  const diagnosisFresh = isDiagnosisCurrent(state);
+  const focusDays = useMemo(() => {
+    if (!diagnosisFresh) return new Set<number>();
+    const cats = getFocusCategories(state.diagnosisResult);
+    return new Set(getFocusDays(cats));
+  }, [state.diagnosisResult, diagnosisFresh]);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const startPress = (d: number) => {
@@ -2516,6 +2558,7 @@ function WeekPicker({
           const active = d === currentDay;
           const isApp = APPLICATION_DAYS.includes(d);
           const isCompleted = state.days[d]?.completed;
+          const isFocus = focusDays.has(d);
           return (
             <motion.button
               key={d}
@@ -2526,13 +2569,15 @@ function WeekPicker({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.95 }}
               aria-current={active ? "step" : undefined}
-              aria-label={`${isApp ? `Dia ${d}, dia de aplicação` : `Dia ${d}`}${isCompleted ? ", concluído" : ""}`}
+              aria-label={`${isApp ? `Dia ${d}, dia de aplicação` : `Dia ${d}`}${isCompleted ? ", concluído" : ""}${isFocus ? ", foco do diagnóstico" : ""}`}
               className={`relative min-h-[54px] rounded-xl border px-2 py-2 text-[13px] font-semibold transition-all focus:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
                 active
                   ? "border-primary bg-primary text-primary-foreground shadow-sm"
-                  : isCompleted 
+                  : isCompleted
                     ? "border-primary/20 bg-primary/5 text-primary/80"
-                    : "border-border bg-card text-foreground hover:border-primary/40"
+                    : isFocus
+                      ? "border-accent/60 bg-accent/5 text-foreground hover:border-accent"
+                      : "border-border bg-card text-foreground hover:border-primary/40"
               }`}
             >
               <div className="flex flex-col items-center gap-0.5">
