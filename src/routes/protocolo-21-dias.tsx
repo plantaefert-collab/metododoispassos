@@ -1708,30 +1708,105 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           .filter((c) => !c.done);
         const nextItems = pendingChecklist.slice(0, 3);
         const allDone = pendingChecklist.length === 0;
+
+        // Detecta estado contextual do usuário
+        const hasPlant = !!state.plant.name?.trim();
+        const applicationPending = isApplicationDay && !today.applicationDone;
+        const protocolFinished = day >= 21 && allDone;
+
+        type Ctx = {
+          eyebrow: string;
+          title: string;
+          desc: string;
+          cta: { label: string; icon: ReactNode; onClick: () => void };
+        };
+
+        let ctx: Ctx | null = null;
+        if (!hasPlant) {
+          ctx = {
+            eyebrow: "Comece por aqui",
+            title: "Cadastre sua orquídea",
+            desc: "Personalizamos o plano com base nas informações da sua planta.",
+            cta: { label: "Cadastrar orquídea", icon: <Sparkles size={16} />, onClick: () => setTab("orquidea") },
+          };
+        } else if (!diagnosisFresh) {
+          ctx = {
+            eyebrow: "Próximo passo",
+            title: "Faça o diagnóstico da sua orquídea",
+            desc: "Em poucos minutos você recebe um plano personalizado de 21 dias.",
+            cta: { label: "Fazer diagnóstico", icon: <Stethoscope size={16} />, onClick: () => setStatus("needs_diagnosis") },
+          };
+        } else if (protocolFinished) {
+          ctx = {
+            eyebrow: "Protocolo concluído",
+            title: "Faça sua avaliação final",
+            desc: "Registre o que evoluiu e defina sua rotina de manutenção.",
+            cta: { label: "Ver resumo", icon: <Calendar size={16} />, onClick: () => setTab("resumo") },
+          };
+        } else if (applicationPending) {
+          ctx = {
+            eyebrow: `Dia ${day} · Aplicação`,
+            title: meta.title,
+            desc: "Hoje é dia de aplicar o Método de 2 Passos. Registre para não perder o próximo ciclo.",
+            cta: { label: "Abrir dia " + day, icon: <ChevronRight size={16} />, onClick: handleRedirectToPlan },
+          };
+        } else if (allDone && day < 21) {
+          ctx = {
+            eyebrow: `Dia ${day} · Concluído`,
+            title: "Você concluiu o dia de hoje",
+            desc: "Avance para o próximo dia ou registre uma observação extra.",
+            cta: { label: `Ir para o dia ${day + 1}`, icon: <ChevronRight size={16} />, onClick: () => { setCurrentDay(day + 1, actorId); handleRedirectToPlan(); } },
+          };
+        } else {
+          ctx = {
+            eyebrow: `Próximo passo · Dia ${day}`,
+            title: meta.title,
+            desc: meta.mainAction,
+            cta: { label: `Continuar dia ${day}`, icon: <ChevronRight size={16} />, onClick: handleRedirectToPlan },
+          };
+        }
+
+        const showChecklist = hasPlant && diagnosisFresh && !applicationPending && !protocolFinished && !allDone && nextItems.length > 0;
+        const progressPct = Math.round(((day - 1) / 21) * 100 + (allDone ? Math.round(100 / 21) : 0));
+
         return (
           <div
             role="button"
             tabIndex={0}
-            onClick={handleRedirectToPlan}
-            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") handleRedirectToPlan(); }}
+            onClick={ctx.cta.onClick}
+            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") ctx.cta.onClick(); }}
             className="group relative w-full cursor-pointer overflow-hidden rounded-2xl border-2 border-accent/30 bg-gradient-to-br from-accent/[0.06] to-primary/[0.04] p-5 text-left shadow-sm transition-all hover:border-accent/50 active:scale-[0.99]"
           >
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-accent">
                 <Sparkles size={14} />
-                <span className="text-[10px] font-bold uppercase tracking-widest">Próximo passo · Dia {day}</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest">{ctx.eyebrow}</span>
               </div>
               <ChevronRight size={16} className="text-accent/60 transition-transform group-hover:translate-x-1" />
             </div>
             <h3 className="mt-2 font-display text-xl leading-tight text-primary">
-              {allDone ? "Você concluiu tudo do dia" : meta.title}
+              {ctx.title}
             </h3>
             <p className="mt-1.5 text-sm text-primary/75">
-              {allDone
-                ? "Registre uma observação final ou avance para o próximo dia."
-                : meta.mainAction}
+              {ctx.desc}
             </p>
-            {!allDone && nextItems.length > 0 && (
+
+            {hasPlant && diagnosisFresh && (
+              <div className="mt-3 space-y-1.5">
+                <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                  <span>Progresso do plano</span>
+                  <span>Dia {day} de 21</span>
+                </div>
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-primary/10">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-accent to-primary transition-all"
+                    style={{ width: `${Math.min(100, Math.max(0, progressPct))}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {showChecklist && (
               <div className="mt-3 space-y-1.5 rounded-xl bg-card/60 p-3">
                 <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                   Checklist pendente
@@ -1749,25 +1824,14 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
                 )}
               </div>
             )}
-            {day === 1 && (
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (diagnosisFresh) {
-                    handleRedirectToPlan();
-                  } else {
-                    setStatus("needs_diagnosis");
-                  }
-                }}
-                className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-accent-foreground shadow-sm transition-all hover:brightness-110 active:scale-[0.98]"
-              >
-                {diagnosisFresh ? (
-                  <><Calendar size={16} /> Ver meu plano</>
-                ) : (
-                  <><Stethoscope size={16} /> Fazer diagnóstico</>
-                )}
-              </button>
-            )}
+
+            <button
+              onClick={(e) => { e.stopPropagation(); ctx.cta.onClick(); }}
+              className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-accent-foreground shadow-sm transition-all hover:brightness-110 active:scale-[0.98]"
+            >
+              {ctx.cta.icon}
+              {ctx.cta.label}
+            </button>
           </div>
         );
       })()}
