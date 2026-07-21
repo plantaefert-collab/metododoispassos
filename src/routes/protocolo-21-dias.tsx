@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useMemo, useState, type ReactNode, type ChangeEvent, useEffect, useRef, useLayoutEffect } from "react";
 import { toast, Toaster } from "sonner";
 import confetti from "canvas-confetti";
@@ -129,12 +129,42 @@ function ProtocoloPage() {
   return <ProtocoloShell />;
 }
 
+const TAB_TO_PATH: Record<Tab, string> = {
+  inicio: "/inicio",
+  plano: "/plano",
+  diagnostico: "/diagnostico",
+  diario: "/diario",
+  aprender: "/aprender",
+  resumo: "/resumo",
+  metodo: "/metodo",
+};
+const PATH_TO_TAB: Record<string, Tab> = Object.fromEntries(
+  Object.entries(TAB_TO_PATH).map(([t, p]) => [p, t as Tab]),
+) as Record<string, Tab>;
+
 export function ProtocoloShell({ initialTab }: { initialTab?: Tab } = {}) {
   const store = useProtocolStore();
   const { status, user, error: authError, setStatus } = useAuthBootstrap();
-  const [tab, setTab] = useState<Tab>(initialTab ?? "inicio");
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const [tab, _setTab] = useState<Tab>(initialTab ?? PATH_TO_TAB[pathname] ?? "inicio");
   const [previewDay, setPreviewDay] = useState<number | null>(null);
   const hasInitialTab = initialTab !== undefined;
+
+  // Sync URL -> tab (voltar/avançar do navegador, deep links, compartilhamento)
+  useEffect(() => {
+    const fromPath = PATH_TO_TAB[pathname];
+    if (fromPath && fromPath !== tab) _setTab(fromPath);
+  }, [pathname]);
+
+  // Sync tab -> URL
+  const setTab = (next: Tab) => {
+    _setTab(next);
+    const target = TAB_TO_PATH[next];
+    if (target && target !== pathname) {
+      navigate({ to: target });
+    }
+  };
 
   // Retomar automaticamente para a aba correta quando o status mudar para ready
   useEffect(() => {
