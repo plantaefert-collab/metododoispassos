@@ -4060,6 +4060,82 @@ function ConfirmModal({
 
 /* ---------------- Resumo ---------------- */
 
+function DayCompleteModal({
+  day,
+  meta,
+  entry,
+  applicationsForDay,
+  canAdvance,
+  onCancel,
+  onConfirm,
+}: {
+  day: number;
+  meta: { checklist: string[]; title?: string };
+  entry: { checklist: Record<string, boolean>; note: string; completed: boolean };
+  applicationsForDay: number;
+  canAdvance: boolean;
+  onCancel: () => void;
+  onConfirm: (advance: boolean) => void;
+}) {
+  const total = meta.checklist.length;
+  const done = meta.checklist.filter((i) => entry.checklist[i]).length;
+  const noteTrim = entry.note?.trim() ?? "";
+  return (
+    <div className="fixed inset-0 z-50 grid place-items-center bg-primary/40 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-sm rounded-3xl border border-border bg-card p-5 shadow-2xl">
+        <div className="text-xs font-bold uppercase tracking-wider text-accent">Resumo do dia</div>
+        <div className="mt-1 font-display text-xl text-primary">Concluir Dia {day}?</div>
+        <div className="mt-4 space-y-2 rounded-2xl border border-border bg-muted/30 p-3 text-sm">
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Checklist</span>
+            <span className="font-semibold text-foreground">{done}/{total}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Aplicações registradas</span>
+            <span className="font-semibold text-foreground">{applicationsForDay}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-muted-foreground">Registro no diário</span>
+            <span className="font-semibold text-foreground">{noteTrim ? "Sim" : "Não"}</span>
+          </div>
+          {noteTrim && (
+            <p className="mt-2 line-clamp-3 border-t border-border/50 pt-2 text-xs italic text-muted-foreground">
+              "{noteTrim}"
+            </p>
+          )}
+        </div>
+        {done < total && (
+          <p className="mt-3 text-xs text-accent">
+            Ainda restam {total - done} item(ns) do checklist. Você pode concluir mesmo assim.
+          </p>
+        )}
+        <div className="mt-4 flex flex-col gap-2">
+          {canAdvance && (
+            <button
+              onClick={() => onConfirm(true)}
+              className="w-full rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
+            >
+              Concluir e avançar para Dia {day + 1}
+            </button>
+          )}
+          <button
+            onClick={() => onConfirm(false)}
+            className="w-full rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground"
+          >
+            {canAdvance ? `Só concluir Dia ${day}` : `Concluir Dia ${day}`}
+          </button>
+          <button
+            onClick={onCancel}
+            className="w-full rounded-full border border-border px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+          >
+            Cancelar
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function ResumoTab({ actorId }: { actorId: string }) {
   const { state } = useProtocolStore();
   const [isGenerating, setIsGenerating] = useState(false);
