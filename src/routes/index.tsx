@@ -8,10 +8,13 @@ import {
   BookOpen,
   ChevronRight,
   Sparkles,
+  LogIn,
+  Flower2,
 } from "lucide-react";
 import welcomeOrchid from "@/assets/welcome-orchid.jpg";
 import kitMetodo from "@/assets/kit-metodo.jpg.asset.json";
 import logoPlantaefert from "@/assets/logo-plantaefert.png";
+import { useAuthBootstrap } from "@/hooks/use-auth-bootstrap";
 
 export const Route = createFileRoute("/")({
   head: () => ({
