@@ -2467,6 +2467,12 @@ function WeekPicker({
   weekDays: number[];
 }) {
   const { state } = useProtocolStore();
+  const diagnosisFresh = isDiagnosisCurrent(state);
+  const focusDays = useMemo(() => {
+    if (!diagnosisFresh) return new Set<number>();
+    const cats = getFocusCategories(state.diagnosisResult);
+    return new Set(getFocusDays(cats));
+  }, [state.diagnosisResult, diagnosisFresh]);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const startPress = (d: number) => {
