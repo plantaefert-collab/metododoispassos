@@ -1807,6 +1807,32 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
   const { state, setCurrentDay, toggleReminder } = useProtocolStore();
   const [focusedMode, setFocusedMode] = useState(false);
 
+  // Sistema de Áudio para Notificações Críticas
+  const playCriticalSound = () => {
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      // Som mais "premium" e alerta: dois bips em harmonia
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
+      oscillator.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.5); // A4
+      
+      gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.5);
+    } catch (e) {
+      console.warn("Audio context not supported or blocked", e);
+    }
+  };
+
+
 
 
   // Foco do dia = fonte única compartilhada (Início, Minha Orquídea, Plano).
