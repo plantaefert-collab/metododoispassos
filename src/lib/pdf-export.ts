@@ -1,5 +1,28 @@
 import type { ProtocolState } from "./protocol-store";
 
+/**
+ * Converte uma foto para dados que o jsPDF consegue embutir. Data URLs passam
+ * direto; URLs remotas (Supabase Storage) são baixadas e convertidas. Retorna
+ * null se não for possível obter a imagem.
+ */
+async function photoToImageData(photo: string): Promise<string | null> {
+  if (photo.startsWith("data:")) return photo;
+  if (!/^https?:\/\//.test(photo)) return null;
+  try {
+    const res = await fetch(photo);
+    if (!res.ok) return null;
+    const blob = await res.blob();
+    return await new Promise<string | null>((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(typeof reader.result === "string" ? reader.result : null);
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(blob);
+    });
+  } catch {
+    return null;
+  }
+}
+
 export async function buildProtocolPDF(state: ProtocolState) {
   const { jsPDF } = await import("jspdf");
   const { default: autoTable } = await import("jspdf-autotable");
@@ -81,6 +104,7 @@ export async function buildProtocolPDF(state: ProtocolState) {
 
     for (const [day, d] of photoEntries) {
       if (!d.photo) continue;
+      const imgData = await photoToImageData(d.photo);
       if (y + imgH + 14 > pageHeight - 10) {
         doc.addPage();
         y = 20;
@@ -88,15 +112,20 @@ export async function buildProtocolPDF(state: ProtocolState) {
       doc.setFontSize(12);
       doc.setTextColor(...brand);
       doc.text(`Dia ${day}`, 14, y);
-      try {
-        doc.addImage(d.photo, "JPEG", 14, y + 4, imgW, imgH);
-      } catch {
+      if (imgData) {
         try {
-          doc.addImage(d.photo, "PNG", 14, y + 4, imgW, imgH);
+          doc.addImage(imgData, "JPEG", 14, y + 4, imgW, imgH);
         } catch {
-          doc.setTextColor(150);
-          doc.text("(imagem indisponível)", 14, y + 20);
+          try {
+            doc.addImage(imgData, "PNG", 14, y + 4, imgW, imgH);
+          } catch {
+            doc.setTextColor(150);
+            doc.text("(imagem indisponível)", 14, y + 20);
+          }
         }
+      } else {
+        doc.setTextColor(150);
+        doc.text("(imagem indisponível)", 14, y + 20);
       }
       y += imgH + 16;
     }

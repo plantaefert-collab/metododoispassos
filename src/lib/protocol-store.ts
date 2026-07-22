@@ -80,6 +80,9 @@ export type ProtocolState = {
 export const SAVE_ERROR_MESSAGE =
   "Não foi possível salvar esta alteração no navegador. Libere espaço ou remova alguma fotografia e tente novamente.";
 
+export const SYNC_ERROR_MESSAGE =
+  "Salvamos suas alterações neste aparelho, mas ainda não conseguimos sincronizar com a sua conta. Tentaremos novamente automaticamente.";
+
 export function isDiagnosisCurrent(state: ProtocolState): boolean {
   return (
     state.diagnosisStatus === "fresh" &&
@@ -196,7 +199,7 @@ export function normalizeRemoteProgress(progress: any): ProtocolState {
   };
 
   next.days = normalizeDays(progress.completed_tasks);
-  next.applications = normalizeApplications(progress.applications, next.days);
+  next.applications = normalizeApplications(progress.applications);
   
   const remoteDiagnosis = migrateLegacyDiagnosis(progress.diagnosis_answers);
   const remoteDiagnosisCount = totalObservations(remoteDiagnosis);
@@ -215,6 +218,47 @@ export function normalizeRemoteProgress(progress: any): ProtocolState {
   };
 }
 
+/**
+ * Marca a geração de sincronização mais recente. Permite descartar o resultado
+ * (sucesso ou falha) de uma sincronização antiga quando outra já começou.
+ */
+let syncGeneration = 0;
+
+/**
+ * Sincroniza o estado com a nuvem em background, com uma nova tentativa. Em caso
+ * de falha, sinaliza `saveError` para o banner já existente; ao ter sucesso,
+ * limpa esse aviso automaticamente (auto-cura). Nunca lança para o chamador.
+ */
+async function syncRemote(actorId: string, state: ProtocolState): Promise<void> {
+  const generation = ++syncGeneration;
+  try {
+    const { saveProgressRemote } = await import("./protocol-cloud");
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const { error } = await saveProgressRemote(actorId, state);
+        if (!error) {
+          // Sucesso: limpa o aviso de sincronização se ainda formos a tentativa atual.
+          if (generation === syncGeneration && currentState.saveError === SYNC_ERROR_MESSAGE) {
+            currentState = { ...currentState, saveError: undefined };
+            notifyListeners();
+          }
+          return;
+        }
+      } catch {
+        /* rede/exceção — cai para nova tentativa abaixo */
+      }
+      if (attempt === 0) await new Promise((r) => setTimeout(r, 1500));
+    }
+  } catch {
+    /* falha ao importar o módulo — tratada abaixo como falha de sincronização */
+  }
+  // Falhou após a nova tentativa: sinaliza apenas se ainda formos a sincronização atual.
+  if (generation === syncGeneration) {
+    currentState = { ...currentState, saveError: SYNC_ERROR_MESSAGE };
+    notifyListeners();
+  }
+}
+
 export function useProtocolStore() {
   const [, force] = useState(0);
   
@@ -228,13 +272,18 @@ export function useProtocolStore() {
     const next = updater(currentState);
     currentState = next;
     notifyListeners();
-    saveToCache(actorId, next);
-    
-    // Se logado, tenta salvar na nuvem em background
+
+    // Persistência local — se o navegador recusar (ex.: cota cheia), avisa sem quebrar a ação.
+    try {
+      saveToCache(actorId, next);
+    } catch {
+      currentState = { ...currentState, saveError: SAVE_ERROR_MESSAGE };
+      notifyListeners();
+    }
+
+    // Sincronização com a nuvem (quando logado), em background, com retry e aviso em caso de falha.
     if (actorId !== "guest") {
-      import("./protocol-cloud").then(({ saveProgressRemote }) => {
-        saveProgressRemote(actorId, next);
-      });
+      void syncRemote(actorId, next);
     }
   }, []);
 

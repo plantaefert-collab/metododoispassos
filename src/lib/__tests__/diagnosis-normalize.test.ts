@@ -115,10 +115,31 @@ describe("normalizeDiagnosisResult", () => {
       priorities: [],
       insufficientInformation: [],
       trackingPoints: [],
+      healthScore: 100,
+      healthStatus: { label: "Saudável", tone: "green", message: "ok" },
+      conflicts: [],
+      insights: [],
       completedAt: "2026-01-01T00:00:00.000Z",
       answersVersion: 1,
     };
     expect(normalizeDiagnosisResult(valid)).toEqual(valid);
+  });
+
+  it("backfills health score, conflicts and insights for legacy results", () => {
+    const legacy = {
+      favorable: [],
+      adjustments: [],
+      priorities: [],
+      insufficientInformation: [],
+      trackingPoints: [],
+      completedAt: "2026-01-01T00:00:00.000Z",
+      answersVersion: 1,
+    };
+    const out = normalizeDiagnosisResult(legacy);
+    expect(out?.healthScore).toBe(100);
+    expect(out?.healthStatus.label).toBe("Saudável");
+    expect(out?.conflicts).toEqual([]);
+    expect(out?.insights).toEqual([]);
   });
 });
 
@@ -129,6 +150,10 @@ describe("reconcileDiagnosisResultState", () => {
     priorities: [],
     insufficientInformation: [],
     trackingPoints: [],
+    healthScore: 100,
+    healthStatus: { label: "Saudável", tone: "green", message: "ok" },
+    conflicts: [],
+    insights: [],
     completedAt: null,
     answersVersion: 3,
   };
@@ -157,10 +182,10 @@ describe("normalizeDays / normalizeApplications / normalizeFinalEval", () => {
     expect(Object.keys(out)).toEqual(["1"]);
   });
   it("returns [] for non-array applications", () => {
-    expect(normalizeApplications(null, {})).toEqual([]);
+    expect(normalizeApplications(null)).toEqual([]);
   });
   it("keeps only plain-object applications", () => {
-    expect(normalizeApplications([{ id: "a" }, "x", 1, null], {})).toEqual([{ id: "a" }]);
+    expect(normalizeApplications([{ id: "a" }, "x", 1, null])).toEqual([{ id: "a" }]);
   });
   it("returns a safe default for finalEval when input is invalid", () => {
     expect(normalizeFinalEval(null)).toEqual({ improved: "", same: "", attention: "", keep: "", path: "" });

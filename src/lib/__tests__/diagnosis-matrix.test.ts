@@ -1,6 +1,8 @@
 import { describe, it, expect } from "bun:test";
 import {
   computeDiagnosisResult,
+  computeInsights,
+  deriveHealthScore,
   totalObservations,
   type DiagnosisAnswers,
   type DiagnosisCategory,
@@ -62,8 +64,8 @@ describe("computeDiagnosisResult", () => {
     expect(r.priorities.map((g) => g.answer)).toContain("Raízes moles");
   });
 
-  it("orders priorities according to the internal PRIORITY_ORDER list", () => {
-    // "Mau cheiro..." comes before "Raízes moles" in PRIORITY_ORDER.
+  it("orders priorities by severity (most urgent first), regardless of input order", () => {
+    // "Mau cheiro..." (severity 90) is more urgent than "Raízes moles" (severity 80).
     const r = computeDiagnosisResult(
       withAnswers({
         roots: ["Raízes moles", "Mau cheiro próximo às raízes ou ao substrato"],
@@ -72,6 +74,22 @@ describe("computeDiagnosisResult", () => {
     );
     expect(r.priorities[0]?.answer).toBe("Mau cheiro próximo às raízes ou ao substrato");
     expect(r.priorities[1]?.answer).toBe("Raízes moles");
+  });
+
+  it("ranks the most severe priority first across categories", () => {
+    const r = computeDiagnosisResult(
+      withAnswers({
+        wateringAndRoutine: ["Uso vários fertilizantes ou produtos ao mesmo tempo"], // 55
+        leaves: ["Queda ou deterioração rápida das folhas"], // 100
+        potAndSubstrate: ["Água acumulada no pratinho ou cachepot"], // 75
+      }),
+      1,
+    );
+    expect(r.priorities.map((g) => g.answer)).toEqual([
+      "Queda ou deterioração rápida das folhas",
+      "Água acumulada no pratinho ou cachepot",
+      "Uso vários fertilizantes ou produtos ao mesmo tempo",
+    ]);
   });
 
   it("dedupes tracking points and caps them at 5", () => {
@@ -112,5 +130,75 @@ describe("computeDiagnosisResult", () => {
   it("propagates the given answersVersion", () => {
     const r = computeDiagnosisResult(EMPTY, 42);
     expect(r.answersVersion).toBe(42);
+  });
+});
+
+describe("deriveHealthScore", () => {
+  it("returns a perfect band with no issues", () => {
+    const { healthScore, healthStatus } = deriveHealthScore(0, 0, 0);
+    expect(healthScore).toBe(100);
+    expect(healthStatus.label).toBe("Saudável");
+    expect(healthStatus.tone).toBe("green");
+  });
+
+  it("clamps to 0 and flags urgent attention with many priorities", () => {
+    const { healthScore, healthStatus } = deriveHealthScore(0, 0, 6);
+    expect(healthScore).toBe(0);
+    expect(healthStatus.label).toBe("Requer atenção imediata");
+    expect(healthStatus.tone).toBe("warn");
+  });
+
+  it("penalizes priorities (20) and adjustments (10), bonuses favorable (5)", () => {
+    // 100 - 1*20 - 1*10 + 2*5 = 80 -> Saudável
+    expect(deriveHealthScore(2, 1, 1).healthScore).toBe(80);
+    // 100 - 2*20 - 1*10 = 50 -> Em recuperação
+    const mid = deriveHealthScore(0, 1, 2);
+    expect(mid.healthScore).toBe(50);
+    expect(mid.healthStatus.label).toBe("Em recuperação");
+  });
+});
+
+describe("computeDiagnosisResult — score / conflicts / insights", () => {
+  it("attaches healthScore and healthStatus to the result", () => {
+    const r = computeDiagnosisResult(withAnswers({ roots: ["Raízes moles"] }), 1);
+    // 100 - 1*20 = 80
+    expect(r.healthScore).toBe(80);
+    expect(r.healthStatus.label).toBe("Saudável");
+  });
+
+  it("detects opposing signals in the same category as a conflict", () => {
+    const r = computeDiagnosisResult(
+      withAnswers({ roots: ["Firmes, verdes ou prateadas", "Raízes moles"] }),
+      1,
+    );
+    expect(r.conflicts).toHaveLength(1);
+    expect(r.conflicts[0]).toEqual({
+      category: "roots",
+      favorable: "Firmes, verdes ou prateadas",
+      priority: "Raízes moles",
+    });
+  });
+
+  it("does not flag a conflict when only one polarity is present", () => {
+    const r = computeDiagnosisResult(withAnswers({ roots: ["Raízes moles"] }), 1);
+    expect(r.conflicts).toHaveLength(0);
+  });
+
+  it("synthesizes an over-watering insight when >=2 related signals are marked", () => {
+    const r = computeDiagnosisResult(
+      withAnswers({
+        roots: ["Raízes moles"],
+        potAndSubstrate: ["Água acumulada no pratinho ou cachepot"],
+      }),
+      1,
+    );
+    expect(r.insights.map((i) => i.id)).toContain("excesso-de-agua");
+    const insight = r.insights.find((i) => i.id === "excesso-de-agua");
+    expect(insight?.relatedAnswers.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it("does not synthesize the over-watering insight for a single related signal", () => {
+    const insights = computeInsights(withAnswers({ roots: ["Raízes moles"] }));
+    expect(insights).toHaveLength(0);
   });
 });

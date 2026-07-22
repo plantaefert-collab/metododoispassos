@@ -41,6 +41,49 @@ export async function compressImage(file: File, opts: CompressOptions = {}): Pro
   return out;
 }
 
+/**
+ * Igual a {@link compressImage}, mas devolve também um `Blob` — necessário para
+ * enviar ao Supabase Storage. O `dataUrl` serve de fallback (visitante/offline).
+ */
+export async function compressImageToBlob(
+  file: File,
+  opts: CompressOptions = {},
+): Promise<{ blob: Blob; dataUrl: string; mimeType: string }> {
+  const maxSide = opts.maxSide ?? 1280;
+  const quality = opts.quality ?? 0.78;
+  const mimeType = opts.mimeType ?? "image/jpeg";
+
+  if (!file.type.startsWith("image/")) {
+    throw new Error("Arquivo não é uma imagem.");
+  }
+  if (file.size > 25 * 1024 * 1024) {
+    throw new Error("Imagem muito grande. Escolha um arquivo menor.");
+  }
+
+  const dataUrl = await readAsDataUrl(file);
+  const img = await loadImage(dataUrl);
+  const { width, height } = fitInside(img.naturalWidth, img.naturalHeight, maxSide);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) throw new Error("Não foi possível processar a imagem.");
+  ctx.drawImage(img, 0, 0, width, height);
+
+  const outDataUrl = canvas.toDataURL(mimeType, quality);
+  if (!outDataUrl || outDataUrl === "data:,") {
+    throw new Error("Não foi possível processar a imagem.");
+  }
+
+  const blob = await new Promise<Blob | null>((resolve) =>
+    canvas.toBlob((b) => resolve(b), mimeType, quality),
+  );
+  if (!blob) throw new Error("Não foi possível processar a imagem.");
+
+  return { blob, dataUrl: outDataUrl, mimeType };
+}
+
 function readAsDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
