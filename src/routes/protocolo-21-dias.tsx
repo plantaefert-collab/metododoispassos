@@ -2005,6 +2005,28 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
                 </div>
               )}
 
+              {showRegistrationShortcut && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRedirectToPlan();
+                    // Pequeno delay para garantir que o scroll aconteça após a troca de aba
+                    setTimeout(() => {
+                      const registerEl = document.querySelector('[data-register-field]');
+                      if (registerEl) registerEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100);
+                  }}
+                  className="mt-3 flex w-full items-center justify-between rounded-xl border border-primary/20 bg-primary/5 px-4 py-2.5 text-[11px] font-bold text-primary transition-all hover:bg-primary/10 active:scale-[0.98]"
+                >
+                  <div className="flex items-center gap-2">
+                    <BookOpen size={14} />
+                    <span>Fazer registro do dia</span>
+                  </div>
+                  <ChevronRight size={14} className="opacity-40" />
+                </button>
+              )}
+
+
               <button
                 onClick={(e) => { e.stopPropagation(); ctx.cta.onClick(); }}
                 className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-accent-foreground shadow-sm transition-all hover:brightness-110 active:scale-[0.98]"
