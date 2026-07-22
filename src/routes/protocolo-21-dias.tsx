@@ -1928,7 +1928,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         <SectionHeader
           eyebrow="Bloco 1"
           title="Foco do dia"
-          hint={focusedMode ? "Visualização concentrada ativa" : "O que você precisa fazer agora"}
+          subtitle={focusedMode ? "Visualização concentrada ativa" : "O que você precisa fazer agora?"}
         />
         <button
           onClick={() => {
