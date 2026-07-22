@@ -2301,8 +2301,8 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
               <Sparkles size={18} />
               Continuar meu plano
             </button>
-            <span className="text-[10px] font-medium text-muted-foreground">
-              Você está no <span className="font-bold text-accent">Dia {day}</span>: {meta.title}
+            <span className="text-[10px] font-medium text-muted-foreground text-center">
+              Você está no <span className="font-bold text-accent">Dia {day}</span>: {getProtocolDay(day).title}
             </span>
           </div>
         </>
