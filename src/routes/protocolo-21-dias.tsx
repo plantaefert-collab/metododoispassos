@@ -2108,6 +2108,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
+                    playInteractionSound();
                     handleRedirectToPlan();
                     setTimeout(() => {
                       const firstChecklistEl = document.querySelector('[data-checklist-item]');
