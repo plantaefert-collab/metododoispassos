@@ -1868,6 +1868,14 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
 
   // Sistema de Áudio para Notificações Críticas
   const playCriticalSound = () => {
+    // Haptic pattern forte para dias críticos (3, 10, 17)
+    if (!state.settings?.hapticsDisabled && typeof navigator !== "undefined" && "vibrate" in navigator) {
+      try {
+        navigator.vibrate([80, 60, 80, 60, 160]);
+      } catch {
+        /* noop */
+      }
+    }
     if (state.settings?.muteSounds) return;
     try {
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
