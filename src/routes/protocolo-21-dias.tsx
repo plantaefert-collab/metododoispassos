@@ -75,6 +75,7 @@ import {
   type ProtocolDay,
   type DayStage,
   type RegisterOption,
+  CATEGORY_FOCUS_DAYS,
 } from "@/lib/protocol-plan";
 import {
   CATEGORY_LABEL,
