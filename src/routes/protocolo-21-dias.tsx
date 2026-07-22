@@ -2216,6 +2216,22 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             </div>
           </div>
 
+          <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <button
+              onClick={() => setTab("resumo")}
+              className="flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-left transition-all hover:bg-primary/10 sm:col-span-2"
+            >
+              <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/20 text-primary">
+                <FileText size={20} />
+              </div>
+              <div className="flex-1">
+                <div className="text-sm font-bold text-primary">Resumo & PDF</div>
+                <div className="text-[10px] text-muted-foreground">Exportar meu progresso</div>
+              </div>
+              <ChevronRight size={16} className="text-primary/40" />
+            </button>
+          </div>
+
           <div className="group relative overflow-hidden rounded-2xl border border-primary/20 bg-primary/[0.02] p-4 transition-all hover:border-primary/40">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-primary">
@@ -2247,19 +2263,13 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             Aplique no horário fresco, evite sol forte e não atinja diretamente as flores.
           </InfoCard>
 
-          <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="mt-6">
             <button
-              onClick={() => setTab("resumo")}
-              className="flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-left transition-all hover:bg-primary/10 sm:col-span-2"
+              onClick={handleRedirectToPlan}
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-8 py-4 text-sm font-bold text-accent-foreground shadow-lg shadow-accent/20 transition-all hover:brightness-110 active:scale-[0.98]"
             >
-              <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/20 text-primary">
-                <FileText size={20} />
-              </div>
-              <div className="flex-1">
-                <div className="text-sm font-bold text-primary">Resumo & PDF</div>
-                <div className="text-[10px] text-muted-foreground">Exportar meu progresso</div>
-              </div>
-              <ChevronRight size={16} className="text-primary/40" />
+              <Sparkles size={18} />
+              Continuar meu plano
             </button>
           </div>
         </>
