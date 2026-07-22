@@ -3002,7 +3002,8 @@ function RegisterField({
   }, []);
 
   return (
-    <div className="mt-4 space-y-2">
+    <div className="mt-4 space-y-2" data-register-field>
+
       <div className="flex items-center justify-between gap-2">
         <label htmlFor={inputId} className="block text-[13px] font-semibold text-primary">
           {label}
