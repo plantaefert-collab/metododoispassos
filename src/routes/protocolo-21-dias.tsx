@@ -51,6 +51,7 @@ import {
   Volume2,
   VolumeX,
   Zap,
+  Clock,
 } from "lucide-react";
 
 import {
