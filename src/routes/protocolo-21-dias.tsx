@@ -1965,8 +1965,21 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           <div
             role="button"
             tabIndex={0}
-            onClick={ctx.cta.onClick}
-            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") ctx.cta.onClick(); }}
+            onClick={() => {
+              if ([3, 10, 17].includes(day) && !state.days[day]?.applicationDone) {
+                playCriticalSound();
+              }
+              ctx.cta.onClick();
+            }}
+            onKeyDown={(e) => { 
+              if (e.key === "Enter" || e.key === " ") {
+                if ([3, 10, 17].includes(day) && !state.days[day]?.applicationDone) {
+                  playCriticalSound();
+                }
+                ctx.cta.onClick(); 
+              }
+            }}
+
             className={cn(
               "group relative w-full cursor-pointer overflow-hidden rounded-2xl border-2 p-5 text-left shadow-sm transition-all active:scale-[0.99]",
               isApplicationDay 
