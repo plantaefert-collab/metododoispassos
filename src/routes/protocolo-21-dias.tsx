@@ -4923,12 +4923,13 @@ function MinhaOrquideaTab({ actorId, setTab }: { actorId: string; setTab: (t: Ta
 
       {/* Próximos passos */}
       {upcomingDays.length > 0 && (
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <div className="rounded-2xl border-2 border-accent/40 bg-gradient-to-br from-accent/10 via-card to-card p-6 shadow-[0_10px_30px_-15px_rgba(217,70,239,0.35)] ring-1 ring-accent/10">
           <div className="flex items-center gap-3">
-            <div className="grid h-9 w-9 place-items-center rounded-xl bg-accent/10 text-accent">
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-accent/15 text-accent shadow-sm">
               <CalendarCheck size={18} />
             </div>
-            <div>
+            <div className="min-w-0 flex-1">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-accent">Em destaque</div>
               <h2 className="font-display text-lg text-primary">Próximos passos</h2>
               <p className="text-xs text-muted-foreground">Atalhos para os próximos dias do protocolo</p>
             </div>
@@ -4941,16 +4942,19 @@ function MinhaOrquideaTab({ actorId, setTab }: { actorId: string; setTab: (t: Ta
                 <li key={d}>
                   <button
                     onClick={() => goToDay(d)}
-                    className="group flex w-full items-center gap-3 rounded-xl border border-border bg-muted/30 px-4 py-3 text-left transition-colors hover:border-primary/40 hover:bg-muted/60"
+                    className="group flex w-full items-center gap-3 rounded-xl border border-accent/25 bg-card/80 px-4 py-3 text-left transition-all hover:border-accent/50 hover:bg-accent/5 hover:shadow-sm"
                   >
-                    <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-primary/10 font-display text-sm font-bold text-primary">
+                    <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-accent/15 font-display text-sm font-bold text-accent">
                       {d}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="text-[10px] font-bold uppercase tracking-widest text-accent">Dia {d} · Fase {meta.phase}</div>
+                      <div className="flex flex-wrap items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-accent">
+                        <span>Dia {d} · Fase {meta.phase}</span>
+                        <span className="rounded-full bg-accent/15 px-1.5 py-0.5 text-accent">Foco</span>
+                      </div>
                       <div className="mt-0.5 truncate text-sm font-semibold text-foreground">{meta.title}</div>
                     </div>
-                    <ArrowRight size={16} className="shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+                    <ArrowRight size={16} className="shrink-0 text-accent/60 transition-transform group-hover:translate-x-0.5 group-hover:text-accent" />
                   </button>
                 </li>
               );
