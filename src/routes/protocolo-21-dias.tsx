@@ -3474,8 +3474,104 @@ function RegisterField({
 
 function MethodDrawer({ actorId, day, onClose }: { actorId: string; day: number; onClose: () => void }) {
   const { registerApplication, state } = useProtocolStore();
-  void state;
-  void registerApplication;
+
+  return _MethodDrawerBody({ actorId, day, onClose, registerApplication, state });
+}
+
+const APPLICATION_STEPS = [
+  "Preparar ambiente arejado, longe do sol forte",
+  "Aplicar Enraizador nas raízes e substrato",
+  "Aplicar Bokashi nas raízes, folhas e substrato",
+  "Aguardar absorção sem escorrer nem encharcar",
+  "Registrar aplicação no app",
+];
+
+function ApplicationQuickChecklist({
+  day,
+  entry,
+  onToggle,
+}: {
+  day: number;
+  entry: DayEntry;
+  onToggle: (item: string) => void;
+}) {
+  const done = APPLICATION_STEPS.filter((s) => entry.checklist[`app:${s}`]).length;
+  const total = APPLICATION_STEPS.length;
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="rounded-2xl border-2 border-accent/40 bg-gradient-to-br from-accent/10 to-accent/5 p-5 shadow-sm"
+    >
+      <div className="mb-3 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <div className="grid h-8 w-8 place-items-center rounded-full bg-accent text-accent-foreground">
+            <Sparkles size={16} />
+          </div>
+          <div>
+            <div className="text-[11px] font-bold uppercase tracking-wider text-accent">
+              Dia {day} · Aplicação
+            </div>
+            <div className="text-sm font-semibold text-primary">Passo a passo rápido</div>
+          </div>
+        </div>
+        <div className="text-xs font-semibold text-accent">
+          {done}/{total}
+        </div>
+      </div>
+      <div className="grid gap-2">
+        {APPLICATION_STEPS.map((step, idx) => {
+          const key = `app:${step}`;
+          const checked = !!entry.checklist[key];
+          return (
+            <motion.button
+              key={key}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => {
+                onToggle(key);
+                if (!checked) playPopSound();
+              }}
+              aria-pressed={checked}
+              className={`flex w-full items-start gap-3 rounded-xl border px-3.5 py-2.5 text-left text-sm transition-colors ${
+                checked
+                  ? "border-primary bg-primary/5 text-primary"
+                  : "border-border bg-card text-foreground hover:border-accent/40"
+              }`}
+            >
+              <div className="mt-0.5 shrink-0">
+                {checked ? (
+                  <CheckCircle2 size={18} className="text-primary" />
+                ) : (
+                  <Circle size={18} className="text-muted-foreground" />
+                )}
+              </div>
+              <span className="mt-0.5 shrink-0 text-[11px] font-bold text-muted-foreground">
+                {idx + 1}.
+              </span>
+              <span className={`min-w-0 flex-1 ${checked ? "line-through opacity-60" : ""}`}>
+                {step}
+              </span>
+            </motion.button>
+          );
+        })}
+      </div>
+    </motion.div>
+  );
+}
+
+function _MethodDrawerBody({
+  actorId,
+  day,
+  onClose,
+  registerApplication,
+  state,
+}: {
+  actorId: string;
+  day: number;
+  onClose: () => void;
+  registerApplication: (day: number, actorId: string) => void;
+  state: ReturnType<typeof useProtocolStore>["state"];
+}) {
 
   const applicationsForDay = state.applications.filter((a) => a.day === day);
   const entry = state.days[day] ?? { checklist: {}, note: "", completed: false };
