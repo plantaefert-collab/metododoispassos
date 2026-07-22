@@ -2754,6 +2754,15 @@ function PlanoTab({ actorId, setTab, onPreviewDay, setStatus }: PlanoTabProps) {
 
         <RegisterField meta={meta} entry={entry} onChange={(note) => updateDay(day, { note }, actorId)} />
 
+        <DayPhotoField
+          day={day}
+          photo={entry.photo ?? null}
+          caption={entry.photoCaption ?? ""}
+          actorId={actorId}
+          onPhoto={(photo) => updateDay(day, { photo }, actorId)}
+          onCaption={(photoCaption) => updateDay(day, { photoCaption }, actorId)}
+        />
+
         <button
           onClick={() => {
             if (entry.completed) {
