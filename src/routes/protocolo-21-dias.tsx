@@ -2129,6 +2129,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
               <button
                 onClick={(e) => { 
                   e.stopPropagation(); 
+                  playInteractionSound();
                   if ([3, 10, 17].includes(day) && !state.days[day]?.applicationDone) {
                     playCriticalSound();
                   }
