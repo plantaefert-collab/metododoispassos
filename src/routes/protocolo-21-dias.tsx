@@ -4735,17 +4735,84 @@ function MinhaOrquideaTab({ actorId, setTab }: { actorId: string; setTab: (t: Ta
           <StatCard label="Fotos" value={totalPhotos} icon={<Images size={16} />} />
         </div>
 
-        <div className="mt-4 flex items-center justify-between rounded-xl border border-border bg-muted/40 px-4 py-3">
-          <div className="flex items-center gap-2 text-sm">
-            <Stethoscope size={16} className="text-primary" />
-            <span className="text-foreground">Diagnóstico</span>
-          </div>
-          <span className={`text-xs font-semibold ${diagnosisFresh ? "text-primary" : "text-accent"}`}>
-            {diagnosisFresh ? "Atualizado" : "Pendente"}
-          </span>
-        </div>
+        {/* Saúde Atual */}
+        {(() => {
+          const result = state.diagnosisResult;
+          const hasResult = !!result;
+          const status = result?.healthStatus;
+          const score = result?.healthScore ?? 0;
+          const isWarn = status?.tone === "warn";
+          const containerCls = !hasResult
+            ? "border-border bg-muted/40"
+            : isWarn
+              ? "border-accent/40 bg-gradient-to-br from-accent/10 to-accent/5"
+              : "border-primary/25 bg-gradient-to-br from-secondary/60 to-secondary/20";
+          const alerts = hasResult ? [...(result?.priorities ?? []), ...(result?.adjustments ?? [])].slice(0, 4) : [];
+          return (
+            <>
+              <div className={`mt-4 rounded-2xl border p-4 ${containerCls}`}>
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${isWarn ? "bg-accent/15 text-accent" : "bg-primary/10 text-primary"}`}>
+                      <Stethoscope size={18} />
+                    </div>
+                    <div className="min-w-0">
+                      <div className={`text-[10px] font-bold uppercase tracking-widest ${isWarn ? "text-accent" : "text-primary"}`}>Saúde atual</div>
+                      <div className={`font-display text-base leading-tight ${isWarn ? "text-accent" : "text-primary"}`}>
+                        {hasResult ? status?.label : "Diagnóstico pendente"}
+                      </div>
+                    </div>
+                  </div>
+                  {hasResult && (
+                    <div className={`shrink-0 text-right font-display text-xl leading-none ${isWarn ? "text-accent" : "text-primary"}`}>
+                      {score}<span className="text-xs text-muted-foreground">/100</span>
+                    </div>
+                  )}
+                </div>
+                <p className="mt-2 text-xs leading-relaxed text-foreground/80">
+                  {hasResult
+                    ? status?.message
+                    : "Responda o diagnóstico rápido para receber prioridades e um plano ajustado à sua orquídea."}
+                </p>
+                {!diagnosisFresh && hasResult && (
+                  <p className="mt-1 text-[11px] font-semibold text-accent">Respostas alteradas — atualize seu diagnóstico.</p>
+                )}
+                <button
+                  onClick={() => setTab("diagnostico")}
+                  className="mt-3 flex w-full items-center justify-between rounded-xl bg-card/80 px-3 py-2.5 text-xs font-bold uppercase tracking-wider text-primary shadow-sm active:scale-[0.98]"
+                >
+                  <span>Acessar detalhes do diagnóstico</span>
+                  <ChevronRight size={16} />
+                </button>
+              </div>
 
-        <div className="mt-3 grid grid-cols-2 gap-2">
+              {alerts.length > 0 && (
+                <div className="mt-4">
+                  <div className="mb-2 text-[10px] font-bold uppercase tracking-widest text-accent">Alertas de atenção</div>
+                  <ul className="space-y-2">
+                    {alerts.map((a) => (
+                      <li
+                        key={a.id}
+                        className="flex items-start gap-2.5 rounded-xl border border-accent/25 bg-accent/5 p-3"
+                      >
+                        <AlertTriangle size={16} className="mt-0.5 shrink-0 text-accent" />
+                        <div className="min-w-0 text-xs leading-relaxed text-foreground">
+                          <strong className="text-foreground">{a.title}:</strong>{" "}
+                          <span className="text-foreground/80">{a.action}</span>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-2 text-[11px] italic text-muted-foreground">
+                    Se os sinais persistirem ou piorarem, considere consultar um orquidófilo experiente.
+                  </p>
+                </div>
+              )}
+            </>
+          );
+        })()}
+
+        <div className="mt-4 grid grid-cols-2 gap-2">
           <button
             onClick={() => setTab("plano")}
             className="rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground shadow-sm active:scale-[0.98]"
@@ -4758,6 +4825,54 @@ function MinhaOrquideaTab({ actorId, setTab }: { actorId: string; setTab: (t: Ta
           >
             Ver resumo completo
           </button>
+        </div>
+
+        {/* Linha do tempo e marcos */}
+        <div className="mt-6 border-t border-border pt-5">
+          <div className="mb-3 flex items-center justify-between">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-accent">Linha do tempo e marcos</div>
+            <span className="rounded-full bg-muted px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              Protocolo 21 dias
+            </span>
+          </div>
+          <ol className="relative space-y-3">
+            {[1, 7, 14, 21].map((d) => {
+              const meta = getProtocolDay(d);
+              const done = isDayFullyDone(state, d, meta.checklist);
+              const isFocus = d === focusDay;
+              const label = d === 1 ? "Início" : d === 21 ? "Final" : `Fase ${meta.phase}`;
+              return (
+                <li key={d} className="flex items-start gap-3">
+                  <div
+                    className={`grid h-8 w-8 shrink-0 place-items-center rounded-full text-[11px] font-bold ${
+                      isFocus
+                        ? "bg-accent text-white shadow-sm ring-2 ring-accent/30"
+                        : done
+                          ? "bg-primary text-primary-foreground"
+                          : "border border-border bg-card text-muted-foreground"
+                    }`}
+                  >
+                    {d}
+                  </div>
+                  <button
+                    onClick={() => goToDay(d)}
+                    className="min-w-0 flex-1 rounded-xl border border-border bg-card px-3 py-2 text-left transition-colors hover:border-primary/40 hover:bg-muted/40"
+                  >
+                    <div className="text-[10px] font-bold uppercase tracking-widest text-accent">{label}</div>
+                    <div className="mt-0.5 truncate text-sm font-semibold text-foreground">Dia {d}</div>
+                    <div className="mt-1 flex flex-wrap gap-1.5 text-[10px] font-bold uppercase tracking-wider">
+                      <span className={`rounded-full px-2 py-0.5 ${done ? "bg-primary/15 text-primary" : "bg-muted text-muted-foreground"}`}>
+                        {done ? "Concluído" : "Pendente"}
+                      </span>
+                      {isFocus && (
+                        <span className="rounded-full bg-accent/15 px-2 py-0.5 text-accent">Hoje</span>
+                      )}
+                    </div>
+                  </button>
+                </li>
+              );
+            })}
+          </ol>
         </div>
       </div>
 
