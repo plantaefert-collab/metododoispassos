@@ -315,8 +315,11 @@ function HomePage() {
         </div>
       </section>
 
-      <footer className="border-t border-border/50 py-6 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} PlantaeFert · Método de 2 Passos
+      <footer className="border-t border-border/50 py-6 text-center text-xs text-muted-foreground space-y-2">
+        <div>© {new Date().getFullYear()} PlantaeFert · Método de 2 Passos</div>
+        <div className="opacity-60 max-w-xs mx-auto px-4">
+          Integre esta suíte de testes no meu pipeline de CI/CD para rodar automaticamente em cada atualização do projeto.
+        </div>
       </footer>
     </div>
   );
