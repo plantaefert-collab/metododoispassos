@@ -1,0 +1,51 @@
+import { describe, it, expect } from "bun:test";
+import { getProtocolDay, phaseOf } from "../protocol-plan";
+import { EDITORIAL_PLAN } from "../editorial-plan";
+
+describe("Protocol UI Data Consistency", () => {
+  it("should have consistent phases and main actions for all 21 days", () => {
+    for (let day = 1; day <= 21; day++) {
+      const dayData = getProtocolDay(day);
+      const phase = phaseOf(day);
+      const editorial = EDITORIAL_PLAN[day];
+
+      // Verify day numbering
+      expect(dayData.day).toBe(day);
+
+      // Verify phase mapping
+      if (day <= 7) expect(phase).toBe("Enraizar");
+      else if (day <= 14) expect(phase).toBe("Nutrir");
+      else expect(phase).toBe("Florescer");
+
+      // Verify main action exists and is a string
+      expect(typeof dayData.mainAction).toBe("string");
+      expect(dayData.mainAction.length).toBeGreaterThan(0);
+
+      // Verify editorial title matches protocol day title
+      expect(dayData.title).toBe(editorial.title);
+    }
+  });
+
+  it("should identify critical application days correctly", () => {
+    const criticalDays = [3, 10, 17];
+    for (const day of criticalDays) {
+      const dayData = getProtocolDay(day);
+      // Application days should mention application in their main action or checklist
+      const hasApplication = 
+        dayData.mainAction.toLowerCase().includes("aplic") || 
+        dayData.checklist.some(item => item.toLowerCase().includes("aplic"));
+      
+      expect(hasApplication).toBe(true);
+    }
+  });
+
+  it("should transition main actions correctly between days", () => {
+    const day1 = getProtocolDay(1);
+    const day2 = getProtocolDay(2);
+    const day3 = getProtocolDay(3);
+
+    // Day 1 and 2 are usually observations, Day 3 is application
+    expect(day1.mainAction).not.toBe(day3.mainAction);
+    expect(day2.mainAction).not.toBe(day3.mainAction);
+  });
+});
