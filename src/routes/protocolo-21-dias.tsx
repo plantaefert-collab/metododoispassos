@@ -8,6 +8,16 @@ import sceneNutrir from "@/assets/scene-nutrir.jpg";
 import kitMetodo from "@/assets/kit-metodo.jpg.asset.json";
 import logoPlantaefert from "@/assets/logo-plantaefert.png";
 import { playSuccessSound, playPopSound } from "@/lib/audio-feedback";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -3505,6 +3515,7 @@ function ApplicationQuickChecklist({
 }) {
   const done = APPLICATION_STEPS.filter((s) => entry.checklist[`app:${s}`]).length;
   const total = APPLICATION_STEPS.length;
+  const [pendingStep, setPendingStep] = useState<string | null>(null);
   return (
     <motion.div
       initial={{ opacity: 0, y: 8 }}
@@ -3536,8 +3547,11 @@ function ApplicationQuickChecklist({
               key={key}
               whileTap={{ scale: 0.98 }}
               onClick={() => {
-                onToggle(key);
-                if (!checked) playPopSound();
+                if (!checked) {
+                  setPendingStep(key);
+                } else {
+                  onToggle(key);
+                }
               }}
               aria-pressed={checked}
               className={`flex w-full items-start gap-3 rounded-xl border px-3.5 py-2.5 text-left text-sm transition-colors ${
@@ -3563,6 +3577,30 @@ function ApplicationQuickChecklist({
           );
         })}
       </div>
+      <AlertDialog open={pendingStep !== null} onOpenChange={(o) => { if (!o) setPendingStep(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirmar aplicação do Dia {day}?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta é uma etapa crítica do protocolo. Confirme apenas se você já realizou este passo agora — a ação registrará seu progresso e não pode ser desfeita automaticamente.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Ainda não</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                if (pendingStep) {
+                  onToggle(pendingStep);
+                  playPopSound();
+                }
+                setPendingStep(null);
+              }}
+            >
+              Sim, marcar como feito
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </motion.div>
   );
 }
