@@ -2521,7 +2521,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           </div>
 
           <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
-            Aplique no horário fresco, evite sol forte e não atinja diretamente as flores.
+            Aplique nas horas mais frescas do dia (evite sol forte entre 9h e 16h) e não atinja diretamente as flores.
           </InfoCard>
 
           <button
