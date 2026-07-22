@@ -2994,7 +2994,23 @@ function WeekPicker({
           );
         })}
       </div>
+      
+      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-1 text-[10px] font-medium text-muted-foreground/80">
+        <div className="flex items-center gap-1.5">
+          <div className="h-2 w-2 rounded-full bg-primary" />
+          <span>Concluído</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="h-2 w-2 rounded-full bg-accent" />
+          <span>Registro Pendente</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="h-2 w-2 rounded-full bg-accent" />
+          <span>Aplicação</span>
+        </div>
+      </div>
     </div>
+
   );
 }
 
