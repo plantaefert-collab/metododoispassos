@@ -4634,23 +4634,34 @@ function DayCompleteModal({
   const total = meta.checklist.length;
   const done = meta.checklist.filter((i) => entry.checklist[i]).length;
   const noteTrim = entry.note?.trim() ?? "";
-  // Trava o scroll do fundo enquanto o modal está aberto
+  // Trava o scroll do fundo enquanto o modal está aberto e permite fechar com ESC
   useEffect(() => {
-    const prev = document.body.style.overflow;
+    const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = prev; };
-  }, []);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onCancel();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [onCancel]);
   return (
     <div
       onClick={onCancel}
-      className="fixed inset-0 z-[100] flex items-end justify-center overflow-y-auto overscroll-contain bg-primary/40 p-4 backdrop-blur-sm sm:items-center"
+      className="fixed inset-0 z-[100] flex items-end justify-center overscroll-contain bg-primary/40 backdrop-blur-sm sm:items-center sm:p-4"
     >
       <div
         onClick={(e) => e.stopPropagation()}
         role="dialog"
         aria-modal="true"
-        className="my-auto w-full max-w-sm rounded-3xl border border-border bg-card p-5 shadow-2xl"
+        className="flex max-h-[90dvh] w-full max-w-sm flex-col overflow-hidden rounded-t-3xl border border-border bg-card shadow-2xl sm:rounded-3xl"
+        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
       >
+        {/* handle visual no mobile */}
+        <div className="mx-auto mt-2 h-1.5 w-10 shrink-0 rounded-full bg-border sm:hidden" />
+        <div className="flex-1 overflow-y-auto overscroll-contain p-5">
         <div className="text-xs font-bold uppercase tracking-wider text-accent">Resumo do dia</div>
         <div className="mt-1 font-display text-xl text-primary">Concluir Dia {day}?</div>
         <div className="mt-4 space-y-2 rounded-2xl border border-border bg-muted/30 p-3 text-sm">
@@ -4698,6 +4709,7 @@ function DayCompleteModal({
           >
             Cancelar
           </button>
+        </div>
         </div>
       </div>
     </div>
