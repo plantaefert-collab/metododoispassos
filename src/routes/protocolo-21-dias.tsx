@@ -2482,6 +2482,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
 
 
 
+
 /* ---------------- Plano ---------------- */
 
 type PlanoTabProps = {
