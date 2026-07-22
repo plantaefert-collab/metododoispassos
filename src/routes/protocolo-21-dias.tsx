@@ -4544,7 +4544,15 @@ function DayPreviewModal({
 /* ---------------- Minha Orquídea ---------------- */
 
 function MinhaOrquideaTab({ actorId, setTab }: { actorId: string; setTab: (t: Tab) => void }) {
-  const { state, updatePlant, setCurrentDay } = useProtocolStore();
+  const { state, updatePlant, setCurrentDay, wrapSetState } = useProtocolStore();
+  
+  const updateSettings = (patch: Partial<ProtocolState['settings']>) => {
+    // @ts-ignore - wrapSetState is internal but we need it here for settings
+    wrapSetState((s: ProtocolState) => ({
+      ...s,
+      settings: { ...s.settings, ...patch }
+    }), actorId);
+  };
   // Foco derivado do checklist real — mesma fonte de verdade da aba Início.
   const focusDay = computeFocusDay(state, (d) => getProtocolDay(d).checklist);
   const today = getProtocolDay(focusDay);
