@@ -8,6 +8,7 @@ import sceneNutrir from "@/assets/scene-nutrir.jpg";
 import kitMetodo from "@/assets/kit-metodo.jpg.asset.json";
 import logoPlantaefert from "@/assets/logo-plantaefert.png";
 import { playSuccessSound, playPopSound } from "@/lib/audio-feedback";
+import { MethodInstructions } from "@/components/MethodInstructions";
 import {
   AlertDialog,
   AlertDialogAction,
