@@ -1837,7 +1837,240 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
 
   return (
     <div className="space-y-4">
-      {/* ─────────── BLOCO DE MODO FOCADO ─────────── */}
+      <div className="flex items-center justify-between px-1">
+        <SectionHeader
+          eyebrow="Bloco 1"
+          title="Foco do dia"
+          hint={focusedMode ? "Visualização concentrada ativa" : "O que você precisa fazer agora"}
+        />
+        <button
+          onClick={() => setFocusedMode(!focusedMode)}
+          className={cn(
+            "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all",
+            focusedMode 
+              ? "bg-primary text-primary-foreground shadow-md" 
+              : "bg-primary/5 text-primary hover:bg-primary/10"
+          )}
+        >
+          {focusedMode ? <Sparkles size={12} /> : <Wind size={12} />}
+          {focusedMode ? "Modo Focado" : "Focar"}
+        </button>
+      </div>
+
+      {(() => {
+        const ctx = getTrackingCardContext();
+        return (
+          <div 
+            onClick={ctx.onCardClick}
+            className={cn(
+              "group relative cursor-pointer overflow-hidden rounded-2xl border transition-all active:scale-[0.98]",
+              ctx.isApplicationDay 
+                ? "border-accent/40 bg-gradient-to-br from-accent/10 via-accent/5 to-transparent shadow-lg shadow-accent/5 ring-1 ring-accent/20" 
+                : "border-border bg-card hover:border-primary/20 shadow-sm"
+            )}
+          >
+            {ctx.isApplicationDay && (
+               <div className="absolute inset-0 pointer-events-none">
+                 <div className="absolute inset-0 bg-accent/5 animate-pulse" />
+                 <div className="absolute -inset-1 bg-accent/10 blur-2xl opacity-50" />
+               </div>
+            )}
+
+            <div className="relative z-10 p-5">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className={cn(
+                      "rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-widest shadow-sm",
+                      ctx.isApplicationDay ? "bg-accent text-accent-foreground" : "bg-primary/10 text-primary"
+                    )}>
+                      Dia {day}
+                    </span>
+                    {ctx.isApplicationDay && (
+                      <span className="flex items-center gap-1 rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-bold text-accent animate-pulse">
+                         <Sparkles size={10} />
+                         Aplicação
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="mt-2 font-display text-2xl leading-tight text-foreground">
+                    {ctx.title}
+                  </h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {ctx.description}
+                  </p>
+                </div>
+                <div className={cn(
+                  "grid h-14 w-14 shrink-0 place-items-center rounded-2xl shadow-inner transition-transform group-hover:scale-110",
+                  ctx.isApplicationDay ? "bg-accent/20 text-accent" : "bg-primary/10 text-primary"
+                )}>
+                  {ctx.icon}
+                </div>
+              </div>
+
+              {pendingChecklist.length > 0 && (
+                <div className="mt-5 space-y-2 border-t border-border/50 pt-4">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Suas Tarefas</span>
+                    <span className="text-[10px] font-medium text-primary">{dayProgress}% concluído</span>
+                  </div>
+                  {nextItems.map((item, idx) => (
+                    <div key={idx} className="flex items-center gap-3">
+                      <div className="h-1.5 w-1.5 rounded-full bg-primary/40" />
+                      <span className="text-xs text-foreground/80 line-clamp-1">{item}</span>
+                    </div>
+                  ))}
+                  {pendingChecklist.length > nextItems.length && (
+                    <div className="pt-1 text-[10px] italic text-muted-foreground">
+                      +{pendingChecklist.length - nextItems.length} item(ns) no plano
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <button
+                onClick={(e) => { e.stopPropagation(); ctx.cta.onClick(); }}
+                className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-accent-foreground shadow-sm transition-all hover:brightness-110 active:scale-[0.98]"
+              >
+                {ctx.cta.icon}
+                {ctx.cta.label}
+              </button>
+            </div>
+          </div>
+        );
+      })()}
+
+      {!focusedMode && (
+        <>
+          <div className="group relative overflow-hidden rounded-2xl border-2 border-primary/40 bg-gradient-to-br from-primary/15 via-primary/8 to-primary/[0.03] shadow-lg shadow-primary/10 transition-all hover:border-primary/60 hover:shadow-primary/20">
+            <div className="relative w-full overflow-hidden">
+              <img
+                src={kitMetodo.url}
+                alt="Kit Método 2 Passos"
+                loading="lazy"
+                className="h-44 w-full object-cover sm:h-52 md:h-60"
+              />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-primary/25 via-transparent to-transparent" />
+            </div>
+            <div className="relative z-10 p-6">
+              <div className="flex items-center gap-2 text-primary">
+                <div className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-primary-foreground shadow-md shadow-primary/30">
+                  <Sprout size={18} />
+                </div>
+                <h3 className="font-display text-xl text-primary">Método de 2 Passos</h3>
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-foreground/80">
+                Entenda como funciona o protocolo de Enraizar e Nutrir para sua orquídea florescer.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button
+                  onClick={() => setTab("metodo")}
+                  className="flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2.5 text-xs font-bold text-primary transition-all hover:bg-primary/20 active:scale-95"
+                >
+                  <Eye size={14} />
+                  Ver Explicação
+                </button>
+                <button
+                  onClick={() => setTab("metodo")}
+                  className="flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-md transition-all hover:brightness-110 active:scale-95"
+                >
+                  <BookOpen size={14} />
+                  Modo de usar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <SectionHeader
+            eyebrow="Bloco 2"
+            title="Progresso"
+            hint="Onde você está na jornada"
+          />
+
+          <div 
+            onClick={handleRedirectToPlan}
+            className="group relative cursor-pointer overflow-hidden rounded-2xl border border-border bg-plantae-cream/40 p-4 sm:p-5 transition-all hover:border-primary/30 active:scale-[0.99]"
+          >
+            <div className="flex items-center gap-3">
+              <div className="grid h-12 w-12 sm:h-14 sm:w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-card transition-transform group-hover:scale-105">
+                {state.plant.photo ? (
+                  <img src={state.plant.photo} alt={state.plant.name} className="h-full w-full object-cover" />
+                ) : (
+                  <Flower2 size={22} className="text-muted-foreground" />
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between">
+                  <h4 className="truncate font-display text-lg text-foreground">Sua jornada</h4>
+                  <span className="text-[10px] font-bold text-primary">{Math.round(((day - 1) / 21) * 100)}%</span>
+                </div>
+                <p className="text-xs font-medium text-foreground/80 line-clamp-1">
+                  {getProtocolDay(day).mainAction}
+                </p>
+                <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-accent/10">
+                  <div
+                    className="h-full rounded-full bg-accent transition-all duration-1000"
+                    style={{ width: `${Math.round(((day - 1) / 21) * 100)}%` }}
+                  />
+                </div>
+              </div>
+              <button 
+                onClick={handleRedirectToPlan}
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent text-accent-foreground shadow-md transition-transform active:scale-90 hover:brightness-110"
+              >
+                <ChevronRight size={20} />
+              </button>
+            </div>
+          </div>
+
+          {upcomingReminders.length > 0 && (
+            <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
+              <div className="flex items-center gap-3">
+                <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
+                  <Bell size={20} />
+                </div>
+                <div>
+                  <h4 className="text-sm font-bold text-primary">Lembretes & Notificações</h4>
+                  <p className="text-xs text-muted-foreground">Próximo lembrete no dia {upcomingReminders[0]}</p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  if ('Notification' in window) {
+                    Notification.requestPermission();
+                  }
+                }}
+                className="mt-4 w-full rounded-xl bg-primary/10 py-2.5 text-xs font-bold text-primary transition-all hover:bg-primary/20"
+              >
+                Ativar Lembretes Diários
+              </button>
+            </div>
+          )}
+
+          <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
+            Aplique no horário fresco, evite sol forte e não atinja diretamente as flores.
+          </InfoCard>
+
+          <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <button
+              onClick={() => setTab("resumo")}
+              className="flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-left transition-all hover:bg-primary/10 sm:col-span-2"
+            >
+              <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/20 text-primary">
+                <FileText size={20} />
+              </div>
+              <div className="flex-1">
+                <div className="text-sm font-bold text-primary">Resumo & PDF</div>
+                <div className="text-[10px] text-muted-foreground">Exportar meu progresso</div>
+              </div>
+              <ChevronRight size={16} className="text-primary/40" />
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+  );
+
 
 
 
