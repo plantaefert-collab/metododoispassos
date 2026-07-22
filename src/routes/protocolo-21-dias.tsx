@@ -4373,9 +4373,23 @@ function DayCompleteModal({
   const total = meta.checklist.length;
   const done = meta.checklist.filter((i) => entry.checklist[i]).length;
   const noteTrim = entry.note?.trim() ?? "";
+  // Trava o scroll do fundo enquanto o modal está aberto
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, []);
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-primary/40 p-4 backdrop-blur-sm">
-      <div className="w-full max-w-sm rounded-3xl border border-border bg-card p-5 shadow-2xl">
+    <div
+      onClick={onCancel}
+      className="fixed inset-0 z-[100] flex items-end justify-center overflow-y-auto overscroll-contain bg-primary/40 p-4 backdrop-blur-sm sm:items-center"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        className="my-auto w-full max-w-sm rounded-3xl border border-border bg-card p-5 shadow-2xl"
+      >
         <div className="text-xs font-bold uppercase tracking-wider text-accent">Resumo do dia</div>
         <div className="mt-1 font-display text-xl text-primary">Concluir Dia {day}?</div>
         <div className="mt-4 space-y-2 rounded-2xl border border-border bg-muted/30 p-3 text-sm">
