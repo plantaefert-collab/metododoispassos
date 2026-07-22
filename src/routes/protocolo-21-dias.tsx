@@ -1997,9 +1997,8 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         );
       })()}
 
-      {!focusedMode && (
-        <>
-          {/* Método 2 Passos — bloco de destaque em verde */}
+      {/* Seção dinâmica condicional: removemos o switch complexo por uma renderização direta */}
+
 
       <div className="group relative overflow-hidden rounded-2xl border-2 border-primary/40 bg-gradient-to-br from-primary/15 via-primary/8 to-primary/[0.03] shadow-lg shadow-primary/10 transition-all hover:border-primary/60 hover:shadow-primary/20">
         <div className="relative w-full overflow-hidden">
