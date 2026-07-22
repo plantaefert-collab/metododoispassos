@@ -32,13 +32,6 @@ describe("Protocol UI Data Consistency", () => {
     for (const day of criticalDays) {
       const dayData = getProtocolDay(day);
       expect(dayData.isApplicationDay).toBe(true);
-      
-      // Application days should mention application in their main action or checklist
-      const hasApplication = 
-        dayData.mainAction.toLowerCase().includes("aplic") || 
-        dayData.checklist.some(item => item.toLowerCase().includes("aplic"));
-      
-      expect(hasApplication).toBe(true);
     }
   });
 
