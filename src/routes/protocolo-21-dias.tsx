@@ -46,7 +46,9 @@ import {
   ArrowRight,
   Share2,
   HelpCircle,
+  CheckSquare,
 } from "lucide-react";
+
 import {
   Accordion,
   AccordionContent,
@@ -1951,9 +1953,10 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             eyebrow: `Próximo passo · Dia ${day}`,
             title: meta.title,
             desc: meta.mainAction,
-            cta: { label: `Continuar dia ${day}`, icon: <ChevronRight size={16} />, onClick: handleRedirectToPlan },
+            cta: { label: `Focar no dia ${day}`, icon: <Sparkles size={16} />, onClick: handleRedirectToPlan },
           };
         }
+
 
         const showChecklist = hasPlant && diagnosisFresh && !applicationPending && !protocolFinished && !allDone && nextItems.length > 0;
         const progressPct = Math.round(((day - 1) / 21) * 100 + (allDone ? Math.round(100 / 21) : 0));
@@ -2074,6 +2077,26 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
               )}
 
 
+              {showChecklist && nextItems.length > 0 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRedirectToPlan();
+                    setTimeout(() => {
+                      const firstChecklistEl = document.querySelector('[data-checklist-item]');
+                      if (firstChecklistEl) firstChecklistEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100);
+                  }}
+                  className="mt-3 flex w-full items-center justify-between rounded-xl border border-accent/20 bg-accent/5 px-4 py-2.5 text-[11px] font-bold text-accent transition-all hover:bg-primary/10 active:scale-[0.98]"
+                >
+                  <div className="flex items-center gap-2">
+                    <CheckSquare size={14} />
+                    <span>Concluir: {nextItems[0].label}</span>
+                  </div>
+                  <ChevronRight size={14} className="opacity-40" />
+                </button>
+              )}
+
               <button
                 onClick={(e) => { 
                   e.stopPropagation(); 
@@ -2084,10 +2107,11 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
                 }}
                 className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-accent-foreground shadow-sm transition-all hover:brightness-110 active:scale-[0.98]"
               >
-
                 {ctx.cta.icon}
                 {ctx.cta.label}
               </button>
+
+
             </div>
           </div>
         );
@@ -2676,6 +2700,8 @@ function WeekPicker({
           return (
             <motion.button
               key={d}
+              data-day-button={d}
+
               onClick={() => onSelectDay(d)}
               onPointerDown={() => startPress(d)}
               onPointerUp={cancelPress}
@@ -2835,8 +2861,10 @@ function StagesList({
           <AccordionItem
             key={stage.id}
             value={stage.id}
+            data-checklist-item
             className="overflow-hidden rounded-xl border border-border bg-card"
           >
+
             <AccordionTrigger className="px-5 py-4 text-left text-[15px] font-semibold text-primary hover:no-underline group">
               <span className="flex items-center gap-2">
                 <span className="text-accent group-data-[state=open]:rotate-90 transition-transform">
