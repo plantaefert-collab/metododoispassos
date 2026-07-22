@@ -2075,9 +2075,16 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
 
 
               <button
-                onClick={(e) => { e.stopPropagation(); ctx.cta.onClick(); }}
+                onClick={(e) => { 
+                  e.stopPropagation(); 
+                  if ([3, 10, 17].includes(day) && !state.days[day]?.applicationDone) {
+                    playCriticalSound();
+                  }
+                  ctx.cta.onClick(); 
+                }}
                 className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-accent-foreground shadow-sm transition-all hover:brightness-110 active:scale-[0.98]"
               >
+
                 {ctx.cta.icon}
                 {ctx.cta.label}
               </button>
