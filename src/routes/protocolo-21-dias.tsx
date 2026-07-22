@@ -2087,7 +2087,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
                       if (firstChecklistEl) firstChecklistEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
                     }, 100);
                   }}
-                  className="mt-3 flex w-full items-center justify-between rounded-xl border border-accent/20 bg-accent/5 px-4 py-2.5 text-[11px] font-bold text-accent transition-all hover:bg-accent/10 active:scale-[0.98]"
+                  className="mt-3 flex w-full items-center justify-between rounded-xl border border-accent/20 bg-accent/5 px-4 py-2.5 text-[11px] font-bold text-accent transition-all hover:bg-primary/10 active:scale-[0.98]"
                 >
                   <div className="flex items-center gap-2">
                     <CheckSquare size={14} />
@@ -2110,6 +2110,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
                 {ctx.cta.icon}
                 {ctx.cta.label}
               </button>
+
 
             </div>
           </div>
