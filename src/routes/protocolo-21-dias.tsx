@@ -1928,7 +1928,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         <SectionHeader
           eyebrow="Bloco 1"
           title="Foco do dia"
-          hint={focusedMode ? "Visualização concentrada ativa" : "O que você precisa fazer agora"}
+          subtitle={focusedMode ? "Visualização concentrada ativa" : "O que você precisa fazer agora?"}
         />
         <button
           onClick={() => {
@@ -4497,21 +4497,30 @@ function SectionHeader({
   eyebrow,
   title,
   hint,
+  subtitle,
 }: {
   eyebrow: string;
   title: string;
   hint?: string;
+  subtitle?: string;
 }) {
   return (
-    <div className="flex items-baseline justify-between gap-3 pt-2">
-      <div className="min-w-0">
-        <div className="text-[10px] font-bold uppercase tracking-widest text-accent">{eyebrow}</div>
-        <h2 className="font-display text-lg leading-tight text-primary">{title}</h2>
+    <div className="pt-2">
+      <div className="flex items-baseline justify-between gap-3">
+        <div className="min-w-0">
+          <div className="text-[10px] font-bold uppercase tracking-widest text-accent">{eyebrow}</div>
+          <h2 className="font-display text-lg leading-tight text-primary">{title}</h2>
+        </div>
+        {hint && (
+          <span className="shrink-0 text-[10px] italic text-muted-foreground text-right max-w-[55%]">
+            {hint}
+          </span>
+        )}
       </div>
-      {hint && (
-        <span className="shrink-0 text-[10px] italic text-muted-foreground text-right max-w-[55%]">
-          {hint}
-        </span>
+      {subtitle && (
+        <p className="mt-1 text-[12px] italic text-muted-foreground">
+          {subtitle}
+        </p>
       )}
     </div>
   );
