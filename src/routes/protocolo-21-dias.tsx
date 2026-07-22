@@ -1840,6 +1840,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
       {/* ─────────── BLOCO DE MODO FOCADO ─────────── */}
 
 
+
       <div className="flex items-center justify-between px-1">
         <SectionHeader
           eyebrow="Bloco 1"
