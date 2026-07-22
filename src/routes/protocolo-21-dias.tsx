@@ -1776,9 +1776,9 @@ function ResultSection({
                       </div>
                     )}
                     {g.warning && (
-                      <div className="mt-1 flex gap-2 rounded-xl bg-accent/10 p-2.5 text-xs text-accent border border-accent/20">
-                        <AlertTriangle size={14} className="mt-0.5 shrink-0" />
-                        <span className="font-medium">{g.warning}</span>
+                      <div className="mt-1 flex gap-2 rounded-xl bg-accent p-2.5 text-xs text-white border border-accent/20">
+                        <AlertTriangle size={14} className="mt-0.5 shrink-0 text-white" />
+                        <span className="font-bold">{g.warning}</span>
                       </div>
                     )}
                   </div>
