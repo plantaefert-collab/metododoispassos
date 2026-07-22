@@ -4257,32 +4257,32 @@ function MetodoContent() {
 
   const productDetails = {
     enraizador: {
-      title: "Enraizador Forte",
+      title: "Enraizador Orgânico",
       icon: <Sprout size={24} />,
       color: "var(--color-plantae-green)",
       badge: "Enraizar",
       steps: [
-        "Dilua 5ml (1 tampa) em 1 litro de água filtrada ou descansada.",
-        "Aplique via rega no substrato, molhando bem as raízes.",
-        "Pode ser usado via foliar (borrifar) no final da tarde.",
-        "Frequência recomendada: 1x por semana na fase de enraizamento."
+        "Aplicar 1 vez por semana, preferencialmente nas horas mais frescas do dia.",
+        "Aplique primeiro o Enraizador Orgânico nas raízes e no substrato.",
+        "Evite aplicar diretamente nas flores.",
+        "Não aplicar sob sol forte, especialmente entre 9h e 16h."
       ],
-      doses: "5ml por litro de água.",
-      warnings: "Evite aplicar sob sol forte. Não aplicar diretamente nas flores abertas."
+      doses: "Conforme orientação da embalagem.",
+      warnings: "Não aplicar sob sol forte (9h–16h). Evite aplicar diretamente nas flores."
     },
     nutrir: {
-      title: "Bokashi Orquídeas",
+      title: "Bokashi Líquido Orquídeas",
       icon: <Leaf size={24} />,
       color: "var(--color-plantae-magenta)",
       badge: "Nutrir",
       steps: [
-        "Agite bem antes de usar.",
-        "Dilua 5ml em 1 litro de água.",
-        "Regue o substrato uniformemente ao redor da planta.",
-        "Use a cada 15 dias para manutenção ou 7 dias para estímulo."
+        "Aplicar 1 vez por semana, preferencialmente nas horas mais frescas do dia.",
+        "Após o Enraizador, aplique o Bokashi Líquido Orquídeas nas raízes, folhas e substrato.",
+        "Evite aplicar diretamente nas flores.",
+        "Não aplicar sob sol forte, especialmente entre 9h e 16h."
       ],
-      doses: "5ml por litro de água.",
-      warnings: "Mantenha em local fresco e escuro. Mantenha fora do alcance de crianças."
+      doses: "Conforme orientação da embalagem.",
+      warnings: "Não aplicar sob sol forte (9h–16h). Evite aplicar diretamente nas flores."
     }
   };
 
@@ -4328,7 +4328,7 @@ function MetodoContent() {
             >
               <img
                 src={sceneEnraizar}
-                alt="Enraizador Forte em cena botânica"
+                alt="Enraizador Orgânico em cena botânica"
                 loading="lazy"
                 width={1024}
                 height={1024}
@@ -4404,7 +4404,7 @@ function MetodoContent() {
             >
               <img
                 src={sceneNutrir}
-                alt="Bokashi Orquídeas em cena botânica"
+                alt="Bokashi Líquido Orquídeas em cena botânica"
                 loading="lazy"
                 width={1024}
                 height={1024}
@@ -4419,7 +4419,7 @@ function MetodoContent() {
           </div>
           <div className="mt-6 space-y-4 relative z-10">
             <p className="text-[15px] leading-relaxed text-foreground/80">
-              Com as raízes prontas, entramos com a <span className="font-bold text-accent">nutrição premium</span>. O Bokashi Orquídeas fornece os elementos exatos que a planta precisa para o vigor vegetativo e a futura floração.
+              Com as raízes prontas, entramos com a <span className="font-bold text-accent">nutrição premium</span>. O Bokashi Líquido Orquídeas fornece os elementos exatos que a planta precisa para o vigor vegetativo e a futura floração.
             </p>
             <div className="rounded-2xl bg-accent/5 p-4 border border-accent/10">
               <h4 className="text-sm font-bold text-accent">O que acontece:</h4>
