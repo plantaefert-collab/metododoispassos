@@ -400,6 +400,12 @@ export function useProtocolStore() {
     clearSaveError: () => {
       currentState = { ...currentState, saveError: undefined };
       notifyListeners();
+    },
+    updateSettings: (patch: Partial<NonNullable<ProtocolState['settings']>>, actorId: string | "guest") => {
+      wrapSetState((s) => ({
+        ...s,
+        settings: { ...s.settings, ...patch }
+      }), actorId);
     }
   };
 }
