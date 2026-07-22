@@ -27,9 +27,12 @@ describe("Protocol UI Data Consistency", () => {
   });
 
   it("should identify critical application days correctly", () => {
-    const criticalDays = [3, 10, 17];
+    // Days defined as isApplicationDay: true in editorial-plan.ts
+    const criticalDays = [1, 7, 14, 21];
     for (const day of criticalDays) {
       const dayData = getProtocolDay(day);
+      expect(dayData.isApplicationDay).toBe(true);
+      
       // Application days should mention application in their main action or checklist
       const hasApplication = 
         dayData.mainAction.toLowerCase().includes("aplic") || 
