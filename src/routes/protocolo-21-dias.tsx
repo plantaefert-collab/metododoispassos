@@ -5019,7 +5019,7 @@ function MinhaOrquideaTab({ actorId, setTab }: { actorId: string; setTab: (t: Ta
           </div>
           <div>
             <h2 className="font-display text-lg text-primary">Preferências</h2>
-            <p className="text-xs text-muted-foreground">Sons e vibrações da interface.</p>
+            <p className="text-xs text-muted-foreground">Personalize sua experiência no aplicativo.</p>
           </div>
         </div>
 
@@ -5073,6 +5073,33 @@ function MinhaOrquideaTab({ actorId, setTab }: { actorId: string; setTab: (t: Ta
               )}
             >
               <span className={cn("pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ease-in-out", !state.settings?.hapticsDisabled ? "translate-x-5" : "translate-x-0")} />
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between rounded-xl border border-border bg-muted/20 p-4">
+            <div className="flex items-center gap-3">
+              <div className={cn("grid h-10 w-10 place-items-center rounded-lg transition-colors", state.settings?.focusedMode ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground")}>
+                <Wind size={20} />
+              </div>
+              <div className="min-w-0">
+                <div className="truncate text-sm font-bold text-foreground">Modo Focado</div>
+                <div className="truncate text-[10px] text-muted-foreground">Reduzir distrações no início</div>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                playInteractionSound();
+                if (navigator.vibrate && !state.settings?.hapticsDisabled) {
+                  navigator.vibrate(10);
+                }
+                updateSettings({ focusedMode: !state.settings?.focusedMode }, actorId);
+              }}
+              className={cn(
+                "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out",
+                state.settings?.focusedMode ? "bg-primary" : "bg-muted"
+              )}
+            >
+              <span className={cn("pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ease-in-out", state.settings?.focusedMode ? "translate-x-5" : "translate-x-0")} />
             </button>
           </div>
         </div>
