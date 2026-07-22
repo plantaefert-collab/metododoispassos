@@ -3474,6 +3474,8 @@ function RegisterField({
 
 function MethodDrawer({ actorId, day, onClose }: { actorId: string; day: number; onClose: () => void }) {
   const { registerApplication, state } = useProtocolStore();
+  void state;
+  void registerApplication;
 
   const applicationsForDay = state.applications.filter((a) => a.day === day);
   const entry = state.days[day] ?? { checklist: {}, note: "", completed: false };
