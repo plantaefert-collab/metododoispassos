@@ -3627,63 +3627,49 @@ function _MethodDrawerBody({
 
   return (
     <Drawer onClose={onClose} title="Método de 2 Passos">
-      <p className="text-sm text-foreground/85">
-        Realize o Método de 2 Passos uma vez por semana, preferencialmente nos horários mais frescos
-        do dia. Os produtos são prontos para uso e não precisam de diluição.
-      </p>
-
-      <div className="mt-4 space-y-3">
-        <div className="rounded-2xl border border-border bg-secondary/50 p-4">
-          <div className="flex items-center gap-2 text-primary">
-            <span className="grid h-7 w-7 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
-              1
-            </span>
-            <Sprout size={18} strokeWidth={2.2} />
-            <span className="text-base font-bold">Enraizar</span>
-          </div>
-          <p className="mt-2 text-sm text-secondary-foreground/90">
-            Aplique primeiro o Enraizador nas raízes e no substrato. Distribua o produto de forma
-            uniforme até umedecer levemente as áreas indicadas, sem escorrer e sem encharcar.
-          </p>
-          <div className="mt-2 text-[12px] font-semibold uppercase tracking-wider text-primary/80">
-            Enraizador Forte 500 ml Pronto Uso
-          </div>
+      <div className="rounded-2xl border border-border bg-secondary/50 p-4">
+        <div className="text-[12px] font-bold uppercase tracking-wider text-primary/80">
+          Uso em conjunto
         </div>
-
-        <div className="rounded-2xl border border-border bg-lilac/60 p-4">
-          <div className="flex items-center gap-2 text-lilac-foreground">
-            <span className="grid h-7 w-7 place-items-center rounded-full bg-accent text-xs font-bold text-accent-foreground">
-              2
-            </span>
-            <Leaf size={18} strokeWidth={2.2} />
-            <span className="text-base font-bold">Nutrir</span>
-          </div>
-          <p className="mt-2 text-sm text-lilac-foreground/90">
-            Em seguida, aplique o Bokashi nas raízes, folhas e substrato. Distribua o produto de
-            forma uniforme até umedecer levemente, sem escorrer e sem encharcar. Evite aplicar
-            diretamente nas flores.
-          </p>
-          <div className="mt-2 text-[12px] font-semibold uppercase tracking-wider text-primary/80">
-            Bokashi Orquídeas Premium 500 ml Pronto Uso
-          </div>
-        </div>
+        <p className="mt-1 text-sm text-secondary-foreground/90">
+          Aplicar 1 vez por semana, preferencialmente nas horas mais frescas do dia.
+        </p>
       </div>
 
-      <div className="mt-4 rounded-2xl border border-accent/30 bg-accent/10 p-4 text-sm text-accent">
-        <div className="flex items-center gap-2">
-          <AlertTriangle size={16} />
-          <span className="font-semibold">Cuidados</span>
-        </div>
-        <ul className="mt-2 space-y-1 text-[13px] text-accent">
-          <li>Não diluir</li>
-          <li>Preferir horários mais frescos</li>
-          <li>Não aplicar sob sol forte, especialmente entre 9h e 16h</li>
-          <li>Evitar aplicação direta nas flores</li>
-          <li>Não deixar o produto escorrer</li>
-          <li>Não encharcar raízes ou substrato</li>
-          <li>Não misturar com outros produtos durante a aplicação</li>
-          <li>Não repetir a aplicação por engano</li>
-        </ul>
+      <div className="mt-4">
+        <div className="text-sm font-bold text-primary">Como aplicar</div>
+        <ol className="mt-3 space-y-3">
+          <li className="flex gap-3 rounded-2xl border border-border bg-card p-3">
+            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+              1
+            </span>
+            <p className="text-sm text-foreground/90">
+              Aplique primeiro o <strong>Enraizador Orgânico</strong> nas raízes e no substrato.
+            </p>
+          </li>
+          <li className="flex gap-3 rounded-2xl border border-border bg-card p-3">
+            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-accent text-xs font-bold text-accent-foreground">
+              2
+            </span>
+            <p className="text-sm text-foreground/90">
+              Em seguida, aplique o <strong>Bokashi Líquido Orquídeas</strong> nas raízes, folhas e substrato.
+            </p>
+          </li>
+          <li className="flex gap-3 rounded-2xl border border-border bg-card p-3">
+            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-muted text-xs font-bold text-foreground">
+              3
+            </span>
+            <p className="text-sm text-foreground/90">Evite aplicar diretamente nas flores.</p>
+          </li>
+          <li className="flex gap-3 rounded-2xl border border-border bg-card p-3">
+            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-muted text-xs font-bold text-foreground">
+              4
+            </span>
+            <p className="text-sm text-foreground/90">
+              Não aplicar sob sol forte, especialmente entre 9h e 16h.
+            </p>
+          </li>
+        </ol>
       </div>
 
       {applicationsForDay.length > 0 && (
