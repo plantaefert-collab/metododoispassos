@@ -1845,7 +1845,6 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           hint={focusedMode ? "Visualização concentrada ativa" : "O que você precisa fazer agora"}
         />
         <button
-
           onClick={() => setFocusedMode(!focusedMode)}
           className={cn(
             "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all",
@@ -1858,6 +1857,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           {focusedMode ? "Modo Focado" : "Focar"}
         </button>
       </div>
+
 
 
       {/* Próximo passo recomendado — CTA principal */}
