@@ -1926,6 +1926,9 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
 
         const showChecklist = hasPlant && diagnosisFresh && !applicationPending && !protocolFinished && !allDone && nextItems.length > 0;
         const progressPct = Math.round(((day - 1) / 21) * 100 + (allDone ? Math.round(100 / 21) : 0));
+        const hasNote = !!today.note?.trim();
+        const showRegistrationShortcut = diagnosisFresh && !allDone && !hasNote;
+
 
         return (
           <div
