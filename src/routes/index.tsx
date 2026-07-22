@@ -318,7 +318,7 @@ function HomePage() {
       <footer className="border-t border-border/50 py-6 text-center text-xs text-muted-foreground space-y-2">
         <div>© {new Date().getFullYear()} PlantaeFert · Método de 2 Passos</div>
         <div className="opacity-60 max-w-xs mx-auto px-4">
-          Implemente um modo alto contraste global com alternância nas preferências e persistência no localStorage.
+          Garantir que modals, drawers e badges do diagnóstico também herdem a classe .high-contrast e mantenham contraste adequado em todos os estados.
         </div>
       </footer>
     </div>
