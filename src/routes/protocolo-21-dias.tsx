@@ -1837,17 +1837,15 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
 
   return (
     <div className="space-y-4">
-
-
       {/* ─────────── BLOCO DE MODO FOCADO ─────────── */}
       <div className="flex items-center justify-between px-1">
         <SectionHeader
           eyebrow="Bloco 1"
           title="Foco do dia"
           hint={focusedMode ? "Visualização concentrada ativa" : "O que você precisa fazer agora"}
-
         />
         <button
+
           onClick={() => setFocusedMode(!focusedMode)}
           className={cn(
             "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all",
