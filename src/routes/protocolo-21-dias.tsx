@@ -1837,6 +1837,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
 
   return (
     <div className="space-y-4">
+
       {/* ─────────── BLOCO DE MODO FOCADO ─────────── */}
       <div className="flex items-center justify-between px-1">
         <SectionHeader
