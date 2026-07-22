@@ -94,7 +94,7 @@ export function WelcomeScreen({
           <img
             src={logoPlantaefert}
             alt="PlantaeFert — Nutrição Vegetal"
-            className="h-9 w-auto"
+            className="h-11 w-auto"
           />
         </header>
 
