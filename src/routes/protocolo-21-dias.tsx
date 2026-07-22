@@ -1805,6 +1805,8 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
   };
 
   const { state, setCurrentDay, toggleReminder } = useProtocolStore();
+  const [focusedMode, setFocusedMode] = useState(false);
+
 
 
   // Foco do dia = fonte única compartilhada (Início, Minha Orquídea, Plano).
