@@ -3577,17 +3577,15 @@ function ApplicationQuickChecklist({
           );
         })}
       </div>
-      <AlertDialog open={pendingStep !== null} onOpenChange={(o) => { if (!o) setPendingStep(null); }}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar aplicação do Dia {day}?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta é uma etapa crítica do protocolo. Confirme apenas se você já realizou este passo agora — a ação registrará seu progresso e não pode ser desfeita automaticamente.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Ainda não</AlertDialogCancel>
-            <AlertDialogAction
+      <ProtocolDialog
+        open={pendingStep !== null}
+        onOpenChange={(o) => { if (!o) setPendingStep(null); }}
+        eyebrow="Aplicação crítica"
+        title={`Confirmar aplicação do Dia ${day}?`}
+        description="Esta é uma etapa crítica do protocolo. Confirme apenas se você já realizou este passo agora — a ação registrará seu progresso e não pode ser desfeita automaticamente."
+        footer={
+          <>
+            <button
               onClick={() => {
                 if (pendingStep) {
                   onToggle(pendingStep);
@@ -3595,12 +3593,19 @@ function ApplicationQuickChecklist({
                 }
                 setPendingStep(null);
               }}
+              className="w-full rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
             >
               Sim, marcar como feito
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+            </button>
+            <button
+              onClick={() => setPendingStep(null)}
+              className="w-full rounded-full border border-border px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+            >
+              Ainda não
+            </button>
+          </>
+        }
+      />
     </motion.div>
   );
 }
