@@ -4561,6 +4561,7 @@ function DayPreviewModal({
 
 function MinhaOrquideaTab({ actorId, setTab }: { actorId: string; setTab: (t: Tab) => void }) {
   const { state, updatePlant, setCurrentDay, updateSettings } = useProtocolStore();
+  const [showPlantForm, setShowPlantForm] = useState(false);
   
   const playInteractionSound = () => {
     if (state.settings?.muteSounds) return;
