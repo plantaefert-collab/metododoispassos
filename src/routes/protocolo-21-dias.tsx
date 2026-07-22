@@ -1944,8 +1944,11 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             className={cn(
               "group relative w-full cursor-pointer overflow-hidden rounded-2xl border-2 p-5 text-left shadow-sm transition-all active:scale-[0.99]",
               isApplicationDay 
-                ? "border-accent/40 bg-gradient-to-br from-accent/10 via-accent/5 to-transparent shadow-lg shadow-accent/5 ring-1 ring-accent/20" 
+                ? [3, 10, 17].includes(day)
+                  ? "border-accent bg-gradient-to-br from-accent/20 via-accent/10 to-transparent shadow-xl shadow-accent/10 ring-2 ring-accent animate-[pulse_3s_ease-in-out_infinite]"
+                  : "border-accent/40 bg-gradient-to-br from-accent/10 via-accent/5 to-transparent shadow-lg shadow-accent/5 ring-1 ring-accent/20" 
                 : "border-accent/30 bg-gradient-to-br from-accent/[0.06] to-primary/[0.04] hover:border-accent/50"
+
             )}
           >
             {isApplicationDay && (
