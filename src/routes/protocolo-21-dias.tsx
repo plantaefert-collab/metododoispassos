@@ -10,6 +10,14 @@ import logoPlantaefert from "@/assets/logo-plantaefert.png";
 import { playSuccessSound, playPopSound } from "@/lib/audio-feedback";
 import { MethodInstructions } from "@/components/MethodInstructions";
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -4634,85 +4642,69 @@ function DayCompleteModal({
   const total = meta.checklist.length;
   const done = meta.checklist.filter((i) => entry.checklist[i]).length;
   const noteTrim = entry.note?.trim() ?? "";
-  // Trava o scroll do fundo enquanto o modal está aberto e permite fechar com ESC
-  useEffect(() => {
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onCancel();
-    };
-    window.addEventListener("keydown", onKey);
-    return () => {
-      document.body.style.overflow = prevOverflow;
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [onCancel]);
   return (
-    <div
-      onClick={onCancel}
-      className="fixed inset-0 z-[100] flex items-end justify-center overscroll-contain bg-primary/40 backdrop-blur-sm sm:items-center sm:p-4"
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        role="dialog"
-        aria-modal="true"
-        className="flex max-h-[90dvh] w-full max-w-sm flex-col overflow-hidden rounded-t-3xl border border-border bg-card shadow-2xl sm:rounded-3xl"
+    <Dialog open onOpenChange={(open) => { if (!open) onCancel(); }}>
+      <DialogContent
+        className="flex max-h-[90dvh] w-[calc(100%-2rem)] max-w-sm flex-col gap-0 overflow-hidden rounded-3xl p-0"
         style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
       >
-        {/* handle visual no mobile */}
-        <div className="mx-auto mt-2 h-1.5 w-10 shrink-0 rounded-full bg-border sm:hidden" />
         <div className="flex-1 overflow-y-auto overscroll-contain p-5">
-        <div className="text-xs font-bold uppercase tracking-wider text-accent">Resumo do dia</div>
-        <div className="mt-1 font-display text-xl text-primary">Concluir Dia {day}?</div>
-        <div className="mt-4 space-y-2 rounded-2xl border border-border bg-muted/30 p-3 text-sm">
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Checklist</span>
-            <span className="font-semibold text-foreground">{done}/{total}</span>
+          <DialogHeader className="space-y-1 text-left">
+            <div className="text-xs font-bold uppercase tracking-wider text-accent">Resumo do dia</div>
+            <DialogTitle className="font-display text-xl text-primary">Concluir Dia {day}?</DialogTitle>
+            <DialogDescription className="sr-only">
+              Confirme a conclusão do Dia {day} do protocolo.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="mt-4 space-y-2 rounded-2xl border border-border bg-muted/30 p-3 text-sm">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Checklist</span>
+              <span className="font-semibold text-foreground">{done}/{total}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Aplicações registradas</span>
+              <span className="font-semibold text-foreground">{applicationsForDay}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Registro no diário</span>
+              <span className="font-semibold text-foreground">{noteTrim ? "Sim" : "Não"}</span>
+            </div>
+            {noteTrim && (
+              <p className="mt-2 line-clamp-3 border-t border-border/50 pt-2 text-xs italic text-muted-foreground">
+                "{noteTrim}"
+              </p>
+            )}
           </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Aplicações registradas</span>
-            <span className="font-semibold text-foreground">{applicationsForDay}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Registro no diário</span>
-            <span className="font-semibold text-foreground">{noteTrim ? "Sim" : "Não"}</span>
-          </div>
-          {noteTrim && (
-            <p className="mt-2 line-clamp-3 border-t border-border/50 pt-2 text-xs italic text-muted-foreground">
-              "{noteTrim}"
+          {done < total && (
+            <p className="mt-3 text-xs text-accent">
+              Ainda restam {total - done} item(ns) do checklist. Você pode concluir mesmo assim.
             </p>
           )}
-        </div>
-        {done < total && (
-          <p className="mt-3 text-xs text-accent">
-            Ainda restam {total - done} item(ns) do checklist. Você pode concluir mesmo assim.
-          </p>
-        )}
-        <div className="mt-4 flex flex-col gap-2">
-          {canAdvance && (
+          <DialogFooter className="mt-4 flex flex-col gap-2 sm:flex-col sm:space-x-0">
+            {canAdvance && (
+              <button
+                onClick={() => onConfirm(true)}
+                className="w-full rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
+              >
+                Concluir e avançar para Dia {day + 1}
+              </button>
+            )}
             <button
-              onClick={() => onConfirm(true)}
-              className="w-full rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
+              onClick={() => onConfirm(false)}
+              className="w-full rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground"
             >
-              Concluir e avançar para Dia {day + 1}
+              {canAdvance ? `Só concluir Dia ${day}` : `Concluir Dia ${day}`}
             </button>
-          )}
-          <button
-            onClick={() => onConfirm(false)}
-            className="w-full rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground"
-          >
-            {canAdvance ? `Só concluir Dia ${day}` : `Concluir Dia ${day}`}
-          </button>
-          <button
-            onClick={onCancel}
-            className="w-full rounded-full border border-border px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
-          >
-            Cancelar
-          </button>
+            <button
+              onClick={onCancel}
+              className="w-full rounded-full border border-border px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+            >
+              Cancelar
+            </button>
+          </DialogFooter>
         </div>
-        </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
