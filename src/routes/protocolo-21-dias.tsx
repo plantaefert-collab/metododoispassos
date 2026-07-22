@@ -2725,11 +2725,10 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           <ChevronRight size={16} className="text-primary/40" />
         </button>
       </div>
-        </>
-      )}
     </div>
   );
 }
+
 
 
 
