@@ -1832,7 +1832,8 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
       console.warn("Audio interaction blocked", e);
     }
   };
-  const [focusedMode, setFocusedMode] = useState(false);
+  const focusedMode = !!state.settings?.focusedMode;
+  const setFocusedMode = (v: boolean) => updateSettings({ focusedMode: v }, actorId);
 
   // Sistema de Áudio para Notificações Críticas
   const playCriticalSound = () => {
