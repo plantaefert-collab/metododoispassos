@@ -2926,11 +2926,14 @@ function WeekPicker({
           const isApp = APPLICATION_DAYS.includes(d);
           const isCompleted = state.days[d]?.completed;
           const isFocus = focusDays.has(d);
+          const isFullyDone = isDayFullyDone(state, d, getProtocolDay(d).checklist);
+          const isPending = d <= state.currentDay && !isCompleted;
+
+
           return (
             <motion.button
               key={d}
               data-day-button={d}
-
               onClick={() => onSelectDay(d)}
               onPointerDown={() => startPress(d)}
               onPointerUp={cancelPress}
@@ -2938,7 +2941,7 @@ function WeekPicker({
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.95 }}
               aria-current={active ? "step" : undefined}
-              aria-label={`${isApp ? `Dia ${d}, dia de aplicação` : `Dia ${d}`}${isCompleted ? ", concluído" : ""}${isFocus ? ", foco do diagnóstico" : ""}`}
+              aria-label={`${isApp ? `Dia ${d}, dia de aplicação` : `Dia ${d}`}${isCompleted ? ", concluído" : ""}${isFocus ? ", foco do diagnóstico" : ""}${isPending ? ", registro pendente" : ""}`}
               className={`relative min-h-[54px] rounded-xl border px-2 py-2 text-[13px] font-semibold transition-all focus:outline-none focus-visible:ring-1 focus-visible:ring-primary ${
                 active
                   ? "border-primary bg-primary text-primary-foreground shadow-sm"
@@ -2953,6 +2956,7 @@ function WeekPicker({
                 <span className="text-[10px] opacity-60 uppercase font-bold tracking-tighter">Dia</span>
                 <span className="font-display text-lg leading-none">{d}</span>
               </div>
+
               
               {isCompleted && (
                 <motion.div 
@@ -2963,7 +2967,17 @@ function WeekPicker({
                   ✓
                 </motion.div>
               )}
-              {isApp && !isCompleted && (
+              {!isCompleted && isPending && (
+                <motion.div 
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  className={`absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-accent text-[8px] text-accent-foreground shadow-sm ${active ? 'ring-1 ring-accent-foreground' : ''}`}
+                  title="Registro Pendente"
+                >
+                  !
+                </motion.div>
+              )}
+              {isApp && !isCompleted && !isPending && (
                 <span
                   aria-hidden
                   className={`absolute right-1.5 top-1.5 h-1.5 w-1.5 rounded-full ${
@@ -2971,6 +2985,7 @@ function WeekPicker({
                   }`}
                 />
               )}
+
               
               {/* Tooltip/Preview Simulado via Título ou CSS se necessário, 
                   mas para mobile o long-press pode ser simulado com title para preview nativo 
@@ -2980,7 +2995,24 @@ function WeekPicker({
           );
         })}
       </div>
+      
+      <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-1 text-[10px] font-medium text-muted-foreground/80">
+        <div className="flex items-center gap-1.5">
+          <div className="h-3 w-3 rounded-full bg-primary flex items-center justify-center text-[7px] text-white">✓</div>
+          <span>Concluído</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="h-3 w-3 rounded-full bg-accent flex items-center justify-center text-[7px] text-white font-bold">!</div>
+          <span>Registro Pendente</span>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <div className="h-1.5 w-1.5 rounded-full bg-accent" />
+          <span>Dia de Aplicação</span>
+        </div>
+      </div>
+
     </div>
+
   );
 }
 
