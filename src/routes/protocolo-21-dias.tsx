@@ -4874,6 +4874,73 @@ function MinhaOrquideaTab({ actorId, setTab }: { actorId: string; setTab: (t: Ta
           Salvar cadastro
         </button>
       </div>
+
+      {/* Preferências */}
+      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+        <div className="flex items-center gap-3">
+          <div className="grid h-9 w-9 place-items-center rounded-xl bg-accent/10 text-accent">
+            <Settings size={18} />
+          </div>
+          <div>
+            <h2 className="font-display text-lg text-primary">Preferências</h2>
+            <p className="text-xs text-muted-foreground">Sons e vibrações da interface.</p>
+          </div>
+        </div>
+
+        <div className="mt-5 space-y-4">
+          <div className="flex items-center justify-between rounded-xl border border-border bg-muted/20 p-4">
+            <div className="flex items-center gap-3">
+              <div className={cn("grid h-10 w-10 place-items-center rounded-lg transition-colors", state.settings?.muteSounds ? "bg-muted text-muted-foreground" : "bg-primary/10 text-primary")}>
+                {state.settings?.muteSounds ? <VolumeX size={20} /> : <Volume2 size={20} />}
+              </div>
+              <div className="min-w-0">
+                <div className="truncate text-sm font-bold text-foreground">Sons</div>
+                <div className="truncate text-[10px] text-muted-foreground">Silenciar interações</div>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                updateSettings({ muteSounds: !state.settings?.muteSounds }, actorId);
+                if (state.settings?.muteSounds) {
+                   setTimeout(() => playInteractionSound(), 50);
+                }
+              }}
+              className={cn(
+                "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out",
+                !state.settings?.muteSounds ? "bg-primary" : "bg-muted"
+              )}
+            >
+              <span className={cn("pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ease-in-out", !state.settings?.muteSounds ? "translate-x-5" : "translate-x-0")} />
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between rounded-xl border border-border bg-muted/20 p-4">
+            <div className="flex items-center gap-3">
+              <div className={cn("grid h-10 w-10 place-items-center rounded-lg transition-colors", state.settings?.hapticsDisabled ? "bg-muted text-muted-foreground" : "bg-primary/10 text-primary")}>
+                <Zap size={20} />
+              </div>
+              <div className="min-w-0">
+                <div className="truncate text-sm font-bold text-foreground">Vibrações</div>
+                <div className="truncate text-[10px] text-muted-foreground">Feedback tátil</div>
+              </div>
+            </div>
+            <button
+              onClick={() => {
+                updateSettings({ hapticsDisabled: !state.settings?.hapticsDisabled }, actorId);
+                if (!state.settings?.hapticsDisabled && "vibrate" in navigator) {
+                  navigator.vibrate(10);
+                }
+              }}
+              className={cn(
+                "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out",
+                !state.settings?.hapticsDisabled ? "bg-primary" : "bg-muted"
+              )}
+            >
+              <span className={cn("pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow transition duration-200 ease-in-out", !state.settings?.hapticsDisabled ? "translate-x-5" : "translate-x-0")} />
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
