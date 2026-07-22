@@ -106,7 +106,7 @@ function HomePage() {
             <img
               src={logoPlantaefert}
               alt="PlantaeFert — Nutrição Vegetal"
-                className="h-11 w-auto md:h-12"
+                className="h-13 w-auto md:h-15"
 
             />
           </Link>
