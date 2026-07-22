@@ -8,6 +8,16 @@ import sceneNutrir from "@/assets/scene-nutrir.jpg";
 import kitMetodo from "@/assets/kit-metodo.jpg.asset.json";
 import logoPlantaefert from "@/assets/logo-plantaefert.png";
 import { playSuccessSound, playPopSound } from "@/lib/audio-feedback";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
