@@ -2140,6 +2140,12 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
                 {ctx.cta.icon}
                 {ctx.cta.label}
               </button>
+              
+              <div className="mt-2 text-center">
+                 <span className="text-[10px] font-medium text-muted-foreground/80 italic">
+                   Etapa atual: <span className="text-accent/90 font-bold">Dia {day}</span> • {getProtocolDay(day).title}
+                 </span>
+              </div>
 
 
             </div>
