@@ -23,6 +23,12 @@ export type DiagnosisGuidance = {
   tracking: string[];
   avoid?: string;
   warning?: string;
+  /**
+   * Peso de urgência (maior = mais urgente). Usado para ordenar as prioridades
+   * sem depender de casamento por string. Quando ausente, é derivado da
+   * classificação em {@link classificationSeverity}.
+   */
+  severity?: number;
 };
 
 export const CATEGORY_LABEL: Record<DiagnosisCategory, string> = {
@@ -127,7 +133,27 @@ function build(category: DiagnosisCategory, entries: GuidanceInit[]): DiagnosisG
     tracking: e.tracking,
     avoid: e.avoid,
     warning: e.warning,
+    severity: e.severity,
   }));
+}
+
+/** Severidade padrão quando a orientação não define uma explicitamente. */
+function classificationSeverity(classification: Classification): number {
+  switch (classification) {
+    case "priority":
+      return 50;
+    case "adjustment":
+      return 40;
+    case "favorable":
+      return 10;
+    case "insufficient":
+      return 0;
+  }
+}
+
+/** Urgência efetiva usada na ordenação (maior primeiro). */
+export function effectiveSeverity(g: DiagnosisGuidance): number {
+  return g.severity ?? classificationSeverity(g.classification);
 }
 
 const ROOTS = build("roots", [
@@ -181,6 +207,7 @@ const ROOTS = build("roots", [
     answer: "Raízes moles",
     title: "Raízes com perda de firmeza",
     classification: "priority",
+    severity: 80,
     explanation:
       "Raízes moles merecem acompanhamento próximo. Podem estar relacionadas a excesso de umidade prolongado.",
     action: "Suspenda regas até o substrato secar, verifique a drenagem e remova água acumulada.",
@@ -191,6 +218,7 @@ const ROOTS = build("roots", [
     answer: "Mau cheiro próximo às raízes ou ao substrato",
     title: "Odor no substrato",
     classification: "priority",
+    severity: 90,
     explanation: "Mau cheiro pode estar relacionado a substrato encharcado ou em decomposição.",
     action:
       "Reavalie substrato, drenagem e ventilação; retire água acumulada e evite regar até secar.",
@@ -290,6 +318,7 @@ const LEAVES = build("leaves", [
     answer: "Manchas aumentando ou se espalhando",
     title: "Manchas em expansão",
     classification: "priority",
+    severity: 95,
     explanation:
       "Manchas que aumentam merecem atenção próxima. Podem estar relacionadas a excesso de umidade, ventilação insuficiente ou outras causas.",
     action: "Melhore ventilação, revise rega e evite molhar folhas ao entardecer.",
@@ -300,6 +329,7 @@ const LEAVES = build("leaves", [
     answer: "Queda ou deterioração rápida das folhas",
     title: "Deterioração acelerada",
     classification: "priority",
+    severity: 100,
     explanation: "Deterioração rápida merece avaliação próxima e cuidadosa.",
     action: "Registre fotos, reduza intervenções simultâneas e avalie substrato e raízes.",
     tracking: ["Ritmo da deterioração"],
@@ -438,6 +468,7 @@ const POT = build("potAndSubstrate", [
     answer: "Água acumulada no pratinho ou cachepot",
     title: "Acúmulo de água",
     classification: "priority",
+    severity: 75,
     explanation: "Água acumulada mantém o substrato encharcado e pode prejudicar as raízes.",
     action: "Retire a água após regar e revise a drenagem.",
     tracking: ["Presença de água acumulada"],
@@ -446,6 +477,7 @@ const POT = build("potAndSubstrate", [
     answer: "Vaso permanece molhado por muito tempo",
     title: "Secagem lenta",
     classification: "priority",
+    severity: 65,
     explanation: "Substrato persistentemente molhado dificulta a respiração das raízes.",
     action: "Reavalie ventilação, exposição à luz e substrato; considere ajustar a rotina de rega.",
     tracking: ["Tempo de secagem"],
@@ -471,6 +503,7 @@ const POT = build("potAndSubstrate", [
     answer: "Mau cheiro no vaso ou substrato",
     title: "Odor no vaso",
     classification: "priority",
+    severity: 85,
     explanation: "Odor no substrato pode estar relacionado a decomposição por excesso de umidade.",
     action: "Interrompa a rega até secar e avalie ventilação e drenagem.",
     tracking: ["Presença ou ausência de odor"],
@@ -549,6 +582,7 @@ const ROUTINE = build("wateringAndRoutine", [
     answer: "Rego mesmo com o substrato úmido",
     title: "Rega com substrato úmido",
     classification: "priority",
+    severity: 60,
     explanation:
       "Regar com o substrato ainda úmido pode manter o meio encharcado e prejudicar as raízes.",
     action: "Aguarde a secagem parcial antes de regar novamente.",
@@ -566,6 +600,7 @@ const ROUTINE = build("wateringAndRoutine", [
     answer: "A água permanece acumulada depois da rega",
     title: "Acúmulo após rega",
     classification: "priority",
+    severity: 70,
     explanation: "Acúmulo persistente pode indicar drenagem insuficiente ou substrato deteriorado.",
     action: "Revise vaso, pratinho e substrato; ajuste a drenagem quando possível.",
     tracking: ["Escoamento e secagem"],
@@ -574,6 +609,7 @@ const ROUTINE = build("wateringAndRoutine", [
     answer: "Uso vários fertilizantes ou produtos ao mesmo tempo",
     title: "Uso simultâneo de produtos",
     classification: "priority",
+    severity: 55,
     explanation:
       "O uso simultâneo dificulta identificar o que ajuda ou o que pode estar prejudicando.",
     action: "Simplifique a rotina durante o plano de 21 dias, evitando misturas.",
@@ -630,18 +666,37 @@ export const ALL_GUIDANCE: DiagnosisGuidance[] = [
   ...ROUTINE,
 ];
 
-// Alternativas com prioridade mais alta na apresentação
-const PRIORITY_ORDER = [
-  "Queda ou deterioração rápida das folhas",
-  "Manchas aumentando ou se espalhando",
-  "Mau cheiro próximo às raízes ou ao substrato",
-  "Mau cheiro no vaso ou substrato",
-  "Raízes moles",
-  "Água acumulada no pratinho ou cachepot",
-  "A água permanece acumulada depois da rega",
-  "Vaso permanece molhado por muito tempo",
-  "Rego mesmo com o substrato úmido",
-  "Uso vários fertilizantes ou produtos ao mesmo tempo",
+/**
+ * Clusters de sinais correlacionados. Quando o usuário marca ao menos
+ * `minMatches` respostas do mesmo cluster, o resultado ganha um insight
+ * sintetizando o padrão — em vez de listar os sinais soltos.
+ * Estrutura em tabela para permitir novos clusters no futuro.
+ */
+export type SignalCluster = {
+  id: string;
+  title: string;
+  message: string;
+  minMatches: number;
+  answers: string[];
+};
+
+const SIGNAL_CLUSTERS: SignalCluster[] = [
+  {
+    id: "excesso-de-agua",
+    title: "Vários sinais apontam para excesso de água",
+    message:
+      "Os sinais marcados sugerem que o substrato pode estar retendo umidade por tempo demais. Priorize secagem, drenagem e ventilação antes de qualquer outra mudança.",
+    minMatches: 2,
+    answers: [
+      "Raízes moles",
+      "Mau cheiro próximo às raízes ou ao substrato",
+      "Mau cheiro no vaso ou substrato",
+      "Água acumulada no pratinho ou cachepot",
+      "Vaso permanece molhado por muito tempo",
+      "Rego mesmo com o substrato úmido",
+      "A água permanece acumulada depois da rega",
+    ],
+  },
 ];
 
 const EMPTY_OBSERVATION_GUIDANCE: DiagnosisGuidance[] = [
@@ -704,15 +759,67 @@ const EMPTY_OBSERVATION_GUIDANCE: DiagnosisGuidance[] = [
 
 export type DiagnosisAnswers = Record<DiagnosisCategory, string[]>;
 
+export type HealthTone = "green" | "accent" | "warn";
+
+export type HealthStatus = {
+  label: string;
+  tone: HealthTone;
+  message: string;
+};
+
+export type DiagnosisConflict = {
+  category: DiagnosisCategory;
+  favorable: string;
+  priority: string;
+};
+
+export type DiagnosisInsight = {
+  id: string;
+  title: string;
+  message: string;
+  relatedAnswers: string[];
+};
+
 export type DiagnosisResult = {
   favorable: DiagnosisGuidance[];
   adjustments: DiagnosisGuidance[];
   priorities: DiagnosisGuidance[];
   insufficientInformation: DiagnosisGuidance[];
   trackingPoints: string[];
+  /** Índice de saúde 0–100 derivado das classificações. */
+  healthScore: number;
+  /** Faixa textual correspondente ao {@link healthScore}. */
+  healthStatus: HealthStatus;
+  /** Sinais opostos marcados na mesma categoria (favorável + prioridade). */
+  conflicts: DiagnosisConflict[];
+  /** Padrões sintetizados a partir de sinais correlacionados. */
+  insights: DiagnosisInsight[];
   completedAt: string | null;
   answersVersion: number;
 };
+
+/**
+ * Deriva o índice de saúde (0–100) e a faixa textual a partir das listas
+ * classificadas. Penaliza prioridades e ajustes; bonifica sinais favoráveis.
+ * Fonte única de verdade — antes vivia embutido na UI (`ResultBlocks`).
+ */
+export function deriveHealthScore(
+  favorableCount: number,
+  adjustmentCount: number,
+  priorityCount: number,
+): { healthScore: number; healthStatus: HealthStatus } {
+  const raw = 100 - priorityCount * 20 - adjustmentCount * 10 + favorableCount * 5;
+  const healthScore = Math.max(0, Math.min(100, raw));
+  const healthStatus: HealthStatus =
+    healthScore >= 80
+      ? { label: "Saudável", tone: "green", message: "Sua orquídea mostra sinais consistentes de saúde. Mantenha a rotina." }
+      : healthScore >= 60
+        ? { label: "Estável com ajustes", tone: "accent", message: "Boa base. Alguns ajustes vão elevar o desempenho." }
+        : healthScore >= 40
+          ? { label: "Em recuperação", tone: "accent", message: "Há pontos de atenção. Siga as prioridades para reverter." }
+          : { label: "Requer atenção imediata", tone: "warn", message: "Foque nas prioridades desta semana. É reversível." };
+  return { healthScore, healthStatus };
+}
 
 export function computeDiagnosisResult(
   answers: DiagnosisAnswers,
@@ -729,24 +836,34 @@ export function computeDiagnosisResult(
     insufficient.push(...EMPTY_OBSERVATION_GUIDANCE);
   }
 
+  const conflicts: DiagnosisConflict[] = [];
+
   (Object.keys(answers) as DiagnosisCategory[]).forEach((cat) => {
+    let firstFavorable: string | null = null;
+    let firstPriority: string | null = null;
     for (const ans of answers[cat]) {
       const g = GUIDANCE_BY_CATEGORY[cat].find((x) => x.answer === ans);
       if (!g) continue;
-      if (g.classification === "favorable") favorable.push(g);
-      else if (g.classification === "adjustment") adjustments.push(g);
-      else if (g.classification === "priority") priorities.push(g);
-      else insufficient.push(g);
+      if (g.classification === "favorable") {
+        favorable.push(g);
+        if (firstFavorable === null) firstFavorable = g.answer;
+      } else if (g.classification === "adjustment") {
+        adjustments.push(g);
+      } else if (g.classification === "priority") {
+        priorities.push(g);
+        if (firstPriority === null) firstPriority = g.answer;
+      } else {
+        insufficient.push(g);
+      }
+    }
+    // Sinais opostos na mesma categoria: um favorável e um prioritário.
+    if (firstFavorable && firstPriority) {
+      conflicts.push({ category: cat, favorable: firstFavorable, priority: firstPriority });
     }
   });
 
-  priorities.sort((a, b) => {
-    const ia = PRIORITY_ORDER.indexOf(a.answer);
-    const ib = PRIORITY_ORDER.indexOf(b.answer);
-    const na = ia === -1 ? 999 : ia;
-    const nb = ib === -1 ? 999 : ib;
-    return na - nb;
-  });
+  // Ordena prioridades por urgência (maior primeiro), estável para empates.
+  priorities.sort((a, b) => effectiveSeverity(b) - effectiveSeverity(a));
 
   // pontos de acompanhamento: derivados das prioridades, depois ajustes.
   const tracking = new Set<string>();
@@ -755,15 +872,50 @@ export function computeDiagnosisResult(
   });
   const trackingPoints = Array.from(tracking).slice(0, 5);
 
+  const insights = computeInsights(answers);
+  const { healthScore, healthStatus } = deriveHealthScore(
+    favorable.length,
+    adjustments.length,
+    priorities.length,
+  );
+
   return {
     favorable,
     adjustments,
     priorities,
     insufficientInformation: insufficient,
     trackingPoints,
+    healthScore,
+    healthStatus,
+    conflicts,
+    insights,
     completedAt,
     answersVersion,
   };
+}
+
+/**
+ * Sintetiza padrões a partir de sinais correlacionados marcados pelo usuário.
+ * Percorre {@link SIGNAL_CLUSTERS} e emite um insight por cluster com ao menos
+ * `minMatches` respostas presentes.
+ */
+export function computeInsights(answers: DiagnosisAnswers): DiagnosisInsight[] {
+  const selected = new Set<string>();
+  (Object.values(answers) as string[][]).forEach((arr) => arr.forEach((a) => selected.add(a)));
+
+  const insights: DiagnosisInsight[] = [];
+  for (const cluster of SIGNAL_CLUSTERS) {
+    const matched = cluster.answers.filter((a) => selected.has(a));
+    if (matched.length >= cluster.minMatches) {
+      insights.push({
+        id: cluster.id,
+        title: cluster.title,
+        message: cluster.message,
+        relatedAnswers: matched,
+      });
+    }
+  }
+  return insights;
 }
 
 export function totalObservations(answers: DiagnosisAnswers): number {
@@ -885,7 +1037,7 @@ export function normalizeDays(v: unknown): Record<number, any> {
   return out;
 }
 
-export function normalizeApplications(v: unknown, days: Record<number, any>): any[] {
+export function normalizeApplications(v: unknown): any[] {
   if (!Array.isArray(v)) return [];
   return v.filter(isPlainObject);
 }
@@ -940,7 +1092,25 @@ export function normalizeDiagnosisResult(v: unknown): DiagnosisResult | null {
   const priorities = normalizeGuidanceList(v.priorities);
   const insufficientInformation = normalizeGuidanceList(v.insufficientInformation);
   if (!favorable || !adjustments || !priorities || !insufficientInformation) return null;
-  return v as DiagnosisResult;
+
+  const raw = v as Record<string, unknown>;
+  // Retrocompatibilidade: resultados salvos antes do score/insights no motor.
+  const hasHealth = typeof raw.healthScore === "number" && isPlainObject(raw.healthStatus);
+  const { healthScore, healthStatus } = hasHealth
+    ? { healthScore: raw.healthScore as number, healthStatus: raw.healthStatus as HealthStatus }
+    : deriveHealthScore(favorable.length, adjustments.length, priorities.length);
+
+  return {
+    ...(v as DiagnosisResult),
+    favorable,
+    adjustments,
+    priorities,
+    insufficientInformation,
+    healthScore,
+    healthStatus,
+    conflicts: Array.isArray(raw.conflicts) ? (raw.conflicts as DiagnosisConflict[]) : [],
+    insights: Array.isArray(raw.insights) ? (raw.insights as DiagnosisInsight[]) : [],
+  };
 }
 
 export function reconcileDiagnosisResultState(

@@ -16,7 +16,7 @@ import logoPlantaefert from "@/assets/logo-plantaefert.png";
 import { getProtocolDay, getProtocolPhase } from "@/lib/protocol-plan";
 import welcomeOrchid from "@/assets/welcome-orchid.jpg";
 
-export type WelcomeTab = "inicio" | "plano" | "diagnostico" | "diario" | "aprender" | "resumo" | "metodo";
+export type WelcomeTab = "inicio" | "orquidea" | "plano" | "diagnostico" | "diario" | "aprender" | "resumo" | "metodo";
 
 export interface WelcomeScreenProps {
   onStart: () => void;

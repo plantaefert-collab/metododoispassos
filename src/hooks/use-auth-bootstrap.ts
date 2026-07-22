@@ -49,17 +49,21 @@ export function useAuthBootstrap() {
       const cachedState = loadFromCache(userId);
       const cachedTimestamp = getCacheTimestamp(userId);
 
-      let finalState = defaultState;
+      // `baseState` pode apontar para o singleton `defaultState`; por isso o
+      // merge do perfil abaixo é feito de forma imutável (spreads), nunca por
+      // mutação in-place — caso contrário poluiríamos `defaultState` para toda a
+      // sessão (inclusive para o próximo visitante).
+      let baseState: ProtocolState = defaultState;
 
       // Reconciliação Determinística
       if (remoteProgress && cachedState) {
         const remoteNormalized = normalizeRemoteProgress(remoteProgress);
         if (remoteTimestamp && cachedTimestamp && new Date(remoteTimestamp) > new Date(cachedTimestamp)) {
           // Banco vence
-          finalState = remoteNormalized;
+          baseState = remoteNormalized;
         } else {
           // Cache vence ou são iguais
-          finalState = cachedState;
+          baseState = cachedState;
           // Sincroniza cache com o banco se for mais recente
           if (cachedTimestamp && (!remoteTimestamp || new Date(cachedTimestamp) > new Date(remoteTimestamp))) {
             await saveProgressRemote(userId, cachedState);
@@ -67,25 +71,31 @@ export function useAuthBootstrap() {
         }
       } else if (remoteProgress) {
         // Apenas banco
-        finalState = normalizeRemoteProgress(remoteProgress);
+        baseState = normalizeRemoteProgress(remoteProgress);
       } else if (cachedState) {
         // Apenas cache
-        finalState = cachedState;
+        baseState = cachedState;
         await saveProgressRemote(userId, cachedState);
       }
 
-      // Mesclar dados do perfil se não existirem no progresso
-      if (profileRes.data) {
-        finalState.plant.name = profileRes.data.plant_name || finalState.plant.name;
-        finalState.onboarded = profileRes.data.onboarded || finalState.onboarded;
-        // Mapear outros campos de planta do perfil
-        finalState.plant.species = profileRes.data.plant_species || finalState.plant.species;
-        finalState.plant.unknownSpecies = profileRes.data.plant_unknown_species ?? finalState.plant.unknownSpecies;
-        finalState.plant.location = profileRes.data.plant_location || finalState.plant.location;
-        finalState.plant.pot = profileRes.data.plant_pot || finalState.plant.pot;
-        finalState.plant.substrate = profileRes.data.plant_substrate || finalState.plant.substrate;
-        finalState.plant.difficulty = profileRes.data.plant_difficulty || finalState.plant.difficulty;
-      }
+      // Mesclar dados do perfil (quando existirem) sem mutar o estado base.
+      const profile = profileRes.data;
+      const finalState: ProtocolState = profile
+        ? {
+            ...baseState,
+            onboarded: profile.onboarded || baseState.onboarded,
+            plant: {
+              ...baseState.plant,
+              name: profile.plant_name || baseState.plant.name,
+              species: profile.plant_species || baseState.plant.species,
+              unknownSpecies: profile.plant_unknown_species ?? baseState.plant.unknownSpecies,
+              location: profile.plant_location || baseState.plant.location,
+              pot: profile.plant_pot || baseState.plant.pot,
+              substrate: profile.plant_substrate || baseState.plant.substrate,
+              difficulty: profile.plant_difficulty || baseState.plant.difficulty,
+            },
+          }
+        : baseState;
 
       hydrateStore(finalState);
 

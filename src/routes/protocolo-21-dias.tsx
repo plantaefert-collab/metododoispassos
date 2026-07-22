@@ -17,6 +17,7 @@ import {
   CalendarCheck,
   Stethoscope,
   Images,
+  MoreHorizontal,
   BookOpen,
   Camera,
   Droplets,
@@ -51,7 +52,8 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { useProtocolStore, isDiagnosisCurrent, defaultState, getState, computeFocusDay, isDayFullyDone } from "@/lib/protocol-store";
-import { compressImage, PHOTO_ERROR_MESSAGE } from "@/lib/image-compress";
+import { PHOTO_ERROR_MESSAGE } from "@/lib/image-compress";
+import { uploadOrEncodePhoto } from "@/lib/photo-upload";
 import {
   getProtocolDay,
   getProtocolPhase,
@@ -72,6 +74,7 @@ import {
   totalObservations,
   type DiagnosisCategory,
   type DiagnosisGuidance,
+  type DiagnosisResult,
 } from "@/lib/diagnosis-matrix";
 import { useAuthBootstrap } from "@/hooks/use-auth-bootstrap";
 import type { AuthBootstrapStatus } from "@/lib/auth/types";
@@ -549,6 +552,7 @@ function AppShell({
   const { user } = useAuthBootstrap();
   const actorId = user?.id || "guest";
   const diagnosisFresh = isDiagnosisCurrent(state);
+  const [moreOpen, setMoreOpen] = useState(false);
   return (
     <div className="min-h-screen bg-background font-sans selection:bg-primary/10">
       <div className="mx-auto flex min-h-screen max-w-[440px] flex-col shadow-[0_30px_90px_-20px_rgba(23,61,50,0.1)] sm:my-4 sm:min-h-[calc(100vh-2rem)] sm:rounded-2xl sm:border sm:border-border sm:bg-card">
@@ -621,7 +625,7 @@ function AppShell({
 
         <PhaseProgressBar currentDay={state.currentDay} />
         <nav className="sticky bottom-0 z-20 border-t border-border bg-card/80 backdrop-blur-md sm:rounded-b-2xl">
-          <div className="grid grid-cols-6">
+          <div className="grid grid-cols-5">
             <TabBtn
               active={tab === "inicio"}
               onClick={() => setTab("inicio")}
@@ -647,10 +651,10 @@ function AppShell({
                 <div className="relative">
                   <Stethoscope size={20} />
                   {!diagnosisFresh && (
-                    <motion.div 
+                    <motion.div
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
-                      className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-accent shadow-[0_0_8px_rgba(217,70,239,0.8)]" 
+                      className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-accent shadow-[0_0_8px_rgba(217,70,239,0.8)]"
                     />
                   )}
                 </div>
@@ -658,19 +662,61 @@ function AppShell({
               label="Diagnóstico"
             />
             <TabBtn
-              active={tab === "diario"}
-              onClick={() => setTab("diario")}
-              icon={<Images size={20} />}
-              label="Diário"
-            />
-            <TabBtn
-              active={tab === "aprender"}
-              onClick={() => setTab("aprender")}
-              icon={<BookOpen size={20} />}
-              label="Dicas"
+              active={tab === "diario" || tab === "aprender"}
+              onClick={() => setMoreOpen(true)}
+              icon={<MoreHorizontal size={20} />}
+              label="Mais"
+              ariaLabel="Mais: Diário e Dicas"
             />
           </div>
         </nav>
+
+        <AnimatePresence>
+          {moreOpen && (
+            <>
+              <motion.div
+                className="fixed inset-0 z-30 bg-black/40"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setMoreOpen(false)}
+              />
+              <motion.div
+                role="dialog"
+                aria-label="Mais opções"
+                className="fixed inset-x-0 bottom-0 z-40 mx-auto max-w-[440px] rounded-t-3xl border border-border bg-card p-4 pb-6 shadow-2xl sm:mb-4 sm:rounded-3xl"
+                initial={{ y: "100%" }}
+                animate={{ y: 0 }}
+                exit={{ y: "100%" }}
+                transition={{ type: "spring", stiffness: 320, damping: 32 }}
+              >
+                <div className="mx-auto mb-3 h-1.5 w-10 rounded-full bg-muted" />
+                <div className="grid grid-cols-2 gap-2">
+                  <MoreItem
+                    active={tab === "diario"}
+                    icon={<Images size={20} />}
+                    label="Diário"
+                    hint="Fotos e evolução"
+                    onClick={() => {
+                      setTab("diario");
+                      setMoreOpen(false);
+                    }}
+                  />
+                  <MoreItem
+                    active={tab === "aprender"}
+                    icon={<BookOpen size={20} />}
+                    label="Dicas"
+                    hint="Aprender sobre orquídeas"
+                    onClick={() => {
+                      setTab("aprender");
+                      setMoreOpen(false);
+                    }}
+                  />
+                </div>
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
@@ -681,16 +727,20 @@ function TabBtn({
   onClick,
   icon,
   label,
+  ariaLabel,
 }: {
   active: boolean;
   onClick: () => void;
   icon: ReactNode;
   label: string;
+  ariaLabel?: string;
 }) {
   return (
     <button
       onClick={onClick}
-      className={`relative flex flex-col items-center gap-1 py-3 transition-all duration-300 ${
+      aria-label={ariaLabel ?? label}
+      aria-current={active ? "page" : undefined}
+      className={`relative flex min-h-[56px] flex-col items-center justify-center gap-1 py-2.5 transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset ${
         active ? "text-primary" : "text-muted-foreground hover:text-foreground"
       }`}
     >
@@ -711,12 +761,46 @@ function TabBtn({
         )}
       </div>
       <span
-        className={`text-[9.5px] font-bold uppercase tracking-widest transition-opacity duration-300 ${
-          active ? "opacity-100" : "opacity-50"
+        className={`text-[11px] font-bold uppercase tracking-wide transition-opacity duration-300 ${
+          active ? "opacity-100" : "opacity-60"
         }`}
       >
         {label}
       </span>
+    </button>
+  );
+}
+
+function MoreItem({
+  active,
+  icon,
+  label,
+  hint,
+  onClick,
+}: {
+  active: boolean;
+  icon: ReactNode;
+  label: string;
+  hint: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      aria-current={active ? "page" : undefined}
+      className={`flex flex-col items-start gap-1.5 rounded-2xl border p-4 text-left transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+        active ? "border-primary/40 bg-primary/5" : "border-border bg-card hover:bg-muted"
+      }`}
+    >
+      <span
+        className={`grid h-10 w-10 place-items-center rounded-xl ${
+          active ? "bg-primary text-primary-foreground" : "bg-secondary text-primary"
+        }`}
+      >
+        {icon}
+      </span>
+      <span className="text-sm font-semibold text-foreground">{label}</span>
+      <span className="text-[11px] leading-tight text-muted-foreground">{hint}</span>
     </button>
   );
 }
@@ -745,8 +829,8 @@ function SignupScreen({
     const file = e.target.files?.[0];
     if (!file) return;
     try {
-      const dataUrl = await compressImage(file);
-      updatePlant({ photo: dataUrl }, actorId);
+      const photo = await uploadOrEncodePhoto(file, actorId);
+      updatePlant({ photo }, actorId);
     } catch {
       alert(PHOTO_ERROR_MESSAGE);
     }
@@ -1062,8 +1146,12 @@ function DiagnosisScreen({ actorId, onFinish, onBack }: { actorId: string; onFin
               >
                 <AccordionTrigger className="px-4 py-3 hover:no-underline">
                   <div className="flex flex-1 items-center gap-3 pr-2">
-                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-secondary text-primary">
-                      {c.icon}
+                    <span
+                      className={`grid h-8 w-8 shrink-0 place-items-center rounded-full transition-colors ${
+                        count > 0 ? "bg-primary text-primary-foreground" : "bg-secondary text-primary"
+                      }`}
+                    >
+                      {count > 0 ? <CheckCircle2 size={16} /> : c.icon}
                     </span>
                     <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
                       <span className="truncate text-left text-sm font-semibold text-foreground">
@@ -1245,38 +1333,27 @@ function ResultBlocks({
   result,
   answers,
 }: {
-  result: {
-    priorities: DiagnosisGuidance[];
-    adjustments: DiagnosisGuidance[];
-    favorable: DiagnosisGuidance[];
-    insufficientInformation: DiagnosisGuidance[];
-    trackingPoints: string[];
-  };
+  result: DiagnosisResult;
   answers?: Record<DiagnosisCategory, string[]>;
 }) {
-  const { priorities, adjustments, favorable, insufficientInformation, trackingPoints } = result;
+  const {
+    priorities,
+    adjustments,
+    favorable,
+    insufficientInformation,
+    trackingPoints,
+    conflicts,
+    insights,
+  } = result;
   const hasAny =
     priorities.length + adjustments.length + favorable.length + insufficientInformation.length > 0;
 
   const nextSteps = [...priorities, ...adjustments].slice(0, 3);
 
-  // Health score (0-100): penaliza prioridades e ajustes, bonifica sinais favoráveis
-  const rawScore = 100 - priorities.length * 20 - adjustments.length * 10 + favorable.length * 5;
-  const score = Math.max(0, Math.min(100, rawScore));
-  const scoreStatus =
-    score >= 80
-      ? { label: "Saudável", tone: "green" as const, message: "Sua orquídea mostra sinais consistentes de saúde. Mantenha a rotina." }
-      : score >= 60
-        ? { label: "Estável com ajustes", tone: "accent" as const, message: "Boa base. Alguns ajustes vão elevar o desempenho." }
-        : score >= 40
-          ? { label: "Em recuperação", tone: "accent" as const, message: "Há pontos de atenção. Siga as prioridades para reverter." }
-          : { label: "Requer atenção imediata", tone: "warn" as const, message: "Foque nas prioridades desta semana. É reversível." };
-  const scoreColor =
-    scoreStatus.tone === "green"
-      ? "text-primary"
-      : scoreStatus.tone === "accent"
-        ? "text-primary"
-        : "text-accent";
+  // Health score e veredito vêm do motor (fonte única de verdade — diagnosis-matrix.ts).
+  const score = result.healthScore;
+  const scoreStatus = result.healthStatus;
+  const scoreColor = scoreStatus.tone === "warn" ? "text-accent" : "text-primary";
   const scoreBgCls =
     scoreStatus.tone === "warn"
       ? "border-accent/40 bg-gradient-to-br from-accent/10 to-accent/5"
@@ -1356,6 +1433,49 @@ function ResultBlocks({
               </ol>
             </div>
           )}
+        </div>
+      )}
+      {insights.length > 0 && (
+        <div className="space-y-2">
+          {insights.map((ins) => (
+            <div
+              key={ins.id}
+              className="rounded-2xl border border-accent/40 bg-accent/5 p-4"
+            >
+              <div className="flex items-start gap-2.5">
+                <Droplets size={18} className="mt-0.5 shrink-0 text-accent" />
+                <div className="min-w-0">
+                  <div className="text-sm font-bold text-accent">{ins.title}</div>
+                  <p className="mt-1 text-xs leading-relaxed text-foreground/80">{ins.message}</p>
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {ins.relatedAnswers.map((a) => (
+                      <span
+                        key={a}
+                        className="rounded-full border border-accent/30 bg-card px-2 py-0.5 text-[11px] text-foreground/70"
+                      >
+                        {a}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      {conflicts.length > 0 && (
+        <div className="rounded-2xl border border-border bg-muted/40 p-4">
+          <div className="flex items-center gap-2 text-sm font-bold text-foreground">
+            <HelpCircle size={16} className="text-primary" /> Sinais opostos — vale reconferir
+          </div>
+          <ul className="mt-2 space-y-1.5">
+            {conflicts.map((c) => (
+              <li key={c.category} className="text-xs leading-relaxed text-muted-foreground">
+                Em <strong className="text-foreground">{CATEGORY_LABEL[c.category]}</strong> você marcou
+                “{c.favorable}” e “{c.priority}” ao mesmo tempo. Observe novamente com calma para confirmar o que se aplica hoje.
+              </li>
+            ))}
+          </ul>
         </div>
       )}
       {!hasAny && (
@@ -3291,8 +3411,8 @@ function DiarioTab({ actorId }: { actorId: string }) {
     const file = e.target.files?.[0];
     if (!file) return;
     try {
-      const dataUrl = await compressImage(file);
-      updateDay(day, { photo: dataUrl }, actorId);
+      const photo = await uploadOrEncodePhoto(file, actorId);
+      updateDay(day, { photo }, actorId);
     } catch {
       alert(PHOTO_ERROR_MESSAGE);
     }
@@ -4472,8 +4592,8 @@ function MinhaOrquideaTab({ actorId, setTab }: { actorId: string; setTab: (t: Ta
     const file = e.target.files?.[0];
     if (!file) return;
     try {
-      const dataUrl = await compressImage(file);
-      updatePlant({ photo: dataUrl }, actorId);
+      const photo = await uploadOrEncodePhoto(file, actorId);
+      updatePlant({ photo }, actorId);
       toast.success("Foto atualizada");
     } catch {
       toast.error(PHOTO_ERROR_MESSAGE);

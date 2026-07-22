@@ -16,22 +16,16 @@ export function QuickTour({ actorId }: { actorId: string | "guest" }) {
 
   const tourSteps = [
     {
-      target: "btn-diag",
       title: "Começar diagnóstico",
-      text: "Inicie aqui para entender as necessidades específicas da sua orquídea.",
-      position: "bottom" as const
+      text: "Comece pelo diagnóstico para entender as necessidades específicas da sua orquídea.",
     },
     {
-      target: "btn-signup",
       title: "Cadastro da orquídea",
-      text: "Registre os dados da sua planta para um acompanhamento preciso.",
-      position: "bottom" as const
+      text: "Registre os dados da sua planta em “Orquídea” para um acompanhamento preciso.",
     },
     {
-      target: "nav-plano",
       title: "Diário & Plano",
-      text: "Aqui você registra suas aplicações e acompanha a evolução diária.",
-      position: "top" as const
+      text: "Em “Plano” você registra suas aplicações e acompanha a evolução diária.",
     }
   ];
 
@@ -92,12 +86,6 @@ export function QuickTour({ actorId }: { actorId: string | "guest" }) {
               {tourStep === tourSteps.length - 1 ? "Entendi!" : "Próximo"}
             </button>
           </div>
-
-          <div 
-            className={`absolute left-1/2 -translate-x-1/2 w-4 h-4 bg-card border-primary/10 border-t border-l rotate-45 ${
-              tourSteps[tourStep].position === 'top' ? '-bottom-2' : '-top-2 rotate-[225deg]'
-            }`}
-          />
         </motion.div>
       </div>
     </AnimatePresence>
