@@ -2026,9 +2026,10 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
         <div className={cn(
           "group relative overflow-hidden rounded-2xl border-2 p-5 shadow-sm transition-all",
           [3, 10, 17].includes(day) 
-            ? "border-accent/50 bg-gradient-to-br from-accent/[0.08] to-accent/[0.02]" 
+            ? "border-accent/50 bg-gradient-to-br from-accent/[0.12] to-accent/[0.04] shadow-[0_0_20px_rgba(217,70,239,0.15)] ring-1 ring-accent/20" 
             : "border-accent/30 bg-gradient-to-br from-accent/[0.04] to-transparent hover:border-accent/50"
         )}>
+
 
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
