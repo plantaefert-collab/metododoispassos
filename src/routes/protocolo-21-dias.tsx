@@ -60,7 +60,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { useProtocolStore, isDiagnosisCurrent, defaultState, getState, computeFocusDay, isDayFullyDone } from "@/lib/protocol-store";
+import { useProtocolStore, isDiagnosisCurrent, defaultState, getState, computeFocusDay, isDayFullyDone, type DayEntry } from "@/lib/protocol-store";
 import { PHOTO_ERROR_MESSAGE } from "@/lib/image-compress";
 import { uploadOrEncodePhoto } from "@/lib/photo-upload";
 import {
