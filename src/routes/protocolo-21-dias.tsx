@@ -47,6 +47,10 @@ import {
   Share2,
   HelpCircle,
   CheckSquare,
+  Settings,
+  Volume2,
+  VolumeX,
+  Zap,
 } from "lucide-react";
 
 import {
