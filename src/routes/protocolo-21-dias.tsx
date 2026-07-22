@@ -1922,9 +1922,88 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
   const reminderDays = [1, 3, 7, 10, 14, 17, 21];
   const upcomingReminders = reminderDays.filter(d => d >= day && !state.remindersCompleted?.[d]);
 
+  // Dados para o "Resumo do dia" e "Lembretes importantes"
+  const todayEntry = state.days[day] ?? { checklist: {}, note: "", completed: false };
+  const todayMeta = getProtocolDay(day);
+  const totalTasks = todayMeta.checklist.length;
+  const doneTasks = todayMeta.checklist.filter((label) => !!todayEntry.checklist?.[label]).length;
+  const noteDone = !!todayEntry.note?.trim();
+  const photoDone = !!todayEntry.photo;
+  const appsDoneToday = state.applications.filter((a) => a.day === day).length;
+  const hasPendencies = doneTasks < totalTasks || !noteDone || !photoDone;
+  const importantDays = [3, 7, 10, 14, 17, 21].filter((d) => d >= day);
+  const reminderTime = state.settings?.reminderTime ?? "08:00";
 
   return (
     <div className="space-y-4">
+      {/* Resumo do dia */}
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={handleRedirectToPlan}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") handleRedirectToPlan(); }}
+        className="group relative cursor-pointer overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-sm transition-all hover:border-primary/40 active:scale-[0.99]"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-primary">
+            <Calendar size={14} />
+            <span className="text-[10px] font-bold uppercase tracking-widest">Resumo do dia {day}</span>
+          </div>
+          <ChevronRight size={16} className="text-primary/40 transition-transform group-hover:translate-x-1" />
+        </div>
+        <h3 className="mt-2 font-display text-2xl leading-tight text-primary">
+          {hasPendencies ? "Você tem pendências" : "Dia em dia"}
+        </h3>
+        <div className="mt-3 grid grid-cols-3 gap-2">
+          <div className="rounded-xl bg-primary/[0.04] p-3 text-center">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Tarefas</div>
+            <div className="mt-1 font-display text-2xl text-primary">
+              {doneTasks}<span className="text-primary/40">/{totalTasks || "—"}</span>
+            </div>
+          </div>
+          <div className="rounded-xl bg-accent/[0.08] p-3 text-center">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Aplicações</div>
+            <div className="mt-1 font-display text-2xl text-accent">{appsDoneToday}</div>
+          </div>
+          <div className="rounded-xl bg-primary/[0.04] p-3 text-center">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Registro</div>
+            <div className="mt-1 font-display text-2xl text-primary">{noteDone ? "✓" : "—"}</div>
+          </div>
+        </div>
+        {(!noteDone || !photoDone) && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {!noteDone && (
+              <span className="rounded-full bg-accent/15 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-accent">
+                Registro pendente
+              </span>
+            )}
+            {!photoDone && (
+              <span className="rounded-full bg-accent/15 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-accent">
+                Foto pendente
+              </span>
+            )}
+          </div>
+        )}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            playInteractionSound();
+            handleRedirectToPlan();
+            setTimeout(() => {
+              const registerEl = document.querySelector('[data-register-field]');
+              if (registerEl) registerEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+          }}
+          className="mt-4 flex w-full items-center justify-between rounded-xl border border-primary/20 bg-primary/[0.04] px-4 py-3 text-sm font-bold text-primary transition-all hover:bg-primary/10 active:scale-[0.98]"
+        >
+          <div className="flex items-center gap-2">
+            <BookOpen size={16} />
+            <span>Escrever registro do dia</span>
+          </div>
+          <ChevronRight size={16} className="opacity-40" />
+        </button>
+      </div>
+
       <div className="flex items-center justify-between px-1">
         <SectionHeader
           eyebrow="Bloco 1"
