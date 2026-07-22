@@ -2140,6 +2140,12 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
                 {ctx.cta.icon}
                 {ctx.cta.label}
               </button>
+              
+              <div className="mt-2 text-center">
+                 <span className="text-[10px] font-medium text-muted-foreground/80 italic">
+                   Etapa atual: <span className="text-accent/90 font-bold">Dia {day}</span> • {getProtocolDay(day).title}
+                 </span>
+              </div>
 
 
             </div>
@@ -2293,7 +2299,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             Aplique no horário fresco, evite sol forte e não atinja diretamente as flores.
           </InfoCard>
 
-          <div className="mt-6">
+          <div className="mt-6 flex flex-col items-center gap-2">
             <button
               onClick={handleRedirectToPlan}
               className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-8 py-4 text-sm font-bold text-accent-foreground shadow-lg shadow-accent/20 transition-all hover:brightness-110 active:scale-[0.98]"
@@ -2301,6 +2307,9 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
               <Sparkles size={18} />
               Continuar meu plano
             </button>
+            <span className="text-[10px] font-medium text-muted-foreground text-center">
+              Você está no <span className="font-bold text-accent">Dia {day}</span>: {getProtocolDay(day).title}
+            </span>
           </div>
         </>
       )}
