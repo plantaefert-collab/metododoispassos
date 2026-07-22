@@ -2104,6 +2104,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
     {!focusedMode && (
       <>
 
+
         {/* ─────────── BLOCO 2 · PROGRESSO (movido para logo abaixo de Método 2 Passos) ─────────── */}
 
       <SectionHeader
