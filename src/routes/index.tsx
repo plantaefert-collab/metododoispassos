@@ -318,7 +318,7 @@ function HomePage() {
       <footer className="border-t border-border/50 py-6 text-center text-xs text-muted-foreground space-y-2">
         <div>© {new Date().getFullYear()} PlantaeFert · Método de 2 Passos</div>
         <div className="opacity-60 max-w-xs mx-auto px-4">
-          Verificar a legibilidade do selo “Dia Crítico” em dispositivos mobile com diferentes níveis de brilho e garantir contraste e foco visível em botões e cards.
+          Implemente um modo alto contraste global com alternância nas preferências e persistência no localStorage.
         </div>
       </footer>
     </div>
