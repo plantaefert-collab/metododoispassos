@@ -1854,6 +1854,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
 
 
 
+
       <div className="flex items-center justify-between px-1">
         <SectionHeader
           eyebrow="Bloco 1"
