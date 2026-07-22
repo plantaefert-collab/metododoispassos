@@ -562,7 +562,7 @@ function AppShell({
               <img
                 src={logoPlantaefert}
                 alt="PlantaeFert — Nutrição Vegetal"
-                className="h-8 w-auto"
+                className="h-10 w-auto"
               />
             </Link>
             <div className="flex items-center gap-1">
@@ -635,7 +635,16 @@ function AppShell({
             <TabBtn
               active={tab === "orquidea"}
               onClick={() => setTab("orquidea")}
-              icon={<Flower2 size={20} />}
+              icon={
+                state.plant.photo ? (
+                  <div className="h-5 w-5 overflow-hidden rounded-full ring-1 ring-primary/20">
+                    <img src={state.plant.photo} alt="" className="h-full w-full object-cover" />
+                  </div>
+                ) : (
+                  <Flower2 size={20} />
+                )
+              }
+
               label="Orquídea"
             />
             <TabBtn
