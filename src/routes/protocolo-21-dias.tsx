@@ -1840,7 +1840,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
     });
     // O foco e scroll serão tratados pelo useEffect na PlanoTab
   };
-  const { state, setCurrentDay, toggleReminder, updateSettings } = useProtocolStore();
+  const { state, setCurrentDay, toggleReminder, updateSettings, updateDay } = useProtocolStore();
   
   const playInteractionSound = () => {
     if (state.settings?.muteSounds) return;
@@ -1931,6 +1931,27 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
   const photoDone = !!todayEntry.photo;
   const appsDoneToday = state.applications.filter((a) => a.day === day).length;
   const hasPendencies = doneTasks < totalTasks || !noteDone || !photoDone;
+  const dayFullyDone = isDayFullyDone(state, day, todayMeta.checklist);
+
+  const handleCompleteDay = () => {
+    playInteractionSound();
+    if (navigator.vibrate && !state.settings?.hapticsDisabled) {
+      navigator.vibrate([15, 40, 15]);
+    }
+    const confirmed = window.confirm(
+      `Confirmar a conclusão do Dia ${day}?\n\nTodas as tarefas serão marcadas como feitas e seu progresso será atualizado.`,
+    );
+    if (!confirmed) return;
+    const allChecked: Record<string, boolean> = {};
+    todayMeta.checklist.forEach((label) => {
+      allChecked[label] = true;
+    });
+    updateDay(day, { checklist: allChecked, completed: true }, actorId);
+    toast.success(`Dia ${day} concluído!`, {
+      description: day < 21 ? `Vamos para o Dia ${day + 1}.` : "Parabéns, você completou os 21 dias! 🎉",
+      duration: 4000,
+    });
+  };
   const importantDays = [3, 7, 10, 14, 17, 21].filter((d) => d >= day);
   const reminderTime = state.settings?.reminderTime ?? "08:00";
 
@@ -2001,6 +2022,26 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             <span>Escrever registro do dia</span>
           </div>
           <ChevronRight size={16} className="opacity-40" />
+        </button>
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            if (dayFullyDone) return;
+            handleCompleteDay();
+          }}
+          disabled={dayFullyDone}
+          className={cn(
+            "mt-2 flex w-full items-center justify-between rounded-xl px-4 py-3 text-sm font-bold transition-all active:scale-[0.98]",
+            dayFullyDone
+              ? "cursor-not-allowed border border-primary/20 bg-primary/[0.06] text-primary/60"
+              : "border border-primary bg-primary text-primary-foreground shadow-md hover:bg-primary/90",
+          )}
+        >
+          <div className="flex items-center gap-2">
+            <CheckCircle2 size={16} />
+            <span>{dayFullyDone ? `Dia ${day} concluído` : "Concluir meu dia"}</span>
+          </div>
+          {!dayFullyDone && <ChevronRight size={16} className="opacity-70" />}
         </button>
       </div>
 
