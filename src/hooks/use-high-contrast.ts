@@ -7,7 +7,8 @@ import { useProtocolStore } from "@/lib/protocol-store";
  * Aplica em qualquer rota do app, incluindo landing e telas fora do shell.
  */
 export function useHighContrastSync() {
-  const highContrast = useProtocolStore((s) => !!s.state.settings?.highContrast);
+  const { state } = useProtocolStore();
+  const highContrast = !!state.settings?.highContrast;
 
   useEffect(() => {
     if (typeof document === "undefined") return;
