@@ -78,6 +78,7 @@ export type ProtocolState = {
     hapticsDisabled?: boolean;
     focusedMode?: boolean;
     highContrast?: boolean;
+    reminderTime?: string;
   };
   /** Non-persisted transient flag set when the last localStorage write failed. */
   saveError?: string;
