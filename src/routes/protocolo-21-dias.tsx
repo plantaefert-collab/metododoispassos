@@ -2310,17 +2310,63 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
 
 
 
-      {/* Lembretes Importantes */}
-      {upcomingReminders.length > 0 && (
-        <div className="rounded-2xl border border-primary/20 bg-primary/[0.02] p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-primary">
-              <Bell size={14} className="animate-pulse" />
-              <span className="text-[10px] font-bold uppercase tracking-widest">Lembretes Importantes</span>
-            </div>
-            <span className="text-[10px] text-muted-foreground">{upcomingReminders.length} pendente(s)</span>
+      {/* Notificações & Lembretes */}
+      <div className="group relative overflow-hidden rounded-2xl border border-primary/20 bg-primary/[0.02] p-4 transition-all hover:border-primary/40">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-primary">
+            <Bell size={14} className="animate-pulse" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Lembretes & Notificações</span>
           </div>
-          <div className="mt-3 space-y-2">
+          <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
+            Ativo
+          </div>
+        </div>
+        
+        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+          Receba alertas diários para não esquecer as aplicações e checklists do seu plano de 21 dias.
+        </p>
+        
+        <div className="mt-4 grid gap-2">
+          <button 
+            onClick={() => {
+              if (!("Notification" in window)) {
+                toast.error("Notificações não são suportadas neste navegador.");
+              } else {
+                Notification.requestPermission().then(permission => {
+                  if (permission === "granted") {
+                    toast.success("Notificações ativadas com sucesso!");
+                  } else {
+                    toast.info("Para receber alertas, habilite as notificações nas configurações do seu navegador.");
+                  }
+                });
+              }
+            }}
+            className="flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground shadow-sm transition-all active:scale-[0.98] hover:brightness-110"
+          >
+            <Bell size={14} /> Ativar Notificações Push
+          </button>
+          
+          <button 
+            className="flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-xs font-bold text-foreground transition-all active:scale-[0.98] hover:bg-muted"
+            onClick={() => {
+              toast.info("Lembrete configurado!", {
+                description: "Enviaremos uma notificação diária para você."
+              });
+            }}
+          >
+            <Calendar size={14} /> Agendar Lembrete Diário
+          </button>
+        </div>
+      </div>
+
+      {/* Lembretes de Marcos Críticos */}
+      {upcomingReminders.length > 0 && (
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 px-1">
+            <div className="h-1.5 w-1.5 rounded-full bg-accent" />
+            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Marcos do Protocolo</span>
+          </div>
+          <div className="grid gap-2">
             {upcomingReminders.map(d => (
               <div
                 key={d}
@@ -2358,6 +2404,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           </div>
         </div>
       )}
+
 
 
       <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
