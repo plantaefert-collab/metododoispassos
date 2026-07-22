@@ -2084,9 +2084,10 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
 
               {showRegistrationShortcut && (
                 <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleRedirectToPlan();
+                onClick={(e) => {
+                  e.stopPropagation();
+                  playInteractionSound();
+                  handleRedirectToPlan();
                     // Pequeno delay para garantir que o scroll aconteça após a troca de aba
                     setTimeout(() => {
                       const registerEl = document.querySelector('[data-register-field]');
