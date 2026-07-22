@@ -1903,12 +1903,16 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             cta: { label: "Ver resumo", icon: <Calendar size={16} />, onClick: () => setTab("resumo") },
           };
         } else if (applicationPending) {
+          const isCriticalApplication = [3, 10, 17].includes(day);
           ctx = {
-            eyebrow: `Dia ${day} · Aplicação`,
+            eyebrow: `Dia ${day} · ${isCriticalApplication ? "⚠️ APLICAÇÃO CRÍTICA" : "Aplicação"}`,
             title: meta.title,
-            desc: "Hoje é dia de aplicar o Método de 2 Passos. Registre para não perder o próximo ciclo.",
-            cta: { label: "Abrir dia " + day, icon: <ChevronRight size={16} />, onClick: handleRedirectToPlan },
+            desc: isCriticalApplication 
+              ? "⚠️ HOJE É O DIA! Não pule esta aplicação para garantir o resultado do protocolo."
+              : "Hoje é dia de aplicar o Método de 2 Passos. Registre para não perder o próximo ciclo.",
+            cta: { label: `Fazer aplicação agora (Dia ${day})`, icon: <ChevronRight size={16} />, onClick: handleRedirectToPlan },
           };
+
         } else if (allDone && day < 21) {
           ctx = {
             eyebrow: `Dia ${day} · Concluído`,
