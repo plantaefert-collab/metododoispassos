@@ -2859,8 +2859,10 @@ function StagesList({
           <AccordionItem
             key={stage.id}
             value={stage.id}
+            data-checklist-item
             className="overflow-hidden rounded-xl border border-border bg-card"
           >
+
             <AccordionTrigger className="px-5 py-4 text-left text-[15px] font-semibold text-primary hover:no-underline group">
               <span className="flex items-center gap-2">
                 <span className="text-accent group-data-[state=open]:rotate-90 transition-transform">
