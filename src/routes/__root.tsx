@@ -11,6 +11,7 @@ import { useEffect, type ReactNode } from "react";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { useHighContrastSync } from "../hooks/use-high-contrast";
 
 function NotFoundComponent() {
   return (
@@ -133,6 +134,8 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useHighContrastSync();
 
   return (
     <QueryClientProvider client={queryClient}>
