@@ -4561,6 +4561,7 @@ function DayPreviewModal({
 
 function MinhaOrquideaTab({ actorId, setTab }: { actorId: string; setTab: (t: Tab) => void }) {
   const { state, updatePlant, setCurrentDay, updateSettings } = useProtocolStore();
+  const [showPlantForm, setShowPlantForm] = useState(false);
   
   const playInteractionSound = () => {
     if (state.settings?.muteSounds) return;
@@ -4806,111 +4807,201 @@ function MinhaOrquideaTab({ actorId, setTab }: { actorId: string; setTab: (t: Ta
         </div>
       )}
 
-      {/* Cadastro Local */}
-      <div className="rounded-2xl border border-border bg-card p-6 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
-            <Flower2 size={18} />
-          </div>
-          <div>
-            <h2 className="font-display text-lg text-primary">Cadastro da planta</h2>
-            <p className="text-xs text-muted-foreground">
-              Salvo no seu navegador{actorId !== "guest" ? " e sincronizado com sua conta" : ""}.
-            </p>
-          </div>
-        </div>
-
-        <div className="mt-5 space-y-5">
-          <Field label="Nome da planta">
-            <input
-              value={plant.name}
-              onChange={(e) => updatePlant({ name: e.target.value }, actorId)}
-              placeholder="Ex.: Minha Phalaenopsis"
-              className="w-full rounded-lg border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-1 focus:ring-primary"
-            />
-          </Field>
-
-          <Field label="Espécie (opcional)">
-            <input
-              value={plant.species}
-              onChange={(e) => updatePlant({ species: e.target.value, unknownSpecies: false }, actorId)}
-              disabled={plant.unknownSpecies}
-              placeholder="Ex.: Phalaenopsis, Cattleya…"
-              className="w-full rounded-lg border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
-            />
-            <label className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-              <input
-                type="checkbox"
-                checked={plant.unknownSpecies}
-                onChange={(e) => {
-                  const unknownSpecies = e.target.checked;
-                  updatePlant({ unknownSpecies, species: unknownSpecies ? "" : plant.species }, actorId);
-                }}
-                className="h-4 w-4 rounded border-input accent-primary"
-              />
-              Não sei a espécie
-            </label>
-          </Field>
-
-          <SelectField
-            label="Local de cultivo"
-            value={plant.location}
-            onChange={(v) => updatePlant({ location: v }, actorId)}
-            options={["Varanda", "Janela interna", "Jardim externo", "Estufa", "Outro"]}
-          />
-
-          <SelectField
-            label="Tipo de vaso"
-            value={plant.pot}
-            onChange={(v) => updatePlant({ pot: v }, actorId)}
-            options={["Vaso plástico transparente", "Vaso plástico comum", "Vaso de barro", "Vaso de madeira", "Cachepot", "Outro"]}
-          />
-
-          <SelectField
-            label="Tipo de substrato"
-            value={plant.substrate}
-            onChange={(v) => updatePlant({ substrate: v }, actorId)}
-            options={["Casca de pinus", "Fibra de coco", "Musgo (sphagnum)", "Mistura", "Não sei", "Outro"]}
-          />
-
-          <SelectField
-            label="Principal dificuldade"
-            value={plant.difficulty}
-            onChange={(v) => updatePlant({ difficulty: v }, actorId)}
-            options={["Não floresce", "Folhas caídas ou enrugadas", "Raízes fracas", "Manchas nas folhas", "Não sei o que fazer", "Outra"]}
-          />
-
-          <Field label="Foto da planta">
-            <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/40 px-4 py-6 text-center transition-colors hover:border-primary/40">
-              {plant.photo ? (
-                <img src={plant.photo} alt="Sua orquídea" className="max-h-48 rounded-lg object-cover" />
-              ) : (
-                <>
-                  <Camera size={22} className="text-muted-foreground" />
-                  <div className="text-sm font-medium text-foreground">Enviar foto</div>
-                  <div className="text-xs text-muted-foreground">Salva no seu navegador</div>
-                </>
-              )}
-              <input type="file" accept="image/*" className="sr-only" onChange={handlePhoto} />
-            </label>
-            {plant.photo && (
+      {/* Cadastro da Planta */}
+      <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-sm">
+        {!showPlantForm ? (
+          <div className="p-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
+                  <Flower2 size={18} />
+                </div>
+                <div>
+                  <h2 className="font-display text-lg text-primary">
+                    {plant.name.trim() ? "Sua planta" : "Cadastrar sua planta"}
+                  </h2>
+                  <p className="text-xs text-muted-foreground">
+                    {plant.name.trim() ? "Informações básicas do seu cultivo." : "Identifique sua planta para um plano melhor."}
+                  </p>
+                </div>
+              </div>
               <button
-                onClick={() => updatePlant({ photo: null }, actorId)}
-                className="mt-2 text-xs text-muted-foreground underline"
+                onClick={() => {
+                  playInteractionSound();
+                  setShowPlantForm(true);
+                }}
+                className="flex h-10 items-center gap-2 rounded-full border border-border bg-muted/40 px-4 text-xs font-bold text-foreground hover:bg-muted"
               >
-                Remover foto
+                {plant.name.trim() ? (
+                  <>
+                    <Settings size={14} />
+                    <span>Atualizar</span>
+                  </>
+                ) : (
+                  <>
+                    <Plus size={14} />
+                    <span>Começar</span>
+                  </>
+                )}
               </button>
-            )}
-          </Field>
-        </div>
+            </div>
 
-        <button
-          onClick={persistProfile}
-          disabled={!plant.name.trim()}
-          className="mt-6 w-full rounded-full bg-primary px-6 py-3.5 text-base font-semibold text-primary-foreground shadow-sm transition-transform active:scale-[0.98] disabled:opacity-40"
-        >
-          Salvar cadastro
-        </button>
+            {!plant.name.trim() && (
+              <div className="mt-5 rounded-xl bg-accent/5 border border-accent/10 p-4">
+                <div className="flex gap-3">
+                  <div className="mt-0.5 text-accent">
+                    <Info size={16} />
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-xs font-bold text-accent uppercase tracking-wider">Por que cadastrar?</p>
+                    <p className="text-[11px] leading-relaxed text-muted-foreground">
+                      Ao identificar o nome, espécie e local de cultivo, o protocolo se torna mais assertivo para as necessidades reais da sua planta hoje.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {plant.name.trim() && (
+              <div className="mt-5 flex items-center gap-4 rounded-xl border border-border bg-muted/20 p-4">
+                <div className="h-12 w-12 shrink-0 overflow-hidden rounded-lg bg-primary/5">
+                  {plant.photo ? (
+                    <img src={plant.photo} alt={plant.name} className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="grid h-full w-full place-items-center text-primary/40">
+                      <Flower2 size={20} />
+                    </div>
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="truncate text-sm font-bold text-foreground">{plant.name}</div>
+                  <div className="truncate text-[10px] text-muted-foreground">
+                    {plant.species || "Espécie não informada"} • {plant.location || "Local não informado"}
+                  </div>
+                </div>
+                <div className="flex h-6 items-center gap-1 rounded-full bg-primary/10 px-2 text-[10px] font-bold text-primary">
+                  <Check size={10} />
+                  Cadastrada
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
+                  <Flower2 size={18} />
+                </div>
+                <div>
+                  <h2 className="font-display text-lg text-primary">Ficha da Planta</h2>
+                  <p className="text-xs text-muted-foreground">Preencha os detalhes do seu cultivo.</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowPlantForm(false)}
+                className="text-xs font-bold text-muted-foreground hover:text-foreground"
+              >
+                Cancelar
+              </button>
+            </div>
+
+            <div className="space-y-5">
+              <Field label="Nome da planta">
+                <input
+                  value={plant.name}
+                  onChange={(e) => updatePlant({ name: e.target.value }, actorId)}
+                  placeholder="Ex.: Minha Phalaenopsis"
+                  className="w-full rounded-lg border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+              </Field>
+
+              <Field label="Espécie (opcional)">
+                <input
+                  value={plant.species}
+                  onChange={(e) => updatePlant({ species: e.target.value, unknownSpecies: false }, actorId)}
+                  disabled={plant.unknownSpecies}
+                  placeholder="Ex.: Phalaenopsis, Cattleya…"
+                  className="w-full rounded-lg border border-input bg-card px-4 py-3 text-[15px] focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
+                />
+                <label className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
+                  <input
+                    type="checkbox"
+                    checked={plant.unknownSpecies}
+                    onChange={(e) => {
+                      const unknownSpecies = e.target.checked;
+                      updatePlant({ unknownSpecies, species: unknownSpecies ? "" : plant.species }, actorId);
+                    }}
+                    className="h-4 w-4 rounded border-input accent-primary"
+                  />
+                  Não sei a espécie
+                </label>
+              </Field>
+
+              <SelectField
+                label="Local de cultivo"
+                value={plant.location}
+                onChange={(v) => updatePlant({ location: v }, actorId)}
+                options={["Varanda", "Janela interna", "Jardim externo", "Estufa", "Outro"]}
+              />
+
+              <SelectField
+                label="Tipo de vaso"
+                value={plant.pot}
+                onChange={(v) => updatePlant({ pot: v }, actorId)}
+                options={["Vaso plástico transparente", "Vaso plástico comum", "Vaso de barro", "Vaso de madeira", "Cachepot", "Outro"]}
+              />
+
+              <SelectField
+                label="Tipo de substrato"
+                value={plant.substrate}
+                onChange={(v) => updatePlant({ substrate: v }, actorId)}
+                options={["Casca de pinus", "Fibra de coco", "Musgo (sphagnum)", "Mistura", "Não sei", "Outro"]}
+              />
+
+              <SelectField
+                label="Principal dificuldade"
+                value={plant.difficulty}
+                onChange={(v) => updatePlant({ difficulty: v }, actorId)}
+                options={["Não floresce", "Folhas caídas ou enrugadas", "Raízes fracas", "Manchas nas folhas", "Não sei o que fazer", "Outra"]}
+              />
+
+              <Field label="Foto da planta">
+                <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border bg-muted/40 px-4 py-6 text-center transition-colors hover:border-primary/40">
+                  {plant.photo ? (
+                    <img src={plant.photo} alt="Sua orquídea" className="max-h-48 rounded-lg object-cover" />
+                  ) : (
+                    <>
+                      <Camera size={22} className="text-muted-foreground" />
+                      <div className="text-sm font-medium text-foreground">Enviar foto</div>
+                      <div className="text-xs text-muted-foreground">Salva no seu navegador</div>
+                    </>
+                  )}
+                  <input type="file" accept="image/*" className="sr-only" onChange={handlePhoto} />
+                </label>
+                {plant.photo && (
+                  <button
+                    onClick={() => updatePlant({ photo: null }, actorId)}
+                    className="mt-2 text-xs text-muted-foreground underline"
+                  >
+                    Remover foto
+                  </button>
+                )}
+              </Field>
+            </div>
+
+            <button
+              onClick={() => {
+                persistProfile();
+                setShowPlantForm(false);
+              }}
+              disabled={!plant.name.trim()}
+              className="mt-8 w-full rounded-full bg-primary px-6 py-3.5 text-base font-semibold text-primary-foreground shadow-sm transition-transform active:scale-[0.98] disabled:opacity-40"
+            >
+              Salvar cadastro
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Preferências */}
