@@ -2927,7 +2927,8 @@ function WeekPicker({
           const isCompleted = state.days[d]?.completed;
           const isFocus = focusDays.has(d);
           const isFullyDone = isDayFullyDone(state, d, getProtocolDay(d).checklist);
-          const isPending = !isFullyDone && (state.days[d]?.note || state.days[d]?.photo || Object.values(state.days[d]?.checklist || {}).some(v => v));
+          const isPending = d <= state.currentDay && !isCompleted;
+
 
           return (
             <motion.button
