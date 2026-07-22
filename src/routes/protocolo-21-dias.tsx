@@ -2369,21 +2369,55 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             </div>
           </div>
 
-          <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <button
-              onClick={() => setTab("resumo")}
-              className="flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-left transition-all hover:bg-primary/10 sm:col-span-2"
-            >
-              <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/20 text-primary">
-                <FileText size={20} />
+          {/* Lembretes importantes */}
+          {importantDays.length > 0 && (
+            <div className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-primary">
+                  <Bell size={14} />
+                  <span className="text-[10px] font-bold uppercase tracking-widest">Lembretes importantes</span>
+                </div>
+                <span className="text-[10px] text-muted-foreground">
+                  {importantDays.filter((d) => !state.remindersCompleted?.[d]).length} pendente(s)
+                </span>
               </div>
-              <div className="flex-1">
-                <div className="text-sm font-bold text-primary">Resumo & PDF</div>
-                <div className="text-[10px] text-muted-foreground">Exportar meu progresso</div>
+              <div className="mt-3 space-y-2">
+                {importantDays.slice(0, 4).map((d) => {
+                  const done = !!state.remindersCompleted?.[d];
+                  const meta = getProtocolDay(d);
+                  return (
+                    <div
+                      key={d}
+                      className="flex items-center gap-3 rounded-xl border border-border/60 bg-background p-3"
+                    >
+                      <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-primary/[0.06] font-display text-lg text-primary">
+                        {d}
+                      </div>
+                      <button
+                        onClick={() => { setCurrentDay(d, actorId); handleRedirectToPlan(); }}
+                        className="min-w-0 flex-1 text-left"
+                      >
+                        <div className="truncate font-display text-base text-primary">
+                          Dia {d}: {meta.title}
+                        </div>
+                        <div className="text-xs text-muted-foreground">Toque para abrir este dia</div>
+                      </button>
+                      <button
+                        onClick={() => toggleReminder(d, actorId)}
+                        aria-label={done ? "Desmarcar lembrete" : "Marcar lembrete como concluído"}
+                        className={cn(
+                          "grid h-9 w-9 shrink-0 place-items-center rounded-lg transition-all",
+                          done ? "bg-primary text-primary-foreground" : "bg-primary/[0.06] text-primary hover:bg-primary/10"
+                        )}
+                      >
+                        <Check size={16} />
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
-              <ChevronRight size={16} className="text-primary/40" />
-            </button>
-          </div>
+            </div>
+          )}
 
           <div className="group relative overflow-hidden rounded-2xl border border-primary/20 bg-primary/[0.02] p-4 transition-all hover:border-primary/40">
             <div className="flex items-center justify-between">
@@ -2409,6 +2443,21 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
               >
                 <Bell size={14} /> Ativar Notificações Push
               </button>
+              <div className="flex items-center gap-3 rounded-xl border border-primary/15 bg-background p-3">
+                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/[0.06] text-primary">
+                  <Clock size={16} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs font-bold text-primary">Horário preferido</div>
+                  <div className="text-[10px] text-muted-foreground">Melhor horário para receber o lembrete</div>
+                </div>
+                <input
+                  type="time"
+                  value={reminderTime}
+                  onChange={(e) => updateSettings({ reminderTime: e.target.value }, actorId)}
+                  className="rounded-lg border border-primary/20 bg-background px-2 py-1.5 text-sm font-bold text-primary focus:border-primary focus:outline-none"
+                />
+              </div>
             </div>
           </div>
 
@@ -2416,13 +2465,27 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             Aplique no horário fresco, evite sol forte e não atinja diretamente as flores.
           </InfoCard>
 
-          <div className="mt-6 flex flex-col items-center gap-2">
+          <button
+            onClick={() => setTab("resumo")}
+            className="mt-6 flex w-full items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-left transition-all hover:bg-primary/10"
+          >
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/20 text-primary">
+              <FileText size={20} />
+            </div>
+            <div className="flex-1">
+              <div className="text-sm font-bold text-primary">Resumo & PDF</div>
+              <div className="text-[10px] text-muted-foreground">Exportar meu progresso</div>
+            </div>
+            <ChevronRight size={16} className="text-primary/40" />
+          </button>
+
+          <div className="mt-3 flex flex-col items-center gap-2">
             <button
               onClick={handleRedirectToPlan}
               className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-8 py-4 text-sm font-bold text-accent-foreground shadow-lg shadow-accent/20 transition-all hover:brightness-110 active:scale-[0.98]"
             >
-              <Sparkles size={18} />
-              Continuar meu plano
+              <Calendar size={18} />
+              Continuar meu plano · Dia {day}
             </button>
             <span className="text-[10px] font-medium text-muted-foreground text-center">
               Você está no <span className="font-bold text-accent">Dia {day}</span>: {getProtocolDay(day).title}
