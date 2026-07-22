@@ -2698,6 +2698,8 @@ function WeekPicker({
           return (
             <motion.button
               key={d}
+              data-day-button={d}
+
               onClick={() => onSelectDay(d)}
               onPointerDown={() => startPress(d)}
               onPointerUp={cancelPress}
