@@ -8,6 +8,7 @@ import sceneNutrir from "@/assets/scene-nutrir.jpg";
 import kitMetodo from "@/assets/kit-metodo.jpg.asset.json";
 import logoPlantaefert from "@/assets/logo-plantaefert.png";
 import { playSuccessSound, playPopSound } from "@/lib/audio-feedback";
+import { MethodInstructions } from "@/components/MethodInstructions";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -3627,50 +3628,7 @@ function _MethodDrawerBody({
 
   return (
     <Drawer onClose={onClose} title="Método de 2 Passos">
-      <div className="rounded-2xl border border-border bg-secondary/50 p-4">
-        <div className="text-[12px] font-bold uppercase tracking-wider text-primary/80">
-          Uso em conjunto
-        </div>
-        <p className="mt-1 text-sm text-secondary-foreground/90">
-          Aplicar 1 vez por semana, preferencialmente nas horas mais frescas do dia.
-        </p>
-      </div>
-
-      <div className="mt-4">
-        <div className="text-sm font-bold text-primary">Como aplicar</div>
-        <ol className="mt-3 space-y-3">
-          <li className="flex gap-3 rounded-2xl border border-border bg-card p-3">
-            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
-              1
-            </span>
-            <p className="text-sm text-foreground/90">
-              Aplique primeiro o <strong>Enraizador Orgânico</strong> nas raízes e no substrato.
-            </p>
-          </li>
-          <li className="flex gap-3 rounded-2xl border border-border bg-card p-3">
-            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-accent text-xs font-bold text-accent-foreground">
-              2
-            </span>
-            <p className="text-sm text-foreground/90">
-              Em seguida, aplique o <strong>Bokashi Líquido Orquídeas</strong> nas raízes, folhas e substrato.
-            </p>
-          </li>
-          <li className="flex gap-3 rounded-2xl border border-border bg-card p-3">
-            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-muted text-xs font-bold text-foreground">
-              3
-            </span>
-            <p className="text-sm text-foreground/90">Evite aplicar diretamente nas flores.</p>
-          </li>
-          <li className="flex gap-3 rounded-2xl border border-border bg-card p-3">
-            <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-muted text-xs font-bold text-foreground">
-              4
-            </span>
-            <p className="text-sm text-foreground/90">
-              Não aplicar sob sol forte, especialmente entre 9h e 16h.
-            </p>
-          </li>
-        </ol>
-      </div>
+      <MethodInstructions />
 
       {applicationsForDay.length > 0 && (
         <div className="mt-4 rounded-xl border border-border bg-secondary/40 p-3 text-xs text-secondary-foreground">
