@@ -3497,10 +3497,10 @@ function MethodDrawer({ actorId, day, onClose }: { actorId: string; day: number;
 }
 
 const APPLICATION_STEPS = [
-  "Preparar ambiente arejado, longe do sol forte",
-  "Aplicar Enraizador nas raízes e substrato",
-  "Aplicar Bokashi nas raízes, folhas e substrato",
-  "Aguardar absorção sem escorrer nem encharcar",
+  "Aplicar nas horas mais frescas do dia, evitando sol forte (9h–16h)",
+  "Aplicar primeiro o Enraizador Orgânico nas raízes e no substrato",
+  "Em seguida, aplicar o Bokashi Líquido Orquídeas nas raízes, folhas e substrato",
+  "Evitar aplicar diretamente nas flores",
   "Registrar aplicação no app",
 ];
 
