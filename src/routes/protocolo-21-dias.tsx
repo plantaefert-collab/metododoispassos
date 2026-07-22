@@ -2094,7 +2094,10 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
       )}
 
 
-      {/* ─────────── BLOCO 2 · PROGRESSO (movido para logo abaixo de Método 2 Passos) ─────────── */}
+    {!focusedMode && (
+      <>
+        {/* ─────────── BLOCO 2 · PROGRESSO (movido para logo abaixo de Método 2 Passos) ─────────── */}
+
       <SectionHeader
         eyebrow="Bloco 2"
         title="Progresso"
