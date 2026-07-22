@@ -2018,6 +2018,47 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           </div>
         </div>
       </div>
+      
+      {/* Dynamic Tracking Section for current Protocol Participants */}
+      {(completedDays > 0 || diagnosisFresh || !!state.plant.name) && (
+        <div className="group relative overflow-hidden rounded-2xl border-2 border-accent/30 bg-gradient-to-br from-accent/[0.04] to-transparent p-5 shadow-sm transition-all hover:border-accent/50">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <div className="grid h-8 w-8 place-items-center rounded-lg bg-accent text-accent-foreground shadow-sm">
+                <Sparkles size={16} />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-primary">Acompanhamento</h3>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-accent/80">Meu próximo passo</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="font-display text-lg text-primary">Dia {day} <span className="text-sm font-sans text-muted-foreground">/ 21</span></div>
+            </div>
+          </div>
+          
+          <div className="mt-4 flex items-center gap-3">
+             <div className="flex-1">
+                <p className="text-xs font-medium text-foreground/80 line-clamp-1">
+                  {getProtocolDay(day).mainAction}
+                </p>
+                <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-accent/10">
+                  <div
+                    className="h-full rounded-full bg-accent transition-all duration-1000"
+                    style={{ width: `${Math.round(((day - 1) / 21) * 100)}%` }}
+                  />
+                </div>
+             </div>
+             <button 
+               onClick={handleRedirectToPlan}
+               className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent text-accent-foreground shadow-md transition-transform active:scale-90 hover:brightness-110"
+             >
+                <ChevronRight size={20} />
+             </button>
+          </div>
+        </div>
+      )}
+
 
       {/* ─────────── BLOCO 2 · PROGRESSO (movido para logo abaixo de Método 2 Passos) ─────────── */}
       <SectionHeader
