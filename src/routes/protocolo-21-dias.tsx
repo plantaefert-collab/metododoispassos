@@ -2032,9 +2032,15 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
                 <p className="text-[10px] font-bold uppercase tracking-widest text-accent/80">Meu próximo passo</p>
               </div>
             </div>
-            <div className="text-right">
+            <div className="flex flex-col items-end gap-1">
+              {[3, 10, 17].includes(day) && (
+                <div className="flex items-center gap-1 rounded-full bg-accent/20 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-accent animate-pulse">
+                  <Droplets size={10} /> Dia de Aplicação
+                </div>
+              )}
               <div className="font-display text-lg text-primary">Dia {day} <span className="text-sm font-sans text-muted-foreground">/ 21</span></div>
             </div>
+
           </div>
           
           <div className="mt-4 flex items-center gap-3">
