@@ -1,21 +1,21 @@
 import { describe, it, expect } from "bun:test";
-import { getProtocolDay, phaseOf } from "../protocol-plan";
+import { getProtocolDay, getProtocolPhase } from "../protocol-plan";
 import { EDITORIAL_PLAN } from "../editorial-plan";
 
 describe("Protocol UI Data Consistency", () => {
   it("should have consistent phases and main actions for all 21 days", () => {
     for (let day = 1; day <= 21; day++) {
       const dayData = getProtocolDay(day);
-      const phase = phaseOf(day);
+      const phaseData = getProtocolPhase(day);
       const editorial = EDITORIAL_PLAN[day];
 
       // Verify day numbering
       expect(dayData.day).toBe(day);
 
       // Verify phase mapping
-      if (day <= 7) expect(phase).toBe("Enraizar");
-      else if (day <= 14) expect(phase).toBe("Nutrir");
-      else expect(phase).toBe("Florescer");
+      if (day <= 7) expect(phaseData.range).toContain("1 a 7");
+      else if (day <= 14) expect(phaseData.range).toContain("8 a 14");
+      else expect(phaseData.range).toContain("15 a 21");
 
       // Verify main action exists and is a string
       expect(typeof dayData.mainAction).toBe("string");
