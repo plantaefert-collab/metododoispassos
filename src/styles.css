@@ -165,3 +165,52 @@
     opacity: 0.98;
   }
 }
+
+/* ===== Modo Alto Contraste global =====
+ * Reescreve tokens semânticos para maximizar contraste texto/fundo,
+ * remove ruído/gradientes e reforça o foco visível.
+ */
+.high-contrast {
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.1 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.1 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.1 0 0);
+  --primary: oklch(0.15 0.05 160);
+  --primary-foreground: oklch(1 0 0);
+  --secondary: oklch(0.95 0 0);
+  --secondary-foreground: oklch(0.1 0 0);
+  --muted: oklch(0.92 0 0);
+  --muted-foreground: oklch(0.25 0 0);
+  --accent: oklch(0.45 0.25 330);
+  --accent-foreground: oklch(1 0 0);
+  --lilac: oklch(0.95 0.04 330);
+  --lilac-foreground: oklch(0.2 0.15 330);
+  --destructive: oklch(0.45 0.22 25);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.2 0 0);
+  --input: oklch(0.2 0 0);
+  --ring: oklch(0.35 0.2 260);
+}
+
+.high-contrast body {
+  background-image: none !important;
+  background-blend-mode: normal !important;
+  opacity: 1 !important;
+}
+
+.high-contrast *:focus-visible {
+  outline: 3px solid oklch(0.35 0.2 260) !important;
+  outline-offset: 2px !important;
+  border-radius: 4px;
+}
+
+.high-contrast a,
+.high-contrast button {
+  text-underline-offset: 3px;
+}
+
+.high-contrast a:not([class*="rounded"]):hover {
+  text-decoration: underline;
+}
