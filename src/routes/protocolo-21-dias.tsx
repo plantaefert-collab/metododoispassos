@@ -1858,263 +1858,6 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
       </div>
 
       {(() => {
-        const ctx = getTrackingCardContext();
-        return (
-          <div 
-            onClick={ctx.onCardClick}
-            className={cn(
-              "group relative cursor-pointer overflow-hidden rounded-2xl border transition-all active:scale-[0.98]",
-              ctx.isApplicationDay 
-                ? "border-accent/40 bg-gradient-to-br from-accent/10 via-accent/5 to-transparent shadow-lg shadow-accent/5 ring-1 ring-accent/20" 
-                : "border-border bg-card hover:border-primary/20 shadow-sm"
-            )}
-          >
-            {ctx.isApplicationDay && (
-               <div className="absolute inset-0 pointer-events-none">
-                 <div className="absolute inset-0 bg-accent/5 animate-pulse" />
-                 <div className="absolute -inset-1 bg-accent/10 blur-2xl opacity-50" />
-               </div>
-            )}
-
-            <div className="relative z-10 p-5">
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className={cn(
-                      "rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-widest shadow-sm",
-                      ctx.isApplicationDay ? "bg-accent text-accent-foreground" : "bg-primary/10 text-primary"
-                    )}>
-                      Dia {day}
-                    </span>
-                    {ctx.isApplicationDay && (
-                      <span className="flex items-center gap-1 rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-bold text-accent animate-pulse">
-                         <Sparkles size={10} />
-                         Aplicação
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="mt-2 font-display text-2xl leading-tight text-foreground">
-                    {ctx.title}
-                  </h3>
-                  <p className="mt-1 text-sm text-muted-foreground">
-                    {ctx.description}
-                  </p>
-                </div>
-                <div className={cn(
-                  "grid h-14 w-14 shrink-0 place-items-center rounded-2xl shadow-inner transition-transform group-hover:scale-110",
-                  ctx.isApplicationDay ? "bg-accent/20 text-accent" : "bg-primary/10 text-primary"
-                )}>
-                  {ctx.icon}
-                </div>
-              </div>
-
-              {pendingChecklist.length > 0 && (
-                <div className="mt-5 space-y-2 border-t border-border/50 pt-4">
-                  <div className="flex items-center justify-between">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Suas Tarefas</span>
-                    <span className="text-[10px] font-medium text-primary">{dayProgress}% concluído</span>
-                  </div>
-                  {nextItems.map((item, idx) => (
-                    <div key={idx} className="flex items-center gap-3">
-                      <div className="h-1.5 w-1.5 rounded-full bg-primary/40" />
-                      <span className="text-xs text-foreground/80 line-clamp-1">{item}</span>
-                    </div>
-                  ))}
-                  {pendingChecklist.length > nextItems.length && (
-                    <div className="pt-1 text-[10px] italic text-muted-foreground">
-                      +{pendingChecklist.length - nextItems.length} item(ns) no plano
-                    </div>
-                  )}
-                </div>
-              )}
-
-              <button
-                onClick={(e) => { e.stopPropagation(); ctx.cta.onClick(); }}
-                className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-accent-foreground shadow-sm transition-all hover:brightness-110 active:scale-[0.98]"
-              >
-                {ctx.cta.icon}
-                {ctx.cta.label}
-              </button>
-            </div>
-          </div>
-        );
-      })()}
-
-      {!focusedMode && (
-        <>
-          <div className="group relative overflow-hidden rounded-2xl border-2 border-primary/40 bg-gradient-to-br from-primary/15 via-primary/8 to-primary/[0.03] shadow-lg shadow-primary/10 transition-all hover:border-primary/60 hover:shadow-primary/20">
-            <div className="relative w-full overflow-hidden">
-              <img
-                src={kitMetodo.url}
-                alt="Kit Método 2 Passos"
-                loading="lazy"
-                className="h-44 w-full object-cover sm:h-52 md:h-60"
-              />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-primary/25 via-transparent to-transparent" />
-            </div>
-            <div className="relative z-10 p-6">
-              <div className="flex items-center gap-2 text-primary">
-                <div className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-primary-foreground shadow-md shadow-primary/30">
-                  <Sprout size={18} />
-                </div>
-                <h3 className="font-display text-xl text-primary">Método de 2 Passos</h3>
-              </div>
-              <p className="mt-2 text-sm leading-relaxed text-foreground/80">
-                Entenda como funciona o protocolo de Enraizar e Nutrir para sua orquídea florescer.
-              </p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <button
-                  onClick={() => setTab("metodo")}
-                  className="flex items-center gap-2 rounded-full bg-primary/10 px-5 py-2.5 text-xs font-bold text-primary transition-all hover:bg-primary/20 active:scale-95"
-                >
-                  <Eye size={14} />
-                  Ver Explicação
-                </button>
-                <button
-                  onClick={() => setTab("metodo")}
-                  className="flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-xs font-bold text-primary-foreground shadow-md transition-all hover:brightness-110 active:scale-95"
-                >
-                  <BookOpen size={14} />
-                  Modo de usar
-                </button>
-              </div>
-            </div>
-          </div>
-
-          <SectionHeader
-            eyebrow="Bloco 2"
-            title="Progresso"
-            hint="Onde você está na jornada"
-          />
-
-          <div 
-            onClick={handleRedirectToPlan}
-            className="group relative cursor-pointer overflow-hidden rounded-2xl border border-border bg-plantae-cream/40 p-4 sm:p-5 transition-all hover:border-primary/30 active:scale-[0.99]"
-          >
-            <div className="flex items-center gap-3">
-              <div className="grid h-12 w-12 sm:h-14 sm:w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-card transition-transform group-hover:scale-105">
-                {state.plant.photo ? (
-                  <img src={state.plant.photo} alt={state.plant.name} className="h-full w-full object-cover" />
-                ) : (
-                  <Flower2 size={22} className="text-muted-foreground" />
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center justify-between">
-                  <h4 className="truncate font-display text-lg text-foreground">Sua jornada</h4>
-                  <span className="text-[10px] font-bold text-primary">{Math.round(((day - 1) / 21) * 100)}%</span>
-                </div>
-                <p className="text-xs font-medium text-foreground/80 line-clamp-1">
-                  {getProtocolDay(day).mainAction}
-                </p>
-                <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-accent/10">
-                  <div
-                    className="h-full rounded-full bg-accent transition-all duration-1000"
-                    style={{ width: `${Math.round(((day - 1) / 21) * 100)}%` }}
-                  />
-                </div>
-              </div>
-              <button 
-                onClick={handleRedirectToPlan}
-                className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent text-accent-foreground shadow-md transition-transform active:scale-90 hover:brightness-110"
-              >
-                <ChevronRight size={20} />
-              </button>
-            </div>
-          </div>
-
-          {upcomingReminders.length > 0 && (
-            <div className="rounded-2xl border border-primary/20 bg-primary/5 p-5">
-              <div className="flex items-center gap-3">
-                <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10 text-primary">
-                  <Bell size={20} />
-                </div>
-                <div>
-                  <h4 className="text-sm font-bold text-primary">Lembretes & Notificações</h4>
-                  <p className="text-xs text-muted-foreground">Próximo lembrete no dia {upcomingReminders[0]}</p>
-                </div>
-              </div>
-              <button
-                onClick={() => {
-                  if ('Notification' in window) {
-                    Notification.requestPermission();
-                  }
-                }}
-                className="mt-4 w-full rounded-xl bg-primary/10 py-2.5 text-xs font-bold text-primary transition-all hover:bg-primary/20"
-              >
-                Ativar Lembretes Diários
-              </button>
-            </div>
-          )}
-
-          <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
-            Aplique no horário fresco, evite sol forte e não atinja diretamente as flores.
-          </InfoCard>
-
-          <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <button
-              onClick={() => setTab("resumo")}
-              className="flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-left transition-all hover:bg-primary/10 sm:col-span-2"
-            >
-              <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/20 text-primary">
-                <FileText size={20} />
-              </div>
-              <div className="flex-1">
-                <div className="text-sm font-bold text-primary">Resumo & PDF</div>
-                <div className="text-[10px] text-muted-foreground">Exportar meu progresso</div>
-              </div>
-              <ChevronRight size={16} className="text-primary/40" />
-            </button>
-          </div>
-        </>
-      )}
-    </div>
-  );
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-      <div className="flex items-center justify-between px-1">
-        <SectionHeader
-          eyebrow="Bloco 1"
-          title="Foco do dia"
-          hint={focusedMode ? "Visualização concentrada ativa" : "O que você precisa fazer agora"}
-        />
-        <button
-          onClick={() => setFocusedMode(!focusedMode)}
-          className={cn(
-            "flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all",
-            focusedMode 
-              ? "bg-primary text-primary-foreground shadow-md" 
-              : "bg-primary/5 text-primary hover:bg-primary/10"
-          )}
-        >
-          {focusedMode ? <Sparkles size={12} /> : <Wind size={12} />}
-          {focusedMode ? "Modo Focado" : "Focar"}
-        </button>
-      </div>
-
-
-
-
-      {/* Próximo passo recomendado — CTA principal */}
-      {(() => {
         const meta = getProtocolDay(day);
         const today = state.days[day] ?? { checklist: {}, note: "", completed: false };
         const checklistState = today.checklist ?? {};
@@ -2190,147 +1933,149 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             tabIndex={0}
             onClick={ctx.cta.onClick}
             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") ctx.cta.onClick(); }}
-            className="group relative w-full cursor-pointer overflow-hidden rounded-2xl border-2 border-accent/30 bg-gradient-to-br from-accent/[0.06] to-primary/[0.04] p-5 text-left shadow-sm transition-all hover:border-accent/50 active:scale-[0.99]"
+            className={cn(
+              "group relative w-full cursor-pointer overflow-hidden rounded-2xl border-2 p-5 text-left shadow-sm transition-all active:scale-[0.99]",
+              isApplicationDay 
+                ? "border-accent/40 bg-gradient-to-br from-accent/10 via-accent/5 to-transparent shadow-lg shadow-accent/5 ring-1 ring-accent/20" 
+                : "border-accent/30 bg-gradient-to-br from-accent/[0.06] to-primary/[0.04] hover:border-accent/50"
+            )}
           >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-accent">
-                <Sparkles size={14} />
-                <span className="text-[10px] font-bold uppercase tracking-widest">{ctx.eyebrow}</span>
-              </div>
-              <ChevronRight size={16} className="text-accent/60 transition-transform group-hover:translate-x-1" />
-            </div>
-            <h3 className="mt-2 font-display text-xl leading-tight text-primary">
-              {ctx.title}
-            </h3>
-            <p className="mt-1.5 text-sm text-primary/75">
-              {ctx.desc}
-            </p>
-
-            {hasPlant && diagnosisFresh && (
-              <div className="mt-3 space-y-1.5">
-                <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                  <span>Progresso do plano</span>
-                  <span>Dia {day} de 21</span>
-                </div>
-                <div className="h-1.5 w-full overflow-hidden rounded-full bg-primary/10">
-                  <div
-                    className="h-full rounded-full bg-gradient-to-r from-accent to-primary transition-all"
-                    style={{ width: `${Math.min(100, Math.max(0, progressPct))}%` }}
-                  />
-                </div>
-              </div>
+            {isApplicationDay && (
+               <div className="absolute inset-0 pointer-events-none">
+                 <div className="absolute inset-0 bg-accent/5 animate-pulse" />
+                 <div className="absolute -inset-1 bg-accent/10 blur-2xl opacity-50" />
+               </div>
             )}
 
-            {showChecklist && (
-              <div className="mt-3 space-y-1.5 rounded-xl bg-card/60 p-3">
-                <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
-                  Checklist pendente
+            <div className="relative z-10">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-accent">
+                  <Sparkles size={14} />
+                  <span className="text-[10px] font-bold uppercase tracking-widest">{ctx.eyebrow}</span>
                 </div>
-                {nextItems.map((c) => (
-                  <div key={c.i} className="flex items-start gap-2 text-xs text-primary/85">
-                    <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
-                    <span className="leading-snug">{c.label}</span>
-                  </div>
-                ))}
-                {pendingChecklist.length > nextItems.length && (
-                  <div className="pt-1 text-[10px] italic text-muted-foreground">
-                    +{pendingChecklist.length - nextItems.length} item(ns) no plano
-                  </div>
+                {isApplicationDay && (
+                  <span className="flex items-center gap-1 rounded-full bg-accent/20 px-2 py-0.5 text-[10px] font-bold text-accent animate-pulse">
+                     <Droplets size={10} />
+                     Aplicação
+                  </span>
                 )}
+                <ChevronRight size={16} className="text-accent/60 transition-transform group-hover:translate-x-1" />
               </div>
-            )}
+              <h3 className="mt-2 font-display text-xl leading-tight text-primary">
+                {ctx.title}
+              </h3>
+              <p className="mt-1.5 text-sm text-primary/75">
+                {ctx.desc}
+              </p>
 
-            <button
-              onClick={(e) => { e.stopPropagation(); ctx.cta.onClick(); }}
-              className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-accent-foreground shadow-sm transition-all hover:brightness-110 active:scale-[0.98]"
-            >
-              {ctx.cta.icon}
-              {ctx.cta.label}
-            </button>
+              {hasPlant && diagnosisFresh && (
+                <div className="mt-3 space-y-1.5">
+                  <div className="flex items-center justify-between text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                    <span>Progresso do plano</span>
+                    <span>Dia {day} de 21</span>
+                  </div>
+                  <div className="h-1.5 w-full overflow-hidden rounded-full bg-primary/10">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-accent to-primary transition-all"
+                      style={{ width: `${Math.min(100, Math.max(0, progressPct))}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+
+              {showChecklist && (
+                <div className="mt-3 space-y-1.5 rounded-xl bg-card/60 p-3">
+                  <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                    Checklist pendente
+                  </div>
+                  {nextItems.map((c) => (
+                    <div key={c.i} className="flex items-start gap-2 text-xs text-primary/85">
+                      <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+                      <span className="leading-snug">{c.label}</span>
+                    </div>
+                  ))}
+                  {pendingChecklist.length > nextItems.length && (
+                    <div className="pt-1 text-[10px] italic text-muted-foreground">
+                      +{pendingChecklist.length - nextItems.length} item(ns) no plano
+                    </div>
+                  )}
+                </div>
+              )}
+
+              <button
+                onClick={(e) => { e.stopPropagation(); ctx.cta.onClick(); }}
+                className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-accent-foreground shadow-sm transition-all hover:brightness-110 active:scale-[0.98]"
+              >
+                {ctx.cta.icon}
+                {ctx.cta.label}
+              </button>
+            </div>
           </div>
         );
       })()}
 
       {!focusedMode && (
         <>
-          {/* Seção dinâmica condicional: removemos o switch complexo por uma renderização direta */}
-
-
-
-
-      <div className="group relative overflow-hidden rounded-2xl border-2 border-primary/40 bg-gradient-to-br from-primary/15 via-primary/8 to-primary/[0.03] shadow-lg shadow-primary/10 transition-all hover:border-primary/60 hover:shadow-primary/20">
-        <div className="relative w-full overflow-hidden">
-          <img
-            src={kitMetodo.url}
-            alt="Kit Método 2 Passos — Enraizador Forte e Bokashi Orquídeas Premium em cena botânica"
-            loading="lazy"
-            className="h-44 w-full object-cover sm:h-52 md:h-60"
-          />
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-primary/25 via-transparent to-transparent" />
-        </div>
-        <div className="relative z-10 p-6">
-          <div className="pointer-events-none absolute -right-6 -top-6 text-primary/20 transition-transform group-hover:scale-110">
-            <Sparkles size={120} />
-          </div>
-          <div className="flex items-center gap-2 text-primary">
-            <div className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-primary-foreground shadow-md shadow-primary/30">
-              <Sprout size={18} />
+          <div className="group relative overflow-hidden rounded-2xl border-2 border-primary/40 bg-gradient-to-br from-primary/15 via-primary/8 to-primary/[0.03] shadow-lg shadow-primary/10 transition-all hover:border-primary/60 hover:shadow-primary/20">
+            <div className="relative w-full overflow-hidden">
+              <img
+                src={kitMetodo.url}
+                alt="Kit Método 2 Passos"
+                loading="lazy"
+                className="h-44 w-full object-cover sm:h-52 md:h-60"
+              />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-primary/25 via-transparent to-transparent" />
             </div>
-            <h3 className="font-display text-xl text-primary">Método de 2 Passos</h3>
-          </div>
-          <p className="mt-2 text-sm leading-relaxed text-foreground/80">
-            Entenda como funciona o protocolo de Enraizar e Nutrir para sua orquídea florescer.
-          </p>
-          <div className="mt-4 flex flex-wrap gap-2">
-            <button
-              onClick={() => setTab("metodo")}
-              className="flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-xs font-bold text-primary-foreground shadow-lg shadow-primary/30 transition-all hover:brightness-110 active:scale-[0.98]"
-            >
-              Ver explicação <ChevronRight size={14} />
-            </button>
-            <button
-              onClick={() => setTab("metodo")}
-              className="flex items-center gap-2 rounded-full border-2 border-primary bg-primary/5 px-5 py-2 text-xs font-bold text-primary transition-all hover:bg-primary/15 active:scale-[0.98]"
-            >
-              Modo de usar <ChevronRight size={14} />
-            </button>
-          </div>
-        </div>
-      </div>
-      
-      {/* Dynamic Tracking Section for current Protocol Participants */}
-      {(completedDays > 0 || diagnosisFresh || !!state.plant.name) && (
-        <div className={cn(
-          "group relative overflow-hidden rounded-2xl border-2 p-5 shadow-sm transition-all",
-          [3, 10, 17].includes(day) 
-            ? "border-accent/50 bg-gradient-to-br from-accent/[0.12] to-accent/[0.04] shadow-[0_0_20px_rgba(217,70,239,0.15)] ring-1 ring-accent/20" 
-            : "border-accent/30 bg-gradient-to-br from-accent/[0.04] to-transparent hover:border-accent/50"
-        )}>
-
-
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="grid h-8 w-8 place-items-center rounded-lg bg-accent text-accent-foreground shadow-sm">
-                <Sparkles size={16} />
-              </div>
-              <div>
-                <h3 className="text-sm font-bold text-primary">Acompanhamento</h3>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-accent/80">Meu próximo passo</p>
-              </div>
-            </div>
-            <div className="flex flex-col items-end gap-1">
-              {[3, 10, 17].includes(day) && (
-                <div className="flex items-center gap-1 rounded-full bg-accent/20 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-accent animate-pulse">
-                  <Droplets size={10} /> Dia de Aplicação
+            <div className="relative z-10 p-6">
+              <div className="flex items-center gap-2 text-primary">
+                <div className="grid h-9 w-9 place-items-center rounded-lg bg-primary text-primary-foreground shadow-md shadow-primary/30">
+                  <Sprout size={18} />
                 </div>
-              )}
-              <div className="font-display text-lg text-primary">Dia {day} <span className="text-sm font-sans text-muted-foreground">/ 21</span></div>
+                <h3 className="font-display text-xl text-primary">Método de 2 Passos</h3>
+              </div>
+              <p className="mt-2 text-sm leading-relaxed text-foreground/80">
+                Entenda como funciona o protocolo de Enraizar e Nutrir para sua orquídea florescer.
+              </p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <button
+                  onClick={() => setTab("metodo")}
+                  className="flex items-center gap-2 rounded-full bg-primary px-5 py-2 text-xs font-bold text-primary-foreground shadow-lg shadow-primary/30 transition-all hover:brightness-110 active:scale-[0.98]"
+                >
+                  Ver explicação <ChevronRight size={14} />
+                </button>
+                <button
+                  onClick={() => setTab("metodo")}
+                  className="flex items-center gap-2 rounded-full border-2 border-primary bg-primary/5 px-5 py-2 text-xs font-bold text-primary transition-all hover:bg-primary/15 active:scale-[0.98]"
+                >
+                  Modo de usar <ChevronRight size={14} />
+                </button>
+              </div>
             </div>
-
           </div>
-          
-          <div className="mt-4 flex items-center gap-3">
-             <div className="flex-1">
+
+          <SectionHeader
+            eyebrow="Bloco 2"
+            title="Progresso"
+            hint="Onde você está na jornada"
+          />
+
+          <div 
+            onClick={handleRedirectToPlan}
+            className="group relative cursor-pointer overflow-hidden rounded-2xl border border-border bg-plantae-cream/40 p-4 sm:p-5 transition-all hover:border-primary/30 active:scale-[0.99]"
+          >
+            <div className="flex items-center gap-3">
+              <div className="grid h-12 w-12 sm:h-14 sm:w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-card transition-transform group-hover:scale-105">
+                {state.plant.photo ? (
+                  <img src={state.plant.photo} alt={state.plant.name} className="h-full w-full object-cover" />
+                ) : (
+                  <Flower2 size={22} className="text-muted-foreground" />
+                )}
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center justify-between">
+                  <h4 className="truncate font-display text-lg text-foreground">Sua jornada</h4>
+                  <span className="text-[10px] font-bold text-primary">{Math.round(((day - 1) / 21) * 100)}%</span>
+                </div>
                 <p className="text-xs font-medium text-foreground/80 line-clamp-1">
                   {getProtocolDay(day).mainAction}
                 </p>
@@ -2340,394 +2085,86 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
                     style={{ width: `${Math.round(((day - 1) / 21) * 100)}%` }}
                   />
                 </div>
-             </div>
-             <button 
-               onClick={handleRedirectToPlan}
-               className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent text-accent-foreground shadow-md transition-transform active:scale-90 hover:brightness-110"
-             >
+              </div>
+              <button 
+                onClick={handleRedirectToPlan}
+                className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-accent text-accent-foreground shadow-md transition-transform active:scale-90 hover:brightness-110"
+              >
                 <ChevronRight size={20} />
-             </button>
-          </div>
-        </div>
-      )}
-
-
-    {!focusedMode && (
-      <>
-
-
-
-        {/* ─────────── BLOCO 2 · PROGRESSO (movido para logo abaixo de Método 2 Passos) ─────────── */}
-
-      <SectionHeader
-        eyebrow="Bloco 2"
-        title="Progresso"
-        hint="Onde você está na jornada"
-      />
-
-      <div 
-        onClick={handleRedirectToPlan}
-        className="group relative cursor-pointer overflow-hidden rounded-2xl border border-border bg-plantae-cream/40 p-4 sm:p-5 transition-all hover:border-primary/30 active:scale-[0.99]"
-      >
-        <div className="flex items-center gap-3">
-          <div className="grid h-12 w-12 sm:h-14 sm:w-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-card transition-transform group-hover:scale-105">
-            {state.plant.photo ? (
-              <img
-                src={state.plant.photo}
-                alt={state.plant.name}
-                className="h-full w-full object-cover"
-              />
-            ) : (
-              <Flower2 size={22} className="text-muted-foreground" />
-            )}
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="truncate text-base sm:text-lg font-bold text-primary">
-              {state.plant.name || "Sua orquídea"}
+              </button>
             </div>
-            <div className="text-[11px] sm:text-xs text-muted-foreground">{phase.label}</div>
           </div>
-        </div>
-        
-        <div className="mt-3 sm:mt-4">
-          <div className="flex items-baseline justify-between text-primary">
-            <div className="text-xs sm:text-sm font-medium">Progresso do plano</div>
-            <div className="text-xs sm:text-sm font-bold">Dia {day} de 21</div>
+
+          <div className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-sm">
+            <div className="flex items-center gap-3">
+              <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
+                <FileText size={18} />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-primary">Sua jornada até aqui</h3>
+                <p className="text-[10px] text-muted-foreground">Progresso consolidado</p>
+              </div>
+            </div>
+            <div className="mt-3 sm:mt-4 grid grid-cols-2 gap-2">
+              <StatCard label="Dias concluídos" value={`${completedDays}/21`} icon={<CalendarCheck size={14} />} />
+              <StatCard label="Aplicações" value={totalApplications} icon={<Droplets size={14} />} />
+              <StatCard label="Observações" value={totalNotes} icon={<BookOpen size={14} />} />
+              <StatCard label="Fotos" value={totalPhotos} icon={<Images size={14} />} />
+            </div>
           </div>
-          <ProgressBar 
-            className="mt-2" 
-            value={(day / 21) * 100} 
-            color={day <= 7 ? "bg-primary" : day <= 14 ? "bg-[#D946EF]" : "bg-accent"} 
-          />
-        </div>
 
-        <div className="mt-3 sm:mt-4 border-t border-border/50 pt-3 sm:pt-4">
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              handleRedirectToPlan();
-            }}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary/10 py-2.5 text-xs font-bold text-primary transition-colors hover:bg-primary/20"
-          >
-            Ir para o Plano <ChevronRight size={14} />
-          </button>
-        </div>
-      </div>
-
-      {/* Resumo da Jornada */}
-      <div className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-sm">
-        <div className="flex items-center gap-3">
-          <div className="grid h-9 w-9 place-items-center rounded-xl bg-primary/10 text-primary">
-            <FileText size={18} />
-          </div>
-          <div>
-            <h3 className="text-sm font-bold text-primary">Sua jornada até aqui</h3>
-            <p className="text-[10px] text-muted-foreground">Progresso consolidado</p>
-          </div>
-        </div>
-        <div className="mt-3 sm:mt-4 grid grid-cols-2 gap-2">
-          <StatCard label="Dias concluídos" value={`${completedDays}/21`} icon={<CalendarCheck size={14} />} />
-          <StatCard label="Aplicações" value={totalApplications} icon={<Droplets size={14} />} />
-          <StatCard label="Observações" value={totalNotes} icon={<BookOpen size={14} />} />
-          <StatCard label="Fotos" value={totalPhotos} icon={<Images size={14} />} />
-        </div>
-      </div>
-
-
-
-
-      {/* Resumo Rápido do Dia Atual */}
-      {(() => {
-        const today = state.days[day] ?? { checklist: {}, note: "", completed: false };
-        const checklistItems = Object.values(today.checklist ?? {});
-        const checklistTotal = checklistItems.length;
-        const checklistDone = checklistItems.filter(Boolean).length;
-        const appToday = state.applications.filter((a) => a.day === day).length;
-        const needsApp = isApplicationDay && appToday === 0;
-        const needsNote = !today.note?.trim();
-        const needsPhoto = !today.photo;
-        const pending: string[] = [];
-        if (needsApp) pending.push("Aplicação");
-        if (checklistTotal > 0 && checklistDone < checklistTotal) pending.push(`${checklistTotal - checklistDone} tarefa(s)`);
-        if (needsNote) pending.push("Registro");
-        if (needsPhoto) pending.push("Foto");
-
-        return (
-          <button
-            onClick={handleRedirectToPlan}
-            className="group relative w-full overflow-hidden rounded-2xl border border-primary/20 bg-card p-5 text-left shadow-sm transition-all hover:border-primary/40 active:scale-[0.99]"
-          >
+          <div className="group relative overflow-hidden rounded-2xl border border-primary/20 bg-primary/[0.02] p-4 transition-all hover:border-primary/40">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-primary">
-              <Calendar size={14} />
-                <span className="text-[10px] font-bold uppercase tracking-widest">Resumo do Dia {day}</span>
+                <Bell size={14} className="animate-pulse" />
+                <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Lembretes & Notificações</span>
               </div>
-              <ChevronRight size={16} className="text-primary/50 transition-transform group-hover:translate-x-1" />
-            </div>
-            <h3 className="mt-2 font-display text-xl text-primary">
-              {today.completed ? "Dia concluído" : pending.length === 0 ? "Tudo em dia" : "Você tem pendências"}
-            </h3>
-            <div className="mt-3 grid grid-cols-3 gap-2">
-              <div className="rounded-xl bg-primary/5 p-2.5 text-center">
-                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Tarefas</div>
-                <div className="mt-0.5 font-display text-lg text-primary">
-                  {checklistDone}/{checklistTotal || "—"}
-                </div>
-              </div>
-              <div className="rounded-xl bg-accent/5 p-2.5 text-center">
-                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Aplicações</div>
-                <div className="mt-0.5 font-display text-lg text-accent">{appToday}</div>
-              </div>
-              <div className="rounded-xl bg-secondary/50 p-2.5 text-center">
-                <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Registro</div>
-                <div className="mt-0.5 flex items-center justify-center">
-                  {today.note?.trim() ? (
-                    <CheckCircle2 size={18} className="text-primary" />
-                  ) : (
-                    <span className="text-lg text-muted-foreground">—</span>
-                  )}
-                </div>
+              <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
+                Ativo
               </div>
             </div>
-            {pending.length > 0 && !today.completed && (
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                {pending.map((p) => (
-                  <span key={p} className="rounded-full bg-accent/10 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-wider text-accent">
-                    {p} pendente
-                  </span>
-                ))}
-              </div>
-            )}
-            {needsNote && !today.completed && (
-              <div
-                role="button"
-                tabIndex={0}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setTab("plano");
-                  setTimeout(() => {
-                    const el = document.getElementById(`note-day-${day}`) as HTMLTextAreaElement | null;
-                    if (el) {
-                      el.scrollIntoView({ behavior: "smooth", block: "center" });
-                      el.focus();
-                    }
-                  }, 350);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    (e.currentTarget as HTMLDivElement).click();
+            <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
+              Receba alertas diários para não esquecer as aplicações e checklists do seu plano de 21 dias.
+            </p>
+            <div className="mt-4 grid gap-2">
+              <button 
+                onClick={() => {
+                  if ("Notification" in window) {
+                    Notification.requestPermission();
                   }
                 }}
-                className="mt-3 flex items-center justify-between gap-2 rounded-xl border border-primary/25 bg-primary/[0.06] px-3 py-2.5 text-left transition-colors hover:bg-primary/[0.1]"
+                className="flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground shadow-sm transition-all active:scale-[0.98] hover:brightness-110"
               >
-                <div className="flex items-center gap-2 text-primary">
-                  <FileText size={14} />
-                  <span className="text-xs font-semibold">Escrever registro do dia</span>
-                </div>
-                <ChevronRight size={14} className="text-primary/60" />
+                <Bell size={14} /> Ativar Notificações Push
+              </button>
+            </div>
+          </div>
+
+          <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
+            Aplique no horário fresco, evite sol forte e não atinja diretamente as flores.
+          </InfoCard>
+
+          <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <button
+              onClick={() => setTab("resumo")}
+              className="flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-left transition-all hover:bg-primary/10 sm:col-span-2"
+            >
+              <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/20 text-primary">
+                <FileText size={20} />
               </div>
-            )}
-            {!needsNote && (
-              <div
-                role="button"
-                tabIndex={0}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setTab("plano");
-                  setTimeout(() => {
-                    const el = document.getElementById(`note-day-${day}`) as HTMLTextAreaElement | null;
-                    if (el) {
-                      el.scrollIntoView({ behavior: "smooth", block: "center" });
-                      el.focus();
-                      const len = el.value.length;
-                      el.setSelectionRange(len, len);
-                    }
-                  }, 350);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ") {
-                    e.preventDefault();
-                    (e.currentTarget as HTMLDivElement).click();
-                  }
-                }}
-                className="mt-3 rounded-xl border border-border bg-card/70 p-3 text-left transition-colors hover:border-primary/30"
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 text-primary">
-                    <FileText size={14} />
-                    <span className="text-xs font-semibold">Editar registro salvo</span>
-                  </div>
-                  <ChevronRight size={14} className="text-primary/60" />
-                </div>
-                <p className="mt-1.5 line-clamp-2 text-[11px] italic text-muted-foreground">
-                  “{today.note.trim()}”
-                </p>
+              <div className="flex-1">
+                <div className="text-sm font-bold text-primary">Resumo & PDF</div>
+                <div className="text-[10px] text-muted-foreground">Exportar meu progresso</div>
               </div>
-            )}
-          </button>
-        );
-      })()}
-
-
-
-      {/* CTA - Começar plano de 21 dias */}
-      {(() => {
-        const hasProgress = completedDays > 0 || totalApplications > 0 || day > 1;
-        const percent = Math.round((completedDays / 21) * 100);
-        return (
-          <button
-            onClick={() => setTab("plano")}
-            className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-full bg-primary px-6 py-4 text-sm font-bold uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-[0.98]"
-          >
-            <Sparkles size={18} />
-            {hasProgress ? `Continuar meu plano — Dia ${day}` : "Começar meu plano de 21 dias"}
-            {hasProgress && (
-              <span className="ml-1 rounded-full bg-primary-foreground/15 px-2 py-0.5 text-[10px] font-bold tracking-wider text-primary-foreground backdrop-blur-sm">
-                <AnimatePresence mode="popLayout" initial={false}>
-                  <motion.span
-                    key={percent}
-                    initial={{ y: -8, opacity: 0, scale: 0.8 }}
-                    animate={{ y: 0, opacity: 1, scale: 1 }}
-                    exit={{ y: 8, opacity: 0, scale: 0.8 }}
-                    transition={{ type: "spring", stiffness: 380, damping: 22 }}
-                    className="inline-block tabular-nums"
-                  >
-                    {percent}%
-                  </motion.span>
-                </AnimatePresence>
-              </span>
-            )}
-            <ChevronRight size={18} className="transition-transform group-hover:translate-x-1" />
-          </button>
-        );
-      })()}
-
-
-
-
-
-
-      {/* Notificações & Lembretes */}
-      <div className="group relative overflow-hidden rounded-2xl border border-primary/20 bg-primary/[0.02] p-4 transition-all hover:border-primary/40">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-primary">
-            <Bell size={14} className="animate-pulse" />
-            <span className="text-[10px] font-bold uppercase tracking-widest text-primary">Lembretes & Notificações</span>
+              <ChevronRight size={16} className="text-primary/40" />
+            </button>
           </div>
-          <div className="flex items-center gap-1.5 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">
-            Ativo
-          </div>
-        </div>
-        
-        <p className="mt-2 text-xs leading-relaxed text-muted-foreground">
-          Receba alertas diários para não esquecer as aplicações e checklists do seu plano de 21 dias.
-        </p>
-        
-        <div className="mt-4 grid gap-2">
-          <button 
-            onClick={() => {
-              if (!("Notification" in window)) {
-                toast.error("Notificações não são suportadas neste navegador.");
-              } else {
-                Notification.requestPermission().then(permission => {
-                  if (permission === "granted") {
-                    toast.success("Notificações ativadas com sucesso!");
-                  } else {
-                    toast.info("Para receber alertas, habilite as notificações nas configurações do seu navegador.");
-                  }
-                });
-              }
-            }}
-            className="flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-xs font-bold text-primary-foreground shadow-sm transition-all active:scale-[0.98] hover:brightness-110"
-          >
-            <Bell size={14} /> Ativar Notificações Push
-          </button>
-          
-          <button 
-            className="flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-4 py-2.5 text-xs font-bold text-foreground transition-all active:scale-[0.98] hover:bg-muted"
-            onClick={() => {
-              toast.info("Lembrete configurado!", {
-                description: "Enviaremos uma notificação diária para você."
-              });
-            }}
-          >
-            <Calendar size={14} /> Agendar Lembrete Diário
-          </button>
-        </div>
-      </div>
-
-      {/* Lembretes de Marcos Críticos */}
-      {upcomingReminders.length > 0 && (
-        <div className="space-y-3">
-          <div className="flex items-center gap-2 px-1">
-            <div className="h-1.5 w-1.5 rounded-full bg-accent" />
-            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Marcos do Protocolo</span>
-          </div>
-          <div className="grid gap-2">
-            {upcomingReminders.map(d => (
-              <div
-                key={d}
-                className="flex items-center justify-between rounded-xl border border-border bg-card p-3 shadow-sm transition-all hover:border-primary/40 hover:shadow-md"
-              >
-                <button
-                  type="button"
-                  onClick={() => {
-                    setCurrentDay(d, actorId);
-                    handleRedirectToPlan();
-                  }}
-                  className="flex flex-1 items-center gap-3 text-left"
-                >
-                  <div className={`grid h-8 w-8 place-items-center rounded-lg text-xs font-bold ${d === day ? 'bg-primary text-primary-foreground' : 'bg-secondary text-primary'}`}>
-                    {d}
-                  </div>
-                  <div>
-                    <div className="text-xs font-bold text-primary">Dia {d}: {d === 1 ? 'Início & Diagnóstico' : d === 21 ? 'Avaliação Final' : 'Manutenção Crítica'}</div>
-                    <div className="text-[10px] text-muted-foreground">Toque para abrir este dia</div>
-                  </div>
-                </button>
-                <button
-                  onClick={() => {
-                    toggleReminder(d, actorId);
-                    toast.success(`Lembrete do dia ${d} concluído!`, {
-                      icon: <CheckCircle2 size={16} className="text-primary" />
-                    });
-                  }}
-                  className="ml-2 shrink-0 rounded-lg bg-primary/10 p-2 text-primary transition-colors hover:bg-primary/20"
-                >
-                  <Check size={16} />
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
+        </>
       )}
-
-
-
-      <InfoCard tone="warn" icon={<AlertTriangle size={16} />}>
-        Aplique no horário fresco, evite sol forte e não atinja diretamente as flores.
-      </InfoCard>
-
-
-      <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
-        <button
-          onClick={() => setTab("resumo")}
-          className="flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-left transition-all hover:bg-primary/10 sm:col-span-2"
-        >
-          <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/20 text-primary">
-            <FileText size={20} />
-          </div>
-          <div className="flex-1">
-            <div className="text-sm font-bold text-primary">Resumo & PDF</div>
-            <div className="text-[10px] text-muted-foreground">Exportar meu progresso</div>
-          </div>
-          <ChevronRight size={16} className="text-primary/40" />
-        </button>
-      </div>
     </div>
   );
 }
+
 
 
 
