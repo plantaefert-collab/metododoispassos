@@ -51,6 +51,7 @@ import {
   Volume2,
   VolumeX,
   Zap,
+  Clock,
 } from "lucide-react";
 
 import {
@@ -1921,9 +1922,88 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
   const reminderDays = [1, 3, 7, 10, 14, 17, 21];
   const upcomingReminders = reminderDays.filter(d => d >= day && !state.remindersCompleted?.[d]);
 
+  // Dados para o "Resumo do dia" e "Lembretes importantes"
+  const todayEntry = state.days[day] ?? { checklist: {}, note: "", completed: false };
+  const todayMeta = getProtocolDay(day);
+  const totalTasks = todayMeta.checklist.length;
+  const doneTasks = todayMeta.checklist.filter((label) => !!todayEntry.checklist?.[label]).length;
+  const noteDone = !!todayEntry.note?.trim();
+  const photoDone = !!todayEntry.photo;
+  const appsDoneToday = state.applications.filter((a) => a.day === day).length;
+  const hasPendencies = doneTasks < totalTasks || !noteDone || !photoDone;
+  const importantDays = [3, 7, 10, 14, 17, 21].filter((d) => d >= day);
+  const reminderTime = state.settings?.reminderTime ?? "08:00";
 
   return (
     <div className="space-y-4">
+      {/* Resumo do dia */}
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={handleRedirectToPlan}
+        onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") handleRedirectToPlan(); }}
+        className="group relative cursor-pointer overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-sm transition-all hover:border-primary/40 active:scale-[0.99]"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 text-primary">
+            <Calendar size={14} />
+            <span className="text-[10px] font-bold uppercase tracking-widest">Resumo do dia {day}</span>
+          </div>
+          <ChevronRight size={16} className="text-primary/40 transition-transform group-hover:translate-x-1" />
+        </div>
+        <h3 className="mt-2 font-display text-2xl leading-tight text-primary">
+          {hasPendencies ? "Você tem pendências" : "Dia em dia"}
+        </h3>
+        <div className="mt-3 grid grid-cols-3 gap-2">
+          <div className="rounded-xl bg-primary/[0.04] p-3 text-center">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Tarefas</div>
+            <div className="mt-1 font-display text-2xl text-primary">
+              {doneTasks}<span className="text-primary/40">/{totalTasks || "—"}</span>
+            </div>
+          </div>
+          <div className="rounded-xl bg-accent/[0.08] p-3 text-center">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Aplicações</div>
+            <div className="mt-1 font-display text-2xl text-accent">{appsDoneToday}</div>
+          </div>
+          <div className="rounded-xl bg-primary/[0.04] p-3 text-center">
+            <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Registro</div>
+            <div className="mt-1 font-display text-2xl text-primary">{noteDone ? "✓" : "—"}</div>
+          </div>
+        </div>
+        {(!noteDone || !photoDone) && (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {!noteDone && (
+              <span className="rounded-full bg-accent/15 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-accent">
+                Registro pendente
+              </span>
+            )}
+            {!photoDone && (
+              <span className="rounded-full bg-accent/15 px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-accent">
+                Foto pendente
+              </span>
+            )}
+          </div>
+        )}
+        <button
+          onClick={(e) => {
+            e.stopPropagation();
+            playInteractionSound();
+            handleRedirectToPlan();
+            setTimeout(() => {
+              const registerEl = document.querySelector('[data-register-field]');
+              if (registerEl) registerEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }, 100);
+          }}
+          className="mt-4 flex w-full items-center justify-between rounded-xl border border-primary/20 bg-primary/[0.04] px-4 py-3 text-sm font-bold text-primary transition-all hover:bg-primary/10 active:scale-[0.98]"
+        >
+          <div className="flex items-center gap-2">
+            <BookOpen size={16} />
+            <span>Escrever registro do dia</span>
+          </div>
+          <ChevronRight size={16} className="opacity-40" />
+        </button>
+      </div>
+
       <div className="flex items-center justify-between px-1">
         <SectionHeader
           eyebrow="Bloco 1"
@@ -2289,21 +2369,55 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             </div>
           </div>
 
-          <div className="mt-8 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <button
-              onClick={() => setTab("resumo")}
-              className="flex items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-left transition-all hover:bg-primary/10 sm:col-span-2"
-            >
-              <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/20 text-primary">
-                <FileText size={20} />
+          {/* Lembretes importantes */}
+          {importantDays.length > 0 && (
+            <div className="rounded-2xl border border-border bg-card p-4 sm:p-5 shadow-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 text-primary">
+                  <Bell size={14} />
+                  <span className="text-[10px] font-bold uppercase tracking-widest">Lembretes importantes</span>
+                </div>
+                <span className="text-[10px] text-muted-foreground">
+                  {importantDays.filter((d) => !state.remindersCompleted?.[d]).length} pendente(s)
+                </span>
               </div>
-              <div className="flex-1">
-                <div className="text-sm font-bold text-primary">Resumo & PDF</div>
-                <div className="text-[10px] text-muted-foreground">Exportar meu progresso</div>
+              <div className="mt-3 space-y-2">
+                {importantDays.slice(0, 4).map((d) => {
+                  const done = !!state.remindersCompleted?.[d];
+                  const meta = getProtocolDay(d);
+                  return (
+                    <div
+                      key={d}
+                      className="flex items-center gap-3 rounded-xl border border-border/60 bg-background p-3"
+                    >
+                      <div className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-primary/[0.06] font-display text-lg text-primary">
+                        {d}
+                      </div>
+                      <button
+                        onClick={() => { setCurrentDay(d, actorId); handleRedirectToPlan(); }}
+                        className="min-w-0 flex-1 text-left"
+                      >
+                        <div className="truncate font-display text-base text-primary">
+                          Dia {d}: {meta.title}
+                        </div>
+                        <div className="text-xs text-muted-foreground">Toque para abrir este dia</div>
+                      </button>
+                      <button
+                        onClick={() => toggleReminder(d, actorId)}
+                        aria-label={done ? "Desmarcar lembrete" : "Marcar lembrete como concluído"}
+                        className={cn(
+                          "grid h-9 w-9 shrink-0 place-items-center rounded-lg transition-all",
+                          done ? "bg-primary text-primary-foreground" : "bg-primary/[0.06] text-primary hover:bg-primary/10"
+                        )}
+                      >
+                        <Check size={16} />
+                      </button>
+                    </div>
+                  );
+                })}
               </div>
-              <ChevronRight size={16} className="text-primary/40" />
-            </button>
-          </div>
+            </div>
+          )}
 
           <div className="group relative overflow-hidden rounded-2xl border border-primary/20 bg-primary/[0.02] p-4 transition-all hover:border-primary/40">
             <div className="flex items-center justify-between">
@@ -2329,6 +2443,21 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
               >
                 <Bell size={14} /> Ativar Notificações Push
               </button>
+              <div className="flex items-center gap-3 rounded-xl border border-primary/15 bg-background p-3">
+                <div className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-primary/[0.06] text-primary">
+                  <Clock size={16} />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs font-bold text-primary">Horário preferido</div>
+                  <div className="text-[10px] text-muted-foreground">Melhor horário para receber o lembrete</div>
+                </div>
+                <input
+                  type="time"
+                  value={reminderTime}
+                  onChange={(e) => updateSettings({ reminderTime: e.target.value }, actorId)}
+                  className="rounded-lg border border-primary/20 bg-background px-2 py-1.5 text-sm font-bold text-primary focus:border-primary focus:outline-none"
+                />
+              </div>
             </div>
           </div>
 
@@ -2336,13 +2465,27 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             Aplique no horário fresco, evite sol forte e não atinja diretamente as flores.
           </InfoCard>
 
-          <div className="mt-6 flex flex-col items-center gap-2">
+          <button
+            onClick={() => setTab("resumo")}
+            className="mt-6 flex w-full items-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-4 text-left transition-all hover:bg-primary/10"
+          >
+            <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/20 text-primary">
+              <FileText size={20} />
+            </div>
+            <div className="flex-1">
+              <div className="text-sm font-bold text-primary">Resumo & PDF</div>
+              <div className="text-[10px] text-muted-foreground">Exportar meu progresso</div>
+            </div>
+            <ChevronRight size={16} className="text-primary/40" />
+          </button>
+
+          <div className="mt-3 flex flex-col items-center gap-2">
             <button
               onClick={handleRedirectToPlan}
               className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-8 py-4 text-sm font-bold text-accent-foreground shadow-lg shadow-accent/20 transition-all hover:brightness-110 active:scale-[0.98]"
             >
-              <Sparkles size={18} />
-              Continuar meu plano
+              <Calendar size={18} />
+              Continuar meu plano · Dia {day}
             </button>
             <span className="text-[10px] font-medium text-muted-foreground text-center">
               Você está no <span className="font-bold text-accent">Dia {day}</span>: {getProtocolDay(day).title}
