@@ -46,7 +46,9 @@ import {
   ArrowRight,
   Share2,
   HelpCircle,
+  CheckSquare,
 } from "lucide-react";
+
 import {
   Accordion,
   AccordionContent,
