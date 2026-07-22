@@ -2021,7 +2021,13 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
       
       {/* Dynamic Tracking Section for current Protocol Participants */}
       {(completedDays > 0 || diagnosisFresh || !!state.plant.name) && (
-        <div className="group relative overflow-hidden rounded-2xl border-2 border-accent/30 bg-gradient-to-br from-accent/[0.04] to-transparent p-5 shadow-sm transition-all hover:border-accent/50">
+        <div className={cn(
+          "group relative overflow-hidden rounded-2xl border-2 p-5 shadow-sm transition-all",
+          [3, 10, 17].includes(day) 
+            ? "border-accent/50 bg-gradient-to-br from-accent/[0.08] to-accent/[0.02]" 
+            : "border-accent/30 bg-gradient-to-br from-accent/[0.04] to-transparent hover:border-accent/50"
+        )}>
+
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <div className="grid h-8 w-8 place-items-center rounded-lg bg-accent text-accent-foreground shadow-sm">
