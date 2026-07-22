@@ -214,3 +214,37 @@
 .high-contrast a:not([class*="rounded"]):hover {
   text-decoration: underline;
 }
+
+/* Garantir que portais Radix (Dialog, Drawer, Sheet, Popover, Tooltip,
+ * DropdownMenu, Toast) herdem os tokens de alto contraste. Radix renderiza
+ * para document.body, então os custom properties cascateiam via <html>,
+ * mas reforçamos aqui overlays translúcidos e badges do diagnóstico. */
+.high-contrast [data-radix-popper-content-wrapper],
+.high-contrast [role="dialog"],
+.high-contrast [role="alertdialog"],
+.high-contrast [data-vaul-drawer],
+.high-contrast [data-sonner-toaster],
+.high-contrast [data-radix-portal] {
+  color: oklch(0.1 0 0) !important;
+}
+
+.high-contrast [data-radix-dialog-overlay],
+.high-contrast [data-vaul-overlay],
+.high-contrast [data-state="open"][class*="overlay"] {
+  background-color: oklch(0 0 0 / 0.75) !important;
+  backdrop-filter: none !important;
+}
+
+/* Badges de diagnóstico e "Dia Crítico" — força contraste sólido */
+.high-contrast [class*="badge"],
+.high-contrast .badge,
+.high-contrast [data-badge] {
+  border-width: 2px !important;
+  font-weight: 600 !important;
+}
+
+/* Estados disabled/muted permanecem legíveis */
+.high-contrast [aria-disabled="true"],
+.high-contrast :disabled {
+  opacity: 0.7 !important;
+}
