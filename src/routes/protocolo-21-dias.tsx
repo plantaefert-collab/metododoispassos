@@ -17,16 +17,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ProtocolDialog } from "@/components/protocol-dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -2824,6 +2815,17 @@ function PlanoTab({ actorId, setTab, onPreviewDay, setStatus }: PlanoTabProps) {
             applicationsForDay={state.applications.filter((a) => a.day === day).length}
             canAdvance={day < 21}
             onCancel={() => setShowCompleteModal(false)}
+            onNextDay={day < 21 ? () => {
+              toggleDayCompleted(day, actorId);
+              playSuccessSound();
+              toast.success(`Dia ${day} concluído! Indo para Dia ${day + 1}...`);
+              setShowCompleteModal(false);
+              setCurrentDay(day + 1, actorId);
+              setTab("plano");
+              requestAnimationFrame(() => {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              });
+            } : undefined}
             onConfirm={(advance) => {
               toggleDayCompleted(day, actorId);
               playSuccessSound();
@@ -3586,17 +3588,15 @@ function ApplicationQuickChecklist({
           );
         })}
       </div>
-      <AlertDialog open={pendingStep !== null} onOpenChange={(o) => { if (!o) setPendingStep(null); }}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar aplicação do Dia {day}?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Esta é uma etapa crítica do protocolo. Confirme apenas se você já realizou este passo agora — a ação registrará seu progresso e não pode ser desfeita automaticamente.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Ainda não</AlertDialogCancel>
-            <AlertDialogAction
+      <ProtocolDialog
+        open={pendingStep !== null}
+        onOpenChange={(o) => { if (!o) setPendingStep(null); }}
+        eyebrow="Aplicação crítica"
+        title={`Confirmar aplicação do Dia ${day}?`}
+        description="Esta é uma etapa crítica do protocolo. Confirme apenas se você já realizou este passo agora — a ação registrará seu progresso e não pode ser desfeita automaticamente."
+        footer={
+          <>
+            <button
               onClick={() => {
                 if (pendingStep) {
                   onToggle(pendingStep);
@@ -3604,12 +3604,19 @@ function ApplicationQuickChecklist({
                 }
                 setPendingStep(null);
               }}
+              className="w-full rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
             >
               Sim, marcar como feito
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+            </button>
+            <button
+              onClick={() => setPendingStep(null)}
+              className="w-full rounded-full border border-border px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+            >
+              Ainda não
+            </button>
+          </>
+        }
+      />
     </motion.div>
   );
 }
@@ -4630,33 +4637,63 @@ function DayCompleteModal({
   canAdvance,
   onCancel,
   onConfirm,
+  onNextDay,
 }: {
   day: number;
   meta: { checklist: string[]; title?: string };
-  entry: { checklist: Record<string, boolean>; note: string; completed: boolean };
+  entry: { checklist: Record<string, boolean>; note: string; completed: boolean; photo?: string | null; photoCaption?: string };
   applicationsForDay: number;
   canAdvance: boolean;
   onCancel: () => void;
   onConfirm: (advance: boolean) => void;
+  onNextDay?: () => void;
 }) {
   const total = meta.checklist.length;
   const done = meta.checklist.filter((i) => entry.checklist[i]).length;
   const noteTrim = entry.note?.trim() ?? "";
+  const photo = entry.photo ?? null;
+  const captionTrim = entry.photoCaption?.trim() ?? "";
   return (
-    <Dialog open onOpenChange={(open) => { if (!open) onCancel(); }}>
-      <DialogContent
-        className="flex max-h-[90dvh] w-[calc(100%-2rem)] max-w-sm flex-col gap-0 overflow-hidden rounded-3xl p-0"
-        style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
-      >
-        <div className="flex-1 overflow-y-auto overscroll-contain p-5">
-          <DialogHeader className="space-y-1 text-left">
-            <div className="text-xs font-bold uppercase tracking-wider text-accent">Resumo do dia</div>
-            <DialogTitle className="font-display text-xl text-primary">Concluir Dia {day}?</DialogTitle>
-            <DialogDescription className="sr-only">
-              Confirme a conclusão do Dia {day} do protocolo.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="mt-4 space-y-2 rounded-2xl border border-border bg-muted/30 p-3 text-sm">
+    <ProtocolDialog
+      open
+      onOpenChange={(open) => { if (!open) onCancel(); }}
+      eyebrow="Resumo do dia"
+      title={`Concluir Dia ${day}?`}
+      description={`Confirme a conclusão do Dia ${day} do protocolo.`}
+      footer={
+        <>
+          {canAdvance && onNextDay && (
+            <button
+              onClick={onNextDay}
+              className="w-full rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
+            >
+              Concluir e ir para Dia {day + 1} →
+            </button>
+          )}
+          {canAdvance && !onNextDay && (
+            <button
+              onClick={() => onConfirm(true)}
+              className="w-full rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
+            >
+              Concluir e avançar para Dia {day + 1}
+            </button>
+          )}
+          <button
+            onClick={() => onConfirm(false)}
+            className="w-full rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground"
+          >
+            {canAdvance ? `Só concluir Dia ${day}` : `Concluir Dia ${day}`}
+          </button>
+          <button
+            onClick={onCancel}
+            className="w-full rounded-full border border-border px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
+          >
+            Cancelar
+          </button>
+        </>
+      }
+    >
+      <div className="mt-4 space-y-2 rounded-2xl border border-border bg-muted/30 p-3 text-sm">
             <div className="flex justify-between">
               <span className="text-muted-foreground">Checklist</span>
               <span className="font-semibold text-foreground">{done}/{total}</span>
@@ -4674,37 +4711,21 @@ function DayCompleteModal({
                 "{noteTrim}"
               </p>
             )}
-          </div>
-          {done < total && (
-            <p className="mt-3 text-xs text-accent">
-              Ainda restam {total - done} item(ns) do checklist. Você pode concluir mesmo assim.
-            </p>
+      </div>
+      {photo && (
+        <div className="mt-3 overflow-hidden rounded-2xl border border-border bg-card">
+          <img src={photo} alt={captionTrim || `Foto do Dia ${day}`} className="h-32 w-full object-cover" />
+          {captionTrim && (
+            <p className="px-3 py-2 text-xs text-muted-foreground line-clamp-2">{captionTrim}</p>
           )}
-          <DialogFooter className="mt-4 flex flex-col gap-2 sm:flex-col sm:space-x-0">
-            {canAdvance && (
-              <button
-                onClick={() => onConfirm(true)}
-                className="w-full rounded-full bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground"
-              >
-                Concluir e avançar para Dia {day + 1}
-              </button>
-            )}
-            <button
-              onClick={() => onConfirm(false)}
-              className="w-full rounded-full bg-accent px-4 py-2.5 text-sm font-semibold text-accent-foreground"
-            >
-              {canAdvance ? `Só concluir Dia ${day}` : `Concluir Dia ${day}`}
-            </button>
-            <button
-              onClick={onCancel}
-              className="w-full rounded-full border border-border px-4 py-2.5 text-sm font-medium text-foreground hover:bg-muted"
-            >
-              Cancelar
-            </button>
-          </DialogFooter>
         </div>
-      </DialogContent>
-    </Dialog>
+      )}
+      {done < total && (
+        <p className="mt-3 text-xs text-accent">
+          Ainda restam {total - done} item(ns) do checklist. Você pode concluir mesmo assim.
+        </p>
+      )}
+    </ProtocolDialog>
   );
 }
 
