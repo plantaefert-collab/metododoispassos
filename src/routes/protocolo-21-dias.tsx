@@ -2714,6 +2714,14 @@ function PlanoTab({ actorId, setTab, onPreviewDay, setStatus }: PlanoTabProps) {
         </button>
       )}
 
+      {[3, 10, 17].includes(day) && (
+        <ApplicationQuickChecklist
+          day={day}
+          entry={entry}
+          onToggle={(item) => toggleChecklist(day, item, actorId)}
+        />
+      )}
+
       <div className="rounded-2xl border border-border bg-card p-5">
         <div className="grid gap-2">
           {meta.checklist.map((item) => {
