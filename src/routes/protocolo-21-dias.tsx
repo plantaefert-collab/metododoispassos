@@ -1811,6 +1811,7 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
 
   // Sistema de Áudio para Notificações Críticas
   const playCriticalSound = () => {
+    if (state.settings?.muteSounds) return;
     try {
       const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
       const oscillator = audioCtx.createOscillator();
