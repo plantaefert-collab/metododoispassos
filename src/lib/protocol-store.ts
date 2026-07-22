@@ -73,6 +73,10 @@ export type ProtocolState = {
   onboarded: boolean;
   tourCompleted?: boolean;
   remindersCompleted?: Record<number, boolean>;
+  settings?: {
+    muteSounds?: boolean;
+    hapticsDisabled?: boolean;
+  };
   /** Non-persisted transient flag set when the last localStorage write failed. */
   saveError?: string;
 };
