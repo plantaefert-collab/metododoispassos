@@ -1809,8 +1809,29 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
     });
     // O foco e scroll serão tratados pelo useEffect na PlanoTab
   };
-
-  const { state, setCurrentDay, toggleReminder } = useProtocolStore();
+  const { state, setCurrentDay, toggleReminder, updateSettings } = useProtocolStore();
+  
+  const playInteractionSound = () => {
+    if (state.settings?.muteSounds) return;
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+      
+      oscillator.type = "sine";
+      oscillator.frequency.setValueAtTime(440, audioCtx.currentTime);
+      gainNode.gain.setValueAtTime(0.05, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+      
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+      
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.1);
+    } catch (e) {
+      console.warn("Audio interaction blocked", e);
+    }
+  };
   const [focusedMode, setFocusedMode] = useState(false);
 
   // Sistema de Áudio para Notificações Críticas
