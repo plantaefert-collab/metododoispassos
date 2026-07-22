@@ -77,6 +77,7 @@ export type ProtocolState = {
     muteSounds?: boolean;
     hapticsDisabled?: boolean;
     focusedMode?: boolean;
+    highContrast?: boolean;
   };
   /** Non-persisted transient flag set when the last localStorage write failed. */
   saveError?: string;
