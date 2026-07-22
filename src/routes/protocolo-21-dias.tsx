@@ -2815,6 +2815,17 @@ function PlanoTab({ actorId, setTab, onPreviewDay, setStatus }: PlanoTabProps) {
             applicationsForDay={state.applications.filter((a) => a.day === day).length}
             canAdvance={day < 21}
             onCancel={() => setShowCompleteModal(false)}
+            onNextDay={day < 21 ? () => {
+              toggleDayCompleted(day, actorId);
+              playSuccessSound();
+              toast.success(`Dia ${day} concluído! Indo para Dia ${day + 1}...`);
+              setShowCompleteModal(false);
+              setCurrentDay(day + 1, actorId);
+              setTab("plano");
+              requestAnimationFrame(() => {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+              });
+            } : undefined}
             onConfirm={(advance) => {
               toggleDayCompleted(day, actorId);
               playSuccessSound();
