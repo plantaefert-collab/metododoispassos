@@ -1723,40 +1723,69 @@ function ResultSection({
           ? "border-primary/20 bg-secondary/40"
           : "border-border bg-card";
   return (
-    <section className={`rounded-2xl border p-4 ${toneCls}`}>
-      <h3 className="text-sm font-semibold text-primary">{title}</h3>
-      <ul className="mt-3 space-y-3">
-        {items.map((g) => (
-          <li key={g.id} className="rounded-xl bg-card/70 p-3 border border-border/60">
-            <div className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              {CATEGORY_LABEL[g.category]} · {g.answer}
-            </div>
-            <div className="mt-1 text-sm font-bold text-primary">{g.title}</div>
-            <p className="mt-1 text-sm text-foreground/85">{g.explanation}</p>
-            <p className="mt-2 text-sm">
-              <span className="font-semibold text-primary">O que fazer: </span>
-              <span className="text-foreground/90">{g.action}</span>
-            </p>
-            {g.avoid && (
-              <p className="mt-1 text-xs text-muted-foreground">
-                <span className="font-semibold">Evite: </span>
-                {g.avoid}
-              </p>
-            )}
-            {g.tracking.length > 0 && (
-              <p className="mt-1 text-xs text-muted-foreground">
-                <span className="font-semibold">Acompanhe: </span>
-                {g.tracking.join(" · ")}
-              </p>
-            )}
-            {g.warning && (
-              <div className="mt-2 flex gap-1.5 rounded-lg bg-accent/10 p-2 text-xs text-accent">
-                <AlertTriangle size={14} className="mt-0.5 shrink-0" />
-                <span>{g.warning}</span>
+    <section className={`rounded-3xl border p-5 shadow-sm transition-all hover:shadow-md ${toneCls}`}>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-sm font-bold uppercase tracking-widest text-primary/80">{title}</h3>
+        <div className={`h-2 w-2 rounded-full animate-pulse ${
+          tone === "warn" ? "bg-accent" : 
+          tone === "accent" ? "bg-primary" : 
+          tone === "green" ? "bg-primary" : "bg-muted-foreground"
+        }`} />
+      </div>
+      <ul className="space-y-4">
+        {items.map((g) => {
+          const isCriticalDay = [3, 10, 17].some(d => CATEGORY_FOCUS_DAYS[g.category]?.includes(d));
+          return (
+            <li key={g.id} className={cn(
+              "group relative overflow-hidden rounded-2xl border bg-card/70 p-4 transition-all hover:border-primary/40",
+              isCriticalDay ? "border-accent/30 ring-1 ring-accent/10" : "border-border/60"
+            )}>
+              {isCriticalDay && (
+                <div className="absolute right-0 top-0 rounded-bl-xl bg-accent/10 px-2 py-1 text-[9px] font-black uppercase tracking-tighter text-accent">
+                  Dia Crítico
+                </div>
+              )}
+              <div className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
+                {CATEGORY_LABEL[g.category]} · {g.answer}
               </div>
-            )}
-          </li>
-        ))}
+              <div className="mt-1 flex items-center gap-2">
+                <div className="text-base font-bold text-primary">{g.title}</div>
+                {isCriticalDay && <Zap size={14} className="text-accent animate-pulse" />}
+              </div>
+              <p className="mt-1.5 text-sm leading-relaxed text-foreground/80">{g.explanation}</p>
+              
+              <div className="mt-4 flex flex-col gap-2.5">
+                <div className="rounded-xl bg-primary/5 p-3 border border-primary/10">
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-primary/60 block mb-1">O que fazer</span>
+                  <span className="text-sm font-medium text-foreground/90">{g.action}</span>
+                </div>
+                
+                {(g.avoid || g.tracking.length > 0 || g.warning) && (
+                  <div className="grid grid-cols-1 gap-2 pt-1">
+                    {g.avoid && (
+                      <div className="flex items-start gap-2 text-xs text-muted-foreground">
+                        <X size={14} className="mt-0.5 shrink-0 text-accent/60" />
+                        <p><span className="font-bold text-foreground/70">Evite:</span> {g.avoid}</p>
+                      </div>
+                    )}
+                    {g.tracking.length > 0 && (
+                      <div className="flex items-start gap-2 text-xs text-muted-foreground">
+                        <Info size={14} className="mt-0.5 shrink-0 text-primary/60" />
+                        <p><span className="font-bold text-foreground/70">Acompanhe:</span> {g.tracking.join(" · ")}</p>
+                      </div>
+                    )}
+                    {g.warning && (
+                      <div className="mt-1 flex gap-2 rounded-xl bg-accent/10 p-2.5 text-xs text-accent border border-accent/20">
+                        <AlertTriangle size={14} className="mt-0.5 shrink-0" />
+                        <span className="font-medium">{g.warning}</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </li>
+          );
+        })}
       </ul>
     </section>
   );
