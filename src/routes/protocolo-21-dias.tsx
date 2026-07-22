@@ -1926,6 +1926,9 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
 
         const showChecklist = hasPlant && diagnosisFresh && !applicationPending && !protocolFinished && !allDone && nextItems.length > 0;
         const progressPct = Math.round(((day - 1) / 21) * 100 + (allDone ? Math.round(100 / 21) : 0));
+        const hasNote = !!today.note?.trim();
+        const showRegistrationShortcut = diagnosisFresh && !allDone && !hasNote;
+
 
         return (
           <div
@@ -2001,6 +2004,28 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
                   )}
                 </div>
               )}
+
+              {showRegistrationShortcut && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRedirectToPlan();
+                    // Pequeno delay para garantir que o scroll aconteça após a troca de aba
+                    setTimeout(() => {
+                      const registerEl = document.querySelector('[data-register-field]');
+                      if (registerEl) registerEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100);
+                  }}
+                  className="mt-3 flex w-full items-center justify-between rounded-xl border border-primary/20 bg-primary/5 px-4 py-2.5 text-[11px] font-bold text-primary transition-all hover:bg-primary/10 active:scale-[0.98]"
+                >
+                  <div className="flex items-center gap-2">
+                    <BookOpen size={14} />
+                    <span>Fazer registro do dia</span>
+                  </div>
+                  <ChevronRight size={14} className="opacity-40" />
+                </button>
+              )}
+
 
               <button
                 onClick={(e) => { e.stopPropagation(); ctx.cta.onClick(); }}
@@ -2977,7 +3002,8 @@ function RegisterField({
   }, []);
 
   return (
-    <div className="mt-4 space-y-2">
+    <div className="mt-4 space-y-2" data-register-field>
+
       <div className="flex items-center justify-between gap-2">
         <label htmlFor={inputId} className="block text-[13px] font-semibold text-primary">
           {label}
