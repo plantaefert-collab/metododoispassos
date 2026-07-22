@@ -1832,8 +1832,9 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
   const totalNotes = Object.values(state.days).filter((d) => d.note?.trim()).length;
   const totalPhotos = Object.values(state.days).filter((d) => d.photo).length;
 
-  const reminderDays = [1, 7, 14, 21];
+  const reminderDays = [1, 3, 7, 10, 14, 17, 21];
   const upcomingReminders = reminderDays.filter(d => d >= day && !state.remindersCompleted?.[d]);
+
 
   return (
     <div className="space-y-4">
@@ -1902,12 +1903,16 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             cta: { label: "Ver resumo", icon: <Calendar size={16} />, onClick: () => setTab("resumo") },
           };
         } else if (applicationPending) {
+          const isCriticalApplication = [3, 10, 17].includes(day);
           ctx = {
-            eyebrow: `Dia ${day} · Aplicação`,
+            eyebrow: `Dia ${day} · ${isCriticalApplication ? "⚠️ APLICAÇÃO CRÍTICA" : "Aplicação"}`,
             title: meta.title,
-            desc: "Hoje é dia de aplicar o Método de 2 Passos. Registre para não perder o próximo ciclo.",
-            cta: { label: "Abrir dia " + day, icon: <ChevronRight size={16} />, onClick: handleRedirectToPlan },
+            desc: isCriticalApplication 
+              ? "⚠️ HOJE É O DIA! Não pule esta aplicação para garantir o resultado do protocolo."
+              : "Hoje é dia de aplicar o Método de 2 Passos. Registre para não perder o próximo ciclo.",
+            cta: { label: `Fazer aplicação agora (Dia ${day})`, icon: <ChevronRight size={16} />, onClick: handleRedirectToPlan },
           };
+
         } else if (allDone && day < 21) {
           ctx = {
             eyebrow: `Dia ${day} · Concluído`,
@@ -1939,8 +1944,11 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             className={cn(
               "group relative w-full cursor-pointer overflow-hidden rounded-2xl border-2 p-5 text-left shadow-sm transition-all active:scale-[0.99]",
               isApplicationDay 
-                ? "border-accent/40 bg-gradient-to-br from-accent/10 via-accent/5 to-transparent shadow-lg shadow-accent/5 ring-1 ring-accent/20" 
+                ? [3, 10, 17].includes(day)
+                  ? "border-accent bg-gradient-to-br from-accent/20 via-accent/10 to-transparent shadow-xl shadow-accent/10 ring-2 ring-accent animate-[pulse_3s_ease-in-out_infinite]"
+                  : "border-accent/40 bg-gradient-to-br from-accent/10 via-accent/5 to-transparent shadow-lg shadow-accent/5 ring-1 ring-accent/20" 
                 : "border-accent/30 bg-gradient-to-br from-accent/[0.06] to-primary/[0.04] hover:border-accent/50"
+
             )}
           >
             {isApplicationDay && (
