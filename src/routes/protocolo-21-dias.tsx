@@ -1807,6 +1807,32 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
   const { state, setCurrentDay, toggleReminder } = useProtocolStore();
   const [focusedMode, setFocusedMode] = useState(false);
 
+  // Sistema de Áudio para Notificações Críticas
+  const playCriticalSound = () => {
+    try {
+      const audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const oscillator = audioCtx.createOscillator();
+      const gainNode = audioCtx.createGain();
+
+      // Som mais "premium" e alerta: dois bips em harmonia
+      oscillator.type = 'sine';
+      oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
+      oscillator.frequency.exponentialRampToValueAtTime(440, audioCtx.currentTime + 0.5); // A4
+      
+      gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
+
+      oscillator.connect(gainNode);
+      gainNode.connect(audioCtx.destination);
+
+      oscillator.start();
+      oscillator.stop(audioCtx.currentTime + 0.5);
+    } catch (e) {
+      console.warn("Audio context not supported or blocked", e);
+    }
+  };
+
+
 
 
   // Foco do dia = fonte única compartilhada (Início, Minha Orquídea, Plano).
@@ -1939,8 +1965,21 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
           <div
             role="button"
             tabIndex={0}
-            onClick={ctx.cta.onClick}
-            onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") ctx.cta.onClick(); }}
+            onClick={() => {
+              if ([3, 10, 17].includes(day) && !state.days[day]?.applicationDone) {
+                playCriticalSound();
+              }
+              ctx.cta.onClick();
+            }}
+            onKeyDown={(e) => { 
+              if (e.key === "Enter" || e.key === " ") {
+                if ([3, 10, 17].includes(day) && !state.days[day]?.applicationDone) {
+                  playCriticalSound();
+                }
+                ctx.cta.onClick(); 
+              }
+            }}
+
             className={cn(
               "group relative w-full cursor-pointer overflow-hidden rounded-2xl border-2 p-5 text-left shadow-sm transition-all active:scale-[0.99]",
               isApplicationDay 
@@ -2036,9 +2075,16 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
 
 
               <button
-                onClick={(e) => { e.stopPropagation(); ctx.cta.onClick(); }}
+                onClick={(e) => { 
+                  e.stopPropagation(); 
+                  if ([3, 10, 17].includes(day) && !state.days[day]?.applicationDone) {
+                    playCriticalSound();
+                  }
+                  ctx.cta.onClick(); 
+                }}
                 className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-bold text-accent-foreground shadow-sm transition-all hover:brightness-110 active:scale-[0.98]"
               >
+
                 {ctx.cta.icon}
                 {ctx.cta.label}
               </button>
