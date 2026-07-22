@@ -3660,6 +3660,89 @@ function DiagnosticoTab({ actorId, onRedo, setTab }: { actorId: string; onRedo: 
 
 /* ---------------- Diário ---------------- */
 
+function DayPhotoField({
+  day,
+  photo,
+  caption,
+  actorId,
+  onPhoto,
+  onCaption,
+}: {
+  day: number;
+  photo: string | null;
+  caption: string;
+  actorId: string;
+  onPhoto: (photo: string | null) => void;
+  onCaption: (caption: string) => void;
+}) {
+  const [busy, setBusy] = useState(false);
+  const handleUpload = async (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setBusy(true);
+    try {
+      const url = await uploadOrEncodePhoto(file, actorId);
+      onPhoto(url);
+    } catch {
+      alert(PHOTO_ERROR_MESSAGE);
+    } finally {
+      setBusy(false);
+      e.target.value = "";
+    }
+  };
+  return (
+    <div className="mt-4 rounded-2xl border border-border bg-muted/30 p-3">
+      <div className="flex items-center justify-between">
+        <div className="text-xs font-bold uppercase tracking-wider text-accent">
+          Foto do Dia {day}
+        </div>
+        {photo && (
+          <button
+            type="button"
+            onClick={() => onPhoto(null)}
+            className="text-[11px] font-semibold text-muted-foreground hover:text-destructive"
+          >
+            Remover
+          </button>
+        )}
+      </div>
+      <label className="mt-2 block cursor-pointer">
+        {photo ? (
+          <img
+            src={photo}
+            alt={`Foto do dia ${day}`}
+            className="h-48 w-full rounded-xl object-cover"
+          />
+        ) : (
+          <div className="grid h-32 place-items-center rounded-xl border-2 border-dashed border-border bg-card text-center">
+            <div className="flex flex-col items-center gap-1 text-muted-foreground">
+              <Camera size={20} />
+              <span className="text-xs font-medium">
+                {busy ? "Enviando..." : "Anexar foto"}
+              </span>
+            </div>
+          </div>
+        )}
+        <input
+          type="file"
+          accept="image/*"
+          className="sr-only"
+          onChange={handleUpload}
+          disabled={busy}
+        />
+      </label>
+      {photo && (
+        <input
+          value={caption}
+          onChange={(e) => onCaption(e.target.value)}
+          placeholder="Legenda (opcional)"
+          className="mt-2 w-full rounded-xl border border-input bg-card px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+        />
+      )}
+    </div>
+  );
+}
+
 function DiarioTab({ actorId }: { actorId: string }) {
   const { state, updateDay } = useProtocolStore();
 
