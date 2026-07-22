@@ -1832,8 +1832,9 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
   const totalNotes = Object.values(state.days).filter((d) => d.note?.trim()).length;
   const totalPhotos = Object.values(state.days).filter((d) => d.photo).length;
 
-  const reminderDays = [1, 7, 14, 21];
+  const reminderDays = [1, 3, 7, 10, 14, 17, 21];
   const upcomingReminders = reminderDays.filter(d => d >= day && !state.remindersCompleted?.[d]);
+
 
   return (
     <div className="space-y-4">
