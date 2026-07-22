@@ -1953,9 +1953,10 @@ function InicioTab({ actorId, setTab, setStatus }: { actorId: string; setTab: (t
             eyebrow: `Próximo passo · Dia ${day}`,
             title: meta.title,
             desc: meta.mainAction,
-            cta: { label: `Continuar dia ${day}`, icon: <ChevronRight size={16} />, onClick: handleRedirectToPlan },
+            cta: { label: `Focar no dia ${day}`, icon: <Sparkles size={16} />, onClick: handleRedirectToPlan },
           };
         }
+
 
         const showChecklist = hasPlant && diagnosisFresh && !applicationPending && !protocolFinished && !allDone && nextItems.length > 0;
         const progressPct = Math.round(((day - 1) / 21) * 100 + (allDone ? Math.round(100 / 21) : 0));
